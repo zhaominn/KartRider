@@ -1,0 +1,82 @@
+# Blender 4.2.3 LTS MTL File: 'None'
+# www.blender.org
+
+newmtl booster_tex
+Ns 63.117920
+Ka 0.500000 0.500000 0.500000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+map_Kd C:/Users/somin/OneDrive/KartRider/asset/car/KRONOS_3D/kronos_texture/unreal_tex/kronos_booster_tex_booster_tex_BaseColor.<UDIM>.png
+
+newmtl display_sq
+Ns 63.117920
+Ka 0.500000 0.500000 0.500000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+map_Kd C:/Users/somin/OneDrive/KartRider/asset/car/KRONOS_3D/kronos_texture/display_sq/display_sq.jpg
+
+newmtl headlight_alltex
+Ns 63.117920
+Ka 0.500000 0.500000 0.500000
+Kd 0.500000 0.500000 0.500000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+
+newmtl headlight_glass
+Ns 63.117920
+Ka 0.500000 0.500000 0.500000
+Kd 0.500000 0.500000 0.500000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 0.357143
+illum 6
+
+newmtl kronos_main_tex
+Ns 410.014435
+Ka 0.692727 0.692727 0.692727
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+map_Kd C:/Users/somin/OneDrive/KartRider/asset/car/KRONOS_3D/kronos_texture/unreal_tex/new_kronos_tex2_kronos_main_tex_BaseColor.<UDIM>.png
+
+newmtl kronos_tire
+Ns 148.252075
+Ka 0.500000 0.500000 0.500000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+map_Kd C:/Users/somin/OneDrive/KartRider/asset/car/KRONOS_3D/kronos_texture/unreal_tex/kronos_tire_kronos_tire_BaseColor.<UDIM>.png
+
+newmtl nt_d_tex
+Ns 63.117920
+Ka 0.500000 0.500000 0.500000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+map_Kd C:/Users/somin/OneDrive/KartRider/asset/car/KRONOS_3D/kronos_texture/unreal_tex/new_kronos_tex2_nt_d_tex_BaseColor.<UDIM>.png
+
+newmtl steer_monitor_frame
+Ns 63.117920
+Ka 0.500000 0.500000 0.500000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+map_Kd C:/Users/somin/OneDrive/KartRider/asset/car/KRONOS_3D/kronos_texture/unreal_tex/new_kronos_tex2_steer_monitor_frame_BaseColor.<UDIM>.png
