@@ -1,0 +1,116 @@
+﻿  Building Custom Rule C:/Mac/Home/Documents/bullet3/src/BulletCollision/CMakeLists.txt
+C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppCommon.targets(254,5): warning MSB8064: "C:\Mac\Home\Documents\bullet3\src\BulletCollision\CMakeLists.txt" 항목에 대한 사용자 지정 빌드에 성공했지만 지정한 종속성 "c:\mac\home\documents\bullet3\src\bulletcollision\cmakelists.txt"이(가) 없습니다. 이 오류로 인해 증분 빌드가 제대로 작동하지 않을 수 있습니다.
+C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppCommon.targets(254,5): warning MSB8065: "C:\Mac\Home\Documents\bullet3\src\BulletCollision\CMakeLists.txt" 항목에 대한 사용자 지정 빌드에 성공했지만 지정한 출력 "c:\mac\home\documents\bullet3\build\src\bulletcollision\cmakefiles\generate.stamp"이(가) 생성되지 않았습니다. 이 오류로 인해 증분 빌드가 제대로 작동하지 않을 수 있습니다.
+  btAxisSweep3.cpp
+  btBroadphaseProxy.cpp
+  btCollisionAlgorithm.cpp
+  btDbvt.cpp
+  btDbvtBroadphase.cpp
+  btDispatcher.cpp
+  btOverlappingPairCache.cpp
+  btQuantizedBvh.cpp
+  btSimpleBroadphase.cpp
+  btActivatingCollisionAlgorithm.cpp
+  btBoxBoxCollisionAlgorithm.cpp
+  btBox2dBox2dCollisionAlgorithm.cpp
+  btBoxBoxDetector.cpp
+  btCollisionDispatcher.cpp
+  btCollisionDispatcherMt.cpp
+  btCollisionObject.cpp
+  btCollisionWorld.cpp
+  btCollisionWorldImporter.cpp
+  btCompoundCollisionAlgorithm.cpp
+  btCompoundCompoundCollisionAlgorithm.cpp
+  코드를 생성하고 있습니다...
+  컴파일하고 있습니다...
+  btConvexConcaveCollisionAlgorithm.cpp
+  btConvexConvexAlgorithm.cpp
+  btConvexPlaneCollisionAlgorithm.cpp
+  btConvex2dConvex2dAlgorithm.cpp
+  btDefaultCollisionConfiguration.cpp
+  btEmptyCollisionAlgorithm.cpp
+  btGhostObject.cpp
+  btHashedSimplePairCache.cpp
+  btInternalEdgeUtility.cpp
+  btManifoldResult.cpp
+  btSimulationIslandManager.cpp
+  btSphereBoxCollisionAlgorithm.cpp
+  btSphereSphereCollisionAlgorithm.cpp
+  btSphereTriangleCollisionAlgorithm.cpp
+  btUnionFind.cpp
+  SphereTriangleDetector.cpp
+  btBoxShape.cpp
+  btBox2dShape.cpp
+  btBvhTriangleMeshShape.cpp
+  btCapsuleShape.cpp
+  코드를 생성하고 있습니다...
+  컴파일하고 있습니다...
+  btCollisionShape.cpp
+  btCompoundShape.cpp
+  btConcaveShape.cpp
+  btConeShape.cpp
+  btConvexHullShape.cpp
+  btConvexInternalShape.cpp
+  btConvexPointCloudShape.cpp
+  btConvexPolyhedron.cpp
+  btConvexShape.cpp
+  btConvex2dShape.cpp
+  btConvexTriangleMeshShape.cpp
+  btCylinderShape.cpp
+  btEmptyShape.cpp
+  btHeightfieldTerrainShape.cpp
+  btMiniSDF.cpp
+  btMinkowskiSumShape.cpp
+  btMultimaterialTriangleMeshShape.cpp
+  btMultiSphereShape.cpp
+  btOptimizedBvh.cpp
+  btPolyhedralConvexShape.cpp
+  코드를 생성하고 있습니다...
+  컴파일하고 있습니다...
+  btScaledBvhTriangleMeshShape.cpp
+  btSdfCollisionShape.cpp
+  btShapeHull.cpp
+  btSphereShape.cpp
+  btStaticPlaneShape.cpp
+  btStridingMeshInterface.cpp
+  btTetrahedronShape.cpp
+  btTriangleBuffer.cpp
+  btTriangleCallback.cpp
+  btTriangleIndexVertexArray.cpp
+  btTriangleIndexVertexMaterialArray.cpp
+  btTriangleMesh.cpp
+  btTriangleMeshShape.cpp
+  btUniformScalingShape.cpp
+  btContactProcessing.cpp
+  btGenericPoolAllocator.cpp
+  btGImpactBvh.cpp
+  btGImpactCollisionAlgorithm.cpp
+C:\Mac\Home\Documents\bullet3\src\BulletCollision\Gimpact\btGImpactShape.h(1,1): warning C4819: 현재 코드 페이지(949)에서 표시할 수 없는 문자가 파일에 들어 있습니다. 데이터가 손실되지 않게 하려면 해당 파일을 유니코드 형식으로 저장하십시오.
+  (소스 파일 '../../../src/BulletCollision/Gimpact/btGImpactCollisionAlgorithm.cpp'을(를) 컴파일하는 중)
+  
+  btGImpactQuantizedBvh.cpp
+  btGImpactShape.cpp
+C:\Mac\Home\Documents\bullet3\src\BulletCollision\Gimpact\btGImpactShape.h(1,1): warning C4819: 현재 코드 페이지(949)에서 표시할 수 없는 문자가 파일에 들어 있습니다. 데이터가 손실되지 않게 하려면 해당 파일을 유니코드 형식으로 저장하십시오.
+  (소스 파일 '../../../src/BulletCollision/Gimpact/btGImpactShape.cpp'을(를) 컴파일하는 중)
+  
+  코드를 생성하고 있습니다...
+  컴파일하고 있습니다...
+  btTriangleShapeEx.cpp
+  gim_box_set.cpp
+  gim_contact.cpp
+  gim_memory.cpp
+  gim_tri_collision.cpp
+  btContinuousConvexCollision.cpp
+  btConvexCast.cpp
+  btGjkConvexCast.cpp
+  btGjkEpa2.cpp
+  btGjkEpaPenetrationDepthSolver.cpp
+  btGjkPairDetector.cpp
+  btMinkowskiPenetrationDepthSolver.cpp
+  btPersistentManifold.cpp
+  btRaycastCallback.cpp
+  btSubSimplexConvexCast.cpp
+  btVoronoiSimplexSolver.cpp
+  btPolyhedralContactClipping.cpp
+  코드를 생성하고 있습니다...
+  BulletCollision.vcxproj -> C:\Mac\Home\Documents\bullet3\build\lib\Debug\BulletCollision_Debug.lib

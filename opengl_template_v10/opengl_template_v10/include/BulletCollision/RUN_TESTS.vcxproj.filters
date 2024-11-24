@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Mac\Home\Documents\bullet3\build\CMakeFiles\89d20dc6304cecb446c7997002562efc\RUN_TESTS_force.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{0C4DDF78-D096-3130-88AB-081F1BCFDBB3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

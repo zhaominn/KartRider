@@ -1,0 +1,8 @@
+﻿  Building Custom Rule C:/Mac/Home/Documents/bullet3/src/Bullet3Common/CMakeLists.txt
+C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppCommon.targets(254,5): warning MSB8064: "C:\Mac\Home\Documents\bullet3\src\Bullet3Common\CMakeLists.txt" 항목에 대한 사용자 지정 빌드에 성공했지만 지정한 종속성 "c:\mac\home\documents\bullet3\src\bullet3common\cmakelists.txt"이(가) 없습니다. 이 오류로 인해 증분 빌드가 제대로 작동하지 않을 수 있습니다.
+C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppCommon.targets(254,5): warning MSB8065: "C:\Mac\Home\Documents\bullet3\src\Bullet3Common\CMakeLists.txt" 항목에 대한 사용자 지정 빌드에 성공했지만 지정한 출력 "c:\mac\home\documents\bullet3\build\src\bullet3common\cmakefiles\generate.stamp"이(가) 생성되지 않았습니다. 이 오류로 인해 증분 빌드가 제대로 작동하지 않을 수 있습니다.
+  b3AlignedAllocator.cpp
+  b3Vector3.cpp
+  b3Logging.cpp
+  코드를 생성하고 있습니다...
+  Bullet3Common.vcxproj -> C:\Mac\Home\Documents\bullet3\build\lib\Debug\Bullet3Common_Debug.lib

@@ -1,0 +1,36 @@
+﻿  Building Custom Rule C:/Mac/Home/Documents/bullet3/src/Bullet3OpenCL/CMakeLists.txt
+C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppCommon.targets(254,5): warning MSB8064: "C:\Mac\Home\Documents\bullet3\src\Bullet3OpenCL\CMakeLists.txt" 항목에 대한 사용자 지정 빌드에 성공했지만 지정한 종속성 "c:\mac\home\documents\bullet3\src\bullet3opencl\cmakelists.txt"이(가) 없습니다. 이 오류로 인해 증분 빌드가 제대로 작동하지 않을 수 있습니다.
+C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppCommon.targets(254,5): warning MSB8065: "C:\Mac\Home\Documents\bullet3\src\Bullet3OpenCL\CMakeLists.txt" 항목에 대한 사용자 지정 빌드에 성공했지만 지정한 출력 "c:\mac\home\documents\bullet3\build\src\bullet3opencl\cmakefiles\generate.stamp"이(가) 생성되지 않았습니다. 이 오류로 인해 증분 빌드가 제대로 작동하지 않을 수 있습니다.
+  clew.c
+  b3GpuGridBroadphase.cpp
+  b3GpuSapBroadphase.cpp
+  b3GpuParallelLinearBvhBroadphase.cpp
+  b3GpuParallelLinearBvh.cpp
+  b3OpenCLUtils.cpp
+  b3ContactCache.cpp
+  b3ConvexHullContact.cpp
+  b3GjkEpa.cpp
+  b3OptimizedBvh.cpp
+  b3QuantizedBvh.cpp
+  b3StridingMeshInterface.cpp
+  b3TriangleCallback.cpp
+  b3TriangleIndexVertexArray.cpp
+  b3VoronoiSimplexSolver.cpp
+  b3BoundSearchCL.cpp
+  b3FillCL.cpp
+  b3LauncherCL.cpp
+  b3PrefixScanCL.cpp
+  b3PrefixScanFloat4CL.cpp
+  b3RadixSort32CL.cpp
+  코드를 생성하고 있습니다...
+  컴파일하고 있습니다...
+  b3GpuRaycast.cpp
+  b3GpuGenericConstraint.cpp
+  b3GpuJacobiContactSolver.cpp
+  b3GpuNarrowPhase.cpp
+  b3GpuPgsConstraintSolver.cpp
+  b3GpuPgsContactSolver.cpp
+  b3GpuRigidBodyPipeline.cpp
+  b3Solver.cpp
+  코드를 생성하고 있습니다...
+  Bullet3OpenCL_clew.vcxproj -> C:\Mac\Home\Documents\bullet3\build\lib\Debug\Bullet3OpenCL_clew_Debug.lib
