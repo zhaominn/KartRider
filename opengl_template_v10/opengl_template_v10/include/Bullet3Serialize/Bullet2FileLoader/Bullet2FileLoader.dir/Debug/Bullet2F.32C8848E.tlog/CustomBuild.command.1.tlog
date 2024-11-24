@@ -1,0 +1,10 @@
+^C:\MAC\HOME\DOCUMENTS\BULLET3\SRC\BULLET3SERIALIZE\BULLET2FILELOADER\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Mac/Home/Documents/bullet3 -BC:/Mac/Home/Documents/bullet3/build --check-stamp-file C:/Mac/Home/Documents/bullet3/build/src/Bullet3Serialize/Bullet2FileLoader/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
