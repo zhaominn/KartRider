@@ -1,0 +1,15 @@
+# Blender 3.6.14 MTL File: 'Simple Wood Box.blend'
+# www.blender.org
+
+newmtl Woods
+Ka 1.000000 1.000000 1.000000
+Kd 0.500000 0.500000 0.500000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Ns Woods_Roughness.png
+map_refl Woods_Metallic.png
+map_Bump -bm 1.000000 Woods_Normal.png
+map_Kd Woods_BaseColor.png
