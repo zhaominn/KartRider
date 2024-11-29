@@ -41,27 +41,56 @@ void debug_model(const Model* model) {
     }
 }
 
-// 디버깅: Material 객체 내부 데이터 출력
-void debug_material(const Material& material) {
-    std::cout << "\nMaterial Debug Info:" << std::endl;
-    std::cout << "Ambient Color (Ka): (" << material.Ka.x << ", " << material.Ka.y << ", " << material.Ka.z << ")" << std::endl;
-    std::cout << "Diffuse Color (Kd): (" << material.Kd.x << ", " << material.Kd.y << ", " << material.Kd.z << ")" << std::endl;
-    std::cout << "Specular Color (Ks): (" << material.Ks.x << ", " << material.Ks.y << ", " << material.Ks.z << ")" << std::endl;
-    std::cout << "Shininess (Ns): " << material.Ns << std::endl;
+// 디버깅: std::unordered_map<std::string, Material> 전체 데이터 출력
+void debug_materials(const std::unordered_map<std::string, Material>& materials) {
+    std::cout << "\nMaterials Debug Info:" << std::endl;
 
-    std::cout << "Textures:" << std::endl;
-    if (!material.map_Ka.empty()) {
-        std::cout << "  Ambient Texture: " << material.map_Ka
-            << " (ID: " << material.ambientTextureID << ")" << std::endl;
-    }
-    if (!material.map_Kd.empty()) {
-        std::cout << "  Diffuse Texture: " << material.map_Kd
-            << " (ID: " << material.diffuseTextureID << ")" << std::endl;
-    }
-    if (!material.map_Ks.empty()) {
-        std::cout << "  Specular Texture: " << material.map_Ks
-            << " (ID: " << material.specularTextureID << ")" << std::endl;
+    if (materials.empty()) {
+        std::cout << "No materials found!" << std::endl;
+        return;
     }
 
-    std::cout << "Has Texture: " << (material.hasTexture ? "Yes" : "No") << std::endl;
+    // 각 Material 정보 출력
+    for (const auto& [materialName, material] : materials) {
+        std::cout << "\nMaterial Name: " << materialName << std::endl;
+
+        std::cout << "  Ambient Color (Ka): (" << material.Ka.x << ", " << material.Ka.y << ", " << material.Ka.z << ")" << std::endl;
+        std::cout << "  Diffuse Color (Kd): (" << material.Kd.x << ", " << material.Kd.y << ", " << material.Kd.z << ")" << std::endl;
+        std::cout << "  Specular Color (Ks): (" << material.Ks.x << ", " << material.Ks.y << ", " << material.Ks.z << ")" << std::endl;
+        std::cout << "  Shininess (Ns): " << material.Ns << std::endl;
+
+        // 텍스처 정보 출력
+        std::cout << "  Textures:" << std::endl;
+
+        if (!material.map_Ka.empty()) {
+            std::cout << "    Ambient Texture: " << material.map_Ka
+                << " (ID: " << material.ambientTextureID << ")" << std::endl;
+        }
+        if (!material.map_Kd.empty()) {
+            std::cout << "    Diffuse Texture: " << material.map_Kd
+                << " (ID: " << material.diffuseTextureID << ")" << std::endl;
+        }
+        if (!material.map_Ks.empty()) {
+            std::cout << "    Specular Texture: " << material.map_Ks
+                << " (ID: " << material.specularTextureID << ")" << std::endl;
+        }
+
+        std::cout << "  Has Texture: " << (material.hasTexture_s ? "Yes" : "No") << std::endl;
+
+        // 추가 디버깅: textures 벡터 내 상세 정보 출력
+        if (!material.textures.empty()) {
+            std::cout << "  Texture List:" << std::endl;
+            for (size_t i = 0; i < material.textures.size(); ++i) {
+                const auto& texture = material.textures[i];
+                std::cout << "    [" << i << "] Type: " << texture.type
+                    << ", Path: " << texture.path
+                    << ", ID: " << texture.id << std::endl;
+            }
+        }
+        else {
+            std::cout << "    No textures associated with this material." << std::endl;
+        }
+    }
+
+    std::cout << "\nTotal Materials: " << materials.size() << std::endl;
 }

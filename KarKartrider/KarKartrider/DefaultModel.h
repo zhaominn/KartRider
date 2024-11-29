@@ -53,57 +53,72 @@ public:
         if (this->model_status) {
             // VAO 바인딩
             glBindVertexArray(this->vao);
-            glLineWidth(1.0f);
 
-            // 텍스처가 있는 경우
-            if (this->material.hasTexture) {
-                // Environment Texture (map_Ka)
-                if (material.ambientTextureID != 0) {
-                    glActiveTexture(GL_TEXTURE0);
-                    glBindTexture(GL_TEXTURE_2D, material.ambientTextureID);
-                    glUniform1i(glGetUniformLocation(shaderProgramID, "map_Ka"), 0);
-                    glUniform1i(glGetUniformLocation(shaderProgramID, "hasKaTexture"), 1);
+            // 텍스처별로 렌더링 수행
+            for (const auto& [materialName, ebo] : this->textureEBOs) {
+                // 현재 재질을 가져옴
+                auto it = this->materials.find(materialName);
+                if (it == this->materials.end()) {
+                    std::cout << "No material found for: " << materialName << std::endl;
+                    continue;  // 해당 재질이 없으면 건너뜀
+                }
+                const Material& material = it->second;
+
+                // **텍스처 바인딩**
+                bool textureBound = false;
+                for (const auto& texture : material.textures) {
+                    if (texture.type == "diffuse") {
+                        glActiveTexture(GL_TEXTURE0);
+                        glBindTexture(GL_TEXTURE_2D, texture.id);
+                        glUniform1i(glGetUniformLocation(shaderProgramID, "map_Kd"), 0);
+                        glUniform1i(glGetUniformLocation(shaderProgramID, "hasKdTexture"), 1);
+                        textureBound = true;
+                    }
+                    else if (texture.type == "ambient") {
+                        glActiveTexture(GL_TEXTURE1);
+                        glBindTexture(GL_TEXTURE_2D, texture.id);
+                        glUniform1i(glGetUniformLocation(shaderProgramID, "map_Ka"), 1);
+                        glUniform1i(glGetUniformLocation(shaderProgramID, "hasKaTexture"), 1);
+                        textureBound = true;
+                    }
+                    else if (texture.type == "specular") {
+                        glActiveTexture(GL_TEXTURE2);
+                        glBindTexture(GL_TEXTURE_2D, texture.id);
+                        glUniform1i(glGetUniformLocation(shaderProgramID, "map_Ks"), 2);
+                        glUniform1i(glGetUniformLocation(shaderProgramID, "hasKsTexture"), 1);
+                        textureBound = true;
+                    }
+                }
+
+                // 텍스처가 없으면 기본 재질 색상 설정
+                if (!textureBound) {
+                    glUniform1i(glGetUniformLocation(shaderProgramID, "hasTexture"), 0);
+
+                    GLint KaLoc = glGetUniformLocation(shaderProgramID, "Ka");
+                    GLint KdLoc = glGetUniformLocation(shaderProgramID, "Kd");
+                    GLint KsLoc = glGetUniformLocation(shaderProgramID, "Ks");
+                    GLint NsLoc = glGetUniformLocation(shaderProgramID, "Ns");
+
+                    glUniform3fv(KaLoc, 1, glm::value_ptr(material.Ka));
+                    glUniform3fv(KdLoc, 1, glm::value_ptr(material.Kd));
+                    glUniform3fv(KsLoc, 1, glm::value_ptr(material.Ks));
+                    glUniform1f(NsLoc, material.Ns);
+                }
+
+                // EBO 바인딩
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+
+                // 텍스처에 해당하는 Face 데이터 렌더링
+                glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(textureGroups[materialName].size()), GL_UNSIGNED_INT, 0);
+
+                // 렌더링 모드 (1번 키로 와이어프레임 전환)
+                if (isKeyPressed_s('1')) {
+                    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
                 }
                 else {
-                    glUniform1i(glGetUniformLocation(shaderProgramID, "hasKaTexture"), 0);
+                    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
                 }
 
-                // Diffuse Texture (map_Kd)
-                if (material.diffuseTextureID != 0) {
-                    glActiveTexture(GL_TEXTURE1);
-                    glBindTexture(GL_TEXTURE_2D, material.diffuseTextureID);
-                    glUniform1i(glGetUniformLocation(shaderProgramID, "map_Kd"), 1);
-                    glUniform1i(glGetUniformLocation(shaderProgramID, "hasKdTexture"), 1);
-                }
-                else {
-                    glUniform1i(glGetUniformLocation(shaderProgramID, "hasKdTexture"), 0);
-                }
-
-                // Specular Texture (map_Ks)
-                if (material.specularTextureID != 0) {
-                    glActiveTexture(GL_TEXTURE2);
-                    glBindTexture(GL_TEXTURE_2D, material.specularTextureID);
-                    glUniform1i(glGetUniformLocation(shaderProgramID, "map_Ks"), 2);
-                    glUniform1i(glGetUniformLocation(shaderProgramID, "hasKsTexture"), 1);
-                }
-                else {
-                    glUniform1i(glGetUniformLocation(shaderProgramID, "hasKsTexture"), 0);
-                }
-            }
-            // 텍스처가 없는 경우 기본 재질 속성만 사용
-            else {
-                glUniform1i(glGetUniformLocation(shaderProgramID, "hasTexture"), 0);
-
-                // 기본 재질 속성 전달
-                GLint KaLoc = glGetUniformLocation(shaderProgramID, "Ka");
-                GLint KdLoc = glGetUniformLocation(shaderProgramID, "Kd");
-                GLint KsLoc = glGetUniformLocation(shaderProgramID, "Ks");
-                GLint NsLoc = glGetUniformLocation(shaderProgramID, "Ns");
-
-                glUniform3fv(KaLoc, 1, glm::value_ptr(this->material.Ka));
-                glUniform3fv(KdLoc, 1, glm::value_ptr(this->material.Kd));
-                glUniform3fv(KsLoc, 1, glm::value_ptr(this->material.Ks));
-                glUniform1f(NsLoc, this->material.Ns);
             }
 
             // 모델 매트릭스와 법선 매트릭스 전달
@@ -113,19 +128,8 @@ public:
 
             glUniform1i(modelStatus, 0);
 
-            // 렌더링 모드 (1번 키로 와이어프레임 전환)
-            if (isKeyPressed_s('1')) {
-                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-            }
-            else {
-                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-            }
-
-            // 삼각형 렌더링
-            glDrawElements(GL_TRIANGLES, this->faces.size() * 3, GL_UNSIGNED_INT, 0);
-
             // OpenGL 상태 초기화
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // 렌더링 모드 초기화
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);  // 렌더링 모드 초기화
 
             // 텍스처 상태 초기화
             glActiveTexture(GL_TEXTURE0);
@@ -136,12 +140,10 @@ public:
             glBindTexture(GL_TEXTURE_2D, 0);
 
             // VAO 바인딩 해제
-            
-            
-            
-            (0);
+            glBindVertexArray(0);
         }
     }
+
 
 
     const void draw_rigidBody(GLuint shaderProgramID) override {
@@ -155,16 +157,21 @@ public:
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
 
-        // Step 2: 복합 인덱스를 단일화된 정점 데이터로 변환
         std::unordered_map<std::tuple<unsigned int, unsigned int, unsigned int>, unsigned int, TupleHash> uniqueVertices;
         std::vector<glm::vec3> vertexBuffer;   // 위치 데이터
         std::vector<glm::vec3> normalBuffer;   // 법선 데이터
         std::vector<glm::vec2> texCoordBuffer; // 텍스처 좌표 데이터
-        std::vector<unsigned int> indices;    // 단일화된 인덱스 배열
 
+        // Step 2: Face를 텍스처별로 그룹화
         for (const Face& face : this->faces) {
+            std::string materialName = face.materialName.empty() ? "default" : face.materialName;
+
+            // 새로운 재질에 대해 초기화
+            if (textureGroups.find(materialName) == textureGroups.end()) {
+                textureGroups[materialName] = {};
+            }
+
             for (int i = 0; i < 3; i++) { // 삼각형의 세 정점 처리
-                // 복합 인덱스 생성
                 unsigned int vertexIndex = (i == 0) ? face.v1 : (i == 1) ? face.v2 : face.v3;
                 unsigned int texCoordIndex = (i == 0) ? face.t1 : (i == 1) ? face.t2 : face.t3;
                 unsigned int normalIndex = (i == 0) ? face.n1 : (i == 1) ? face.n2 : face.n3;
@@ -172,7 +179,6 @@ public:
 
                 // 고유한 정점인지 확인
                 if (uniqueVertices.count(key) == 0) {
-                    // 새로운 정점 추가
                     uniqueVertices[key] = static_cast<unsigned int>(vertexBuffer.size());
 
                     // 위치 추가
@@ -182,7 +188,7 @@ public:
                         this->vertices[vertexIndex].z
                     ));
 
-                    // 텍스처 좌표 추가 (존재하면)
+                    // 텍스처 좌표 추가
                     if (texCoordIndex != static_cast<unsigned int>(-1)) {
                         texCoordBuffer.push_back(glm::vec2(
                             this->texCoords[texCoordIndex].u,
@@ -201,8 +207,8 @@ public:
                     ));
                 }
 
-                // 인덱스 추가
-                indices.push_back(uniqueVertices[key]);
+                // 인덱스를 텍스처 그룹에 추가
+                textureGroups[materialName].push_back(uniqueVertices[key]);
             }
         }
 
@@ -227,12 +233,18 @@ public:
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), (void*)0);
         glEnableVertexAttribArray(2);
 
-        // Step 6: EBO 설정 - 인덱스 데이터
-        glGenBuffers(1, &vbos[3]);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbos[3]);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
+        // Step 6: 텍스처별 EBO 생성
+        for (auto& [materialName, indices] : textureGroups) {
+            GLuint ebo;
+            glGenBuffers(1, &ebo);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
+
+            textureEBOs[materialName] = ebo; // EBO 저장
+        }
 
         // Step 7: VAO 바인딩 해제
         glBindVertexArray(0);
     }
+
 };

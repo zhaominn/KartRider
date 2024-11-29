@@ -150,6 +150,7 @@
     <ClInclude Include="Light.h" />
     <ClInclude Include="LoadMtl.h" />
     <ClInclude Include="LoadObj.h" />
+    <ClInclude Include="LoadProgress.h" />
     <ClInclude Include="LoadTexture.h" />
     <ClInclude Include="DefaultModel.h" />
     <ClInclude Include="Model.h" />

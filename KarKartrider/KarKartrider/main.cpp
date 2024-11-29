@@ -7,6 +7,7 @@
 #include "Camera.h"
 #include "Light.h"
 #include "Debug.h"
+#include "LoadProgress.h"
 
 using namespace std;
 
@@ -19,16 +20,14 @@ vector<Model*> models;
 
 int main(int argc, char** argv) {
 
-  
-
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
     int screenWidth = glutGet(GLUT_SCREEN_WIDTH);  // 모니터의 가로 해상도
     int screenHeight = glutGet(GLUT_SCREEN_HEIGHT); // 모니터의 세로 해상도
     glutInitWindowPosition(0, 0);
-    //glutInitWindowSize(screenWidth - 20, screenHeight - 60); // 창 크기를 화면 크기로 설정
+    glutInitWindowSize(800, 600); // 창 크기를 화면 크기로 설정
     glutCreateWindow("KarKartrider");
-    glutFullScreen(); // 전체 화면으로 전환
+    //glutFullScreen(); // 전체 화면으로 전환
 
     glewExperimental = GL_TRUE;
     if (glewInit() != GLEW_OK) {
@@ -42,16 +41,19 @@ int main(int argc, char** argv) {
 
     initPhysics(); // Bullet 초기화 함수 호출
 
-    DefaultModel* default_model = new DefaultModel("obj/straight_road.obj", "straight_road", "box", glm::scale(glm::mat4(1.0f), glm::vec3(10.0, 10.0, 10.0))); // 실제 모델 가져오기
-    models.push_back(default_model);
+    loadModelWithProgress <DefaultModel>("obj/paragon_red.obj", "straight_road", "sphere", glm::scale(glm::mat4(1.0f), glm::vec3(80.0, 80.0, 80.0)), models);
 
     // 디버깅 출력
-    //debug_model(default_model);
+    /*debug_model(models.back());
+    debug_materials(models.back()->materials);*/
 
     initializeModelsWithPhysics(models); // 모든 모델 Bullet world에 추가
 
     InitBuffer();   
 
+    // 초기 프레임 강제 렌더링
+    drawScene();  // 디스플레이 콜백 함수 직접 호출
+    
     glutDisplayFunc(drawScene);
     glutReshapeFunc(Reshape);
     glutKeyboardFunc(keyDown);
