@@ -5,19 +5,13 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <unordered_map> // 추가: 재질별 매핑 관리
 
 #include "Model.h"
 #include "LoadMtl.h"
 
-
-struct FullVertex {
-    glm::vec3 position;  // 정점 위치
-    glm::vec3 normal;    // 법선
-    glm::vec2 texCoord;  // 텍스처 좌표
-};
-
 // OBJ 파일을 읽어와서 모델 데이터를 파싱하는 함수
-void read_obj_file(const std::string& filename, Model* model, std::string name, std::string type) {
+void read_obj_file(const std::string& filename, Model* model, const std::string& name, const std::string& type) {
     std::ifstream file(filename);  // 파일 읽기 모드로 열기
     if (!file.is_open()) {  // 파일을 열지 못한 경우
         std::cerr << "Error opening file: " << filename << std::endl;
@@ -25,7 +19,9 @@ void read_obj_file(const std::string& filename, Model* model, std::string name, 
     }
 
     std::string line;
-    std::string mtlFilename;
+    std::string mtlFilename;  // MTL 파일 이름
+    std::string currentMaterial;  // 현재 사용 중인 재질 이름
+    std::unordered_map<std::string, Material> materials;  // 재질별 데이터를 저장할 매핑 구조
 
     // 파일을 한 줄씩 읽어가며 정점, 텍스처 좌표, 법선 벡터, 면 데이터를 처리하는 루프
     while (std::getline(file, line)) {
@@ -54,6 +50,9 @@ void read_obj_file(const std::string& filename, Model* model, std::string name, 
             Normal normal;
             ss >> normal.nx >> normal.ny >> normal.nz;
             model->normals.push_back(normal);
+        }
+        else if (prefix == "usemtl") {  // 재질 지정
+            ss >> currentMaterial;  // 현재 재질 이름 업데이트
         }
         else if (prefix == "f") {  // Face 데이터를 읽을 때
             std::vector<unsigned int> vertexIndices, texCoordIndices, normalIndices;
@@ -98,6 +97,7 @@ void read_obj_file(const std::string& filename, Model* model, std::string name, 
                 face.n2 = normalIndices.size() > 1 ? normalIndices[1] : 0;
                 face.n3 = normalIndices.size() > 2 ? normalIndices[2] : 0;
 
+                face.materialName = currentMaterial;  // 현재 재질 이름 저장
                 // Face와 normalFaces 추가
                 model->faces.push_back(face);
             }
@@ -118,6 +118,7 @@ void read_obj_file(const std::string& filename, Model* model, std::string name, 
                 face1.n2 = normalIndices.size() > 1 ? normalIndices[1] : 0;
                 face1.n3 = normalIndices.size() > 2 ? normalIndices[2] : 0;
 
+                face1.materialName = currentMaterial;  // 현재 재질 이름 저장
                 model->faces.push_back(face1);
 
                 // 두 번째 삼각형 (v1, v3, v4)
@@ -135,6 +136,7 @@ void read_obj_file(const std::string& filename, Model* model, std::string name, 
                 face2.n2 = normalIndices.size() > 2 ? normalIndices[2] : 0;
                 face2.n3 = normalIndices.size() > 3 ? normalIndices[3] : 0;
 
+                face2.materialName = currentMaterial;  // 현재 재질 이름 저장
                 model->faces.push_back(face2);
             }
         }
@@ -149,9 +151,9 @@ void read_obj_file(const std::string& filename, Model* model, std::string name, 
 
     // MTL 파일 처리
     if (!mtlFilename.empty()) {
-        read_mtl_file(mtlFilename, model->material);  // MTL 파일 로드
+        read_mtl_file(mtlFilename, materials);  // MTL 파일 로드
+        model->materials = materials;          // 로드한 재질 정보를 모델에 저장
     }
 
     file.close();  // 파일 닫기
-
 }
