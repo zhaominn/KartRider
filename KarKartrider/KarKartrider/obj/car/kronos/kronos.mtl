@@ -19,21 +19,20 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.500000
 d 1.000000
 illum 3
-map_Kd kartdissc03.0229.jpg
+map_Kd kartdissc.jpg
 
 newmtl headlight_alltex
+Ns 63.117920
 Ka 0.500000 0.500000 0.500000
+Kd 0.500000 0.500000 0.500000
 Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
 Ni 1.500000
 d 1.000000
 illum 3
-map_Kd new_kronos_tex2_headlight_alltex_BaseColor.1001.png
-map_Ns new_kronos_tex2_headlight_alltex_Roughness.1001.png
-map_refl new_kronos_tex2_headlight_alltex_Metallic.1001.png
-map_Ke new_kronos_tex2_headlight_alltex_Emissive.1001.png
 
 newmtl headlight_glass
-Ns 1000.000000
+Ns 63.117920
 Ka 0.500000 0.500000 0.500000
 Kd 0.500000 0.500000 0.500000
 Ks 1.000000 1.000000 1.000000
@@ -43,46 +42,41 @@ d 0.357143
 illum 6
 
 newmtl kronos_main_tex
-Ka 0.500000 0.500000 0.500000
-Ks 1.000000 1.000000 1.000000
-Ni 1.500000
-d 1.000000
-illum 3
-map_Kd new_kronos_tex2_kronos_main_tex_BaseColor.1001.png
-map_Ns new_kronos_tex2_kronos_main_tex_Roughness.1001.png
-map_refl new_kronos_tex2_kronos_main_tex_Metallic.1001.png
-map_Ke new_kronos_tex2_kronos_main_tex_Emissive.1001.png
-map_Bump -bm 1.000000 new_kronos_tex2_kronos_main_tex_Normal.1001.png
-
-newmtl kronos_tire
+Ns 63.117920
 Ka 0.500000 0.500000 0.500000
 Ks 1.000000 1.000000 1.000000
 Ke 0.000000 0.000000 0.000000
 Ni 1.500000
 d 1.000000
 illum 3
-map_Kd kronos_tire_kronos_tire_BaseColor.1001.png
-map_Ns kronos_tire_kronos_tire_Roughness.1001.png
-map_refl kronos_tire_kronos_tire_Metallic.1001.png
+map_Kd new_kronos_tex2_kronos_main_tex_BaseColor.<UDIM>.png
+
+newmtl kronos_tire
+Ns 148.252075
+Ka 0.500000 0.500000 0.500000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+map_Kd kronos_tire_kronos_tire_BaseColor.<UDIM>.png
 
 newmtl nt_d_tex
+Ns 63.117920
 Ka 0.500000 0.500000 0.500000
 Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
 Ni 1.500000
 d 1.000000
 illum 3
-map_Kd new_kronos_tex2_nt_d_tex_BaseColor.1001.png
-map_Ns new_kronos_tex2_nt_d_tex_Roughness.1001.png
-map_refl new_kronos_tex2_nt_d_tex_Metallic.1001.png
-map_Ke new_kronos_tex2_nt_d_tex_Emissive.1001.png
+map_Kd new_kronos_tex2_nt_d_tex_BaseColor.<UDIM>.png
 
 newmtl steer_monitor_frame
+Ns 63.117920
 Ka 0.500000 0.500000 0.500000
 Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
 Ni 1.500000
 d 1.000000
 illum 3
-map_Kd new_kronos_tex2_steer_monitor_frame_BaseColor.1001.png
-map_Ns new_kronos_tex2_steer_monitor_frame_Roughness.1001.png
-map_refl new_kronos_tex2_steer_monitor_frame_Metallic.1001.png
-map_Ke new_kronos_tex2_steer_monitor_frame_Emissive.1001.png
+map_Kd new_kronos_tex2_steer_monitor_frame_BaseColor.<UDIM>.png
