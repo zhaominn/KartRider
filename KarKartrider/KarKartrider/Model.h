@@ -92,7 +92,7 @@ public:
     // 재질과 텍스처 매핑
     std::unordered_map<std::string, Texture> materialTextureMap;
 
-    virtual void load_obj(std::string name, std::string obj_name, std::string obj_type, glm::mat4 start_matrix = glm::mat4(1.0f)) = 0;
+    virtual void load_obj(std::string name, std::string path, std::string obj_name, std::string obj_type, glm::mat4 start_matrix = glm::mat4(1.0f)) = 0;
     virtual const void draw(GLint shaderProgramID, bool (*isKeyPressed_s)(const char&)) = 0;
     virtual const void draw_rigidBody(GLuint shaderProgramID) = 0;
     virtual void initBuffer() = 0;
