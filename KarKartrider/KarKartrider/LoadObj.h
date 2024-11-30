@@ -11,8 +11,8 @@
 #include "LoadMtl.h"
 
 // OBJ 파일을 읽어와서 모델 데이터를 파싱하는 함수
-void read_obj_file(const std::string& filename, Model* model, const std::string& name, const std::string& type) {
-    std::ifstream file(filename);  // 파일 읽기 모드로 열기
+void read_obj_file(const std::string& filename, const string path, Model* model, const std::string& name, const std::string& type) {
+    std::ifstream file(path + filename);  // 파일 읽기 모드로 열기
     if (!file.is_open()) {  // 파일을 열지 못한 경우
         std::cerr << "Error opening file: " << filename << std::endl;
         return;
@@ -151,7 +151,7 @@ void read_obj_file(const std::string& filename, Model* model, const std::string&
 
     // MTL 파일 처리
     if (!mtlFilename.empty()) {
-        read_mtl_file(mtlFilename, materials);  // MTL 파일 로드
+        read_mtl_file(mtlFilename, path, materials);  // MTL 파일 로드
         model->materials = materials;          // 로드한 재질 정보를 모델에 저장
     }
 

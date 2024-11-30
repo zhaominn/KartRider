@@ -11,8 +11,10 @@
 #include "LoadTexture.h"
 
 // MTL 파일을 읽어와서 재질 정보를 파싱하는 함수
-void read_mtl_file(const std::string& filename, std::unordered_map<std::string, Material>& materials) {
-    std::ifstream file("obj/" + filename);  // MTL 파일 열기
+void read_mtl_file(const std::string& filename, const std::string path, std::unordered_map<std::string, Material>& materials) {
+    cout << "이게뭐니?";
+    cout << path << filename << endl;
+    std::ifstream file(path + filename);  // MTL 파일 열기
     if (!file.is_open()) {  // 파일 열기 실패 시 예외 처리
         std::cerr << "[ERROR] Failed to open MTL file: " << filename << std::endl;
         return;
@@ -45,7 +47,7 @@ void read_mtl_file(const std::string& filename, std::unordered_map<std::string, 
         else if (prefix == "map_Ka") {  // 환경광 텍스처 경로 (Ambient Texture)
             std::string texturePath;
             ss >> texturePath;
-            Texture ambientTexture = load_texture("obj/" + texturePath, "ambient");
+            Texture ambientTexture = load_texture(path + texturePath, "ambient");
             if (ambientTexture.id != 0) {
                 materials[currentMaterial].textures.push_back(ambientTexture);
                 materials[currentMaterial].map_Ka = texturePath;
@@ -59,7 +61,8 @@ void read_mtl_file(const std::string& filename, std::unordered_map<std::string, 
         else if (prefix == "map_Kd") {  // 난반사광 텍스처 경로 (Diffuse Texture)
             std::string texturePath;
             ss >> texturePath;
-            Texture diffuseTexture = load_texture("obj/" + texturePath, "diffuse");
+            cout << texturePath << endl;
+            Texture diffuseTexture = load_texture(path + texturePath, "diffuse");
             if (diffuseTexture.id != 0) {
                 materials[currentMaterial].textures.push_back(diffuseTexture);
                 materials[currentMaterial].map_Kd = texturePath;
@@ -74,7 +77,7 @@ void read_mtl_file(const std::string& filename, std::unordered_map<std::string, 
             std::string texturePath;
             ss >> texturePath;
 
-            Texture specularTexture = load_texture("obj/" + texturePath, "specular");
+            Texture specularTexture = load_texture(path + texturePath, "specular");
             if (specularTexture.id != 0) {
                 materials[currentMaterial].textures.push_back(specularTexture);
                 materials[currentMaterial].map_Ks = texturePath;

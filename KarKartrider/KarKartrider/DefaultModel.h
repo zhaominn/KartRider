@@ -33,15 +33,15 @@ class DefaultModel : public Model {
 public:
     DefaultModel(){}
 
-    DefaultModel(string name, string obj_name, string obj_type, glm::mat4 start_matrix = glm::mat4(1.0f)) {
-        read_obj_file(name, this, obj_name, obj_type);
+    DefaultModel(string name, string path, string obj_name, string obj_type, glm::mat4 start_matrix = glm::mat4(1.0f)) {
+        read_obj_file(name, path, this, obj_name, obj_type);
         this->matrix = start_matrix * this->matrix;
     }
 
     ~DefaultModel(){}
 
-    void load_obj(string name, string obj_name, string obj_type, glm::mat4 start_matrix = glm::mat4(1.0f)) override {
-        read_obj_file(name, this, obj_name, obj_type);
+    void load_obj(string name, string path, string obj_name, string obj_type, glm::mat4 start_matrix = glm::mat4(1.0f)) override {
+        read_obj_file(name, path, this, obj_name, obj_type);
         this->matrix = start_matrix * this->matrix;
     }
 
