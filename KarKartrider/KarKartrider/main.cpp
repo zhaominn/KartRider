@@ -41,7 +41,9 @@ int main(int argc, char** argv) {
 
     initPhysics(); // Bullet 초기화 함수 호출
 
-    loadModelWithProgress <DefaultModel>("kronos.obj", "obj/car/kronos/", "straight_road", "sphere", glm::scale(glm::mat4(1.0f), glm::vec3(10.0, 10.0, 10.0)), models);
+    loadModelWithProgress <DefaultModel>("kronos.obj", "obj/car/kronos/", "car", "sphere", glm::scale(glm::mat4(1.0f), glm::vec3(10.0, 10.0, 10.0)), models);
+
+    loadModelWithProgress <DefaultModel>("road_all_1.obj", "obj/road/", "road_all", "cube", glm::scale(glm::mat4(1.0f), glm::vec3(20.0, 20.0, 20.0)), models);
 
     // 디버깅 출력
     /*debug_model(models.back());
