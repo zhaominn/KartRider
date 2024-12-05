@@ -155,6 +155,7 @@
     <ClInclude Include="LoadTexture.h" />
     <ClInclude Include="DefaultModel.h" />
     <ClInclude Include="Model.h" />
+    <ClInclude Include="RoadModel.h" />
     <ClInclude Include="shaderMaker.h" />
   </ItemGroup>
   <ItemGroup>

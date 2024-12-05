@@ -10,6 +10,7 @@
 #include "LoadProgress.h"
 
 #include "KartModel.h"
+#include "RoadModel.h"
 
 using namespace std;
 
@@ -19,7 +20,6 @@ GLvoid Reshape(int w, int h);
 
 //모델
 vector<Model*> models;
-vector<Model*> karts;
 
 int main(int argc, char** argv) {
 
@@ -44,10 +44,9 @@ int main(int argc, char** argv) {
 
     initPhysics(); // Bullet 초기화 함수 호출
 
-    loadModelWithProgress <KartModel>("kronos.obj", "obj/car/kronos/", "car", "sphere", glm::scale(glm::mat4(1.0f), glm::vec3(10.0, 10.0, 10.0)), karts);
-    //여기서 마지막 인자 Karts로 바꾸면 화면에 출력되지 않음.
+    loadModelWithProgress <KartModel>("kronos.obj", "obj/car/kronos/", "car", "sphere", glm::scale(glm::mat4(1.0f), glm::vec3(10.0, 10.0, 10.0)), models);
 
-    loadModelWithProgress <DefaultModel>("road_all_1.obj", "obj/road/", "road_all", "cube", glm::scale(glm::mat4(1.0f), glm::vec3(20.0, 20.0, 20.0)), models);
+    loadModelWithProgress <RoadModel>("road_all_1.obj", "obj/road/", "road_all", "cube", glm::scale(glm::mat4(1.0f), glm::vec3(20.0, 20.0, 20.0)), models);
 
     // 디버깅 출력
     /*debug_model(models.back());
