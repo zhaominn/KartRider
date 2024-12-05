@@ -113,6 +113,9 @@
     <ClInclude Include="root.h">
       <Filter>헤더 파일\root</Filter>
     </ClInclude>
+    <ClInclude Include="LogoMode.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
