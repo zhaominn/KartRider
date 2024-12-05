@@ -1,3 +1,5 @@
+#pragma once
+
 #include "RoadModel.h"
 #include "KartModel.h"
 // Models

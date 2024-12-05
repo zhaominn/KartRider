@@ -3,7 +3,10 @@
 #include "Mode.h"
 #include "RoadModel.h"
 #include "KartModel.h"
-
+#include "shaderMaker.h"
+#include "LoadProgress.h"
+#include "root.h"
+#include "KeyBoard.h"
 
 
 class PlayMode : public Mode {
