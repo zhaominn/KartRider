@@ -42,13 +42,20 @@ int main(int argc, char** argv) {
 
 	initPhysics(); // Bullet 초기화 함수 호출
 
-	LogoMode logoMode;
-	MM.SetMode(&logoMode); //초기 모드 세팅
+
+	// play mode에 필요한 모델 로드
+	loadModelWithProgress <KartModel>("kronos.obj", "obj/car/kronos/", "car", "sphere", glm::scale(glm::mat4(1.0f), glm::vec3(10.0, 10.0, 10.0)), karts);
+	loadModelWithProgress <RoadModel>("road_all_1.obj", "obj/road/", "road_all", "cube", glm::scale(glm::mat4(1.0f), glm::vec3(20.0, 20.0, 20.0)), roads);
+
+	initializeModelsWithPhysics(karts); // 모든 모델 Bullet world에 추가
+	initializeModelsWithPhysics(roads);
+
+	LogoMode* logoMode = new LogoMode();
+	MM.SetMode(logoMode); //초기 모드 세팅
 
 	// 디버깅 출력
 	/*debug_model(models.back());
 	debug_materials(models.back()->materials);*/
-
 
 
 	InitBuffer();

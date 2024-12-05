@@ -7,24 +7,27 @@
 #include "LoadProgress.h"
 #include "root.h"
 #include "KeyBoard.h"
-
+#include "PlayMode.h"
 
 class LogoMode : public Mode {
 public:
+
+	/* 기본 생성자 필수~~ */
+	LogoMode() {}
+
 	void init() override {
 
-		// play mode에 필요한 모델 로드
-		loadModelWithProgress <KartModel>("kronos.obj", "obj/car/kronos/", "car", "sphere", glm::scale(glm::mat4(1.0f), glm::vec3(10.0, 10.0, 10.0)), karts);
-
-		initializeModelsWithPhysics(karts); // 모든 모델 Bullet world에 추가
 	}
 
 	void keyboard(unsigned char key, int x, int y) override {
 		switch (key)
 		{
 		case 'k':
-			cout << "k" << endl;
+		{
+			PlayMode* playMode = new PlayMode();
+			MM.SetMode(playMode);
 			break;
+		}
 		default:
 			break;
 		}
