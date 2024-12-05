@@ -9,9 +9,7 @@
 #include "Debug.h"
 #include "LoadProgress.h"
 #include "root.h"
-#include "PlayMode.h"
-#include "ModeManager.h"
-ModeManager MM;
+#include "LogoMode.h"
 
 using namespace std;
 
@@ -44,8 +42,8 @@ int main(int argc, char** argv) {
 
 	initPhysics(); // Bullet 초기화 함수 호출
 
-	PlayMode play;
-	MM.SetMode(&play); //초기 모드 세팅
+	LogoMode logoMode;
+	MM.SetMode(&logoMode); //초기 모드 세팅
 
 	// 디버깅 출력
 	/*debug_model(models.back());
