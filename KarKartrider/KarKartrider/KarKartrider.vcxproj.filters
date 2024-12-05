@@ -37,6 +37,12 @@
     <Filter Include="헤더 파일\Debug">
       <UniqueIdentifier>{b1083f7e-6c5e-4cc2-9548-8c21a83b047e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="헤더 파일\Mode">
+      <UniqueIdentifier>{1ab445c5-5fa2-4b35-b31b-715ef78e181f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\root">
+      <UniqueIdentifier>{242ec515-613e-49db-a45b-66b49812ae62}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="vertex.glsl">
@@ -68,9 +74,6 @@
     <ClInclude Include="DefaultModel.h">
       <Filter>헤더 파일\Object</Filter>
     </ClInclude>
-    <ClInclude Include="Model.h">
-      <Filter>헤더 파일\Object</Filter>
-    </ClInclude>
     <ClInclude Include="shaderMaker.h">
       <Filter>헤더 파일\Shader</Filter>
     </ClInclude>
@@ -94,6 +97,21 @@
     </ClInclude>
     <ClInclude Include="RoadModel.h">
       <Filter>헤더 파일\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Model.h">
+      <Filter>헤더 파일\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Mode.h">
+      <Filter>헤더 파일\Mode</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayMode.h">
+      <Filter>헤더 파일\Mode</Filter>
+    </ClInclude>
+    <ClInclude Include="ModeManager.h">
+      <Filter>헤더 파일\Mode</Filter>
+    </ClInclude>
+    <ClInclude Include="root.h">
+      <Filter>헤더 파일\root</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
