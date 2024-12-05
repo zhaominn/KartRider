@@ -20,9 +20,10 @@ public:
 	}
 
 	void keyboard(unsigned char key, int x, int y) override {
+
 		switch (key)
 		{
-		case 'k':
+		case '\r':
 		{
 			PlayMode* playMode = new PlayMode();
 			MM.SetMode(playMode);
@@ -34,15 +35,11 @@ public:
 	}
 
 	void draw_model() override {
-		for (const auto& kart : karts) { // ½ÇÁ¦ ¸ðµ¨ draw
-			kart->draw(shaderProgramID, isKeyPressed_s);
-		}
+	
 	}
 
 	void draw_bb() override {
-		for (const auto& model : karts) { // ¸ðµ¨ bb draw
-			model->draw_rigidBody(shaderProgramID);
-		}
+		
 	}
 
 	void finish() override {
