@@ -11,7 +11,7 @@
 #include "LoadMtl.h"
 
 // OBJ 파일을 읽어와서 모델 데이터를 파싱하는 함수
-void read_obj_file(const std::string& filename, const string path, Model* model, const std::string& name, const std::string& type) {
+void read_obj_file(const std::string& filename, const std::string path, Model* model, const std::string& name, const std::string& type) {
     std::ifstream file(path + filename);  // 파일 읽기 모드로 열기
     if (!file.is_open()) {  // 파일을 열지 못한 경우
         std::cerr << "Error opening file: " << filename << std::endl;

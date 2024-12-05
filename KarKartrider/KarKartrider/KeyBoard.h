@@ -6,6 +6,7 @@
 #include <gl/glm/glm/gtc/matrix_transform.hpp>
 #include <unordered_map>
 
+#include "root.h"
 #include "Camera.h"
 
 //Ű
@@ -35,6 +36,8 @@ void keyUp(unsigned char key, int x, int y) {
 }
 
 void keyDown(unsigned char key, int x, int y) {
+
+    MM.keyboard(key, x, y);
 
     keyDown_s(key);
 

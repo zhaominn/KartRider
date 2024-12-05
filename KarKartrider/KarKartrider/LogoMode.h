@@ -7,36 +7,41 @@
 #include "LoadProgress.h"
 #include "root.h"
 #include "KeyBoard.h"
+#include "PlayMode.h"
 
-
-class PlayMode : public Mode {
+class LogoMode : public Mode {
 public:
 
-	PlayMode(){}
+	/* ±âº» »ý¼ºÀÚ ÇÊ¼ö~~ */
+	LogoMode() {}
 
 	void init() override {
 
 	}
 
 	void keyboard(unsigned char key, int x, int y) override {
-
+		switch (key)
+		{
+		case 'k':
+		{
+			PlayMode* playMode = new PlayMode();
+			MM.SetMode(playMode);
+			break;
+		}
+		default:
+			break;
+		}
 	}
 
 	void draw_model() override {
 		for (const auto& kart : karts) { // ½ÇÁ¦ ¸ðµ¨ draw
 			kart->draw(shaderProgramID, isKeyPressed_s);
 		}
-		for (const auto& road : roads) { // ½ÇÁ¦ ¸ðµ¨ draw
-			road->draw(shaderProgramID, isKeyPressed_s);
-		}
 	}
 
 	void draw_bb() override {
 		for (const auto& model : karts) { // ¸ðµ¨ bb draw
 			model->draw_rigidBody(shaderProgramID);
-		}
-		for (const auto& road : roads) { // ¸ðµ¨ bb draw
-			road->draw_rigidBody(shaderProgramID);
 		}
 	}
 

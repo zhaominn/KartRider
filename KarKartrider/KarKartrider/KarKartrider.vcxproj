@@ -154,6 +154,7 @@
     <ClInclude Include="LoadProgress.h" />
     <ClInclude Include="LoadTexture.h" />
     <ClInclude Include="DefaultModel.h" />
+    <ClInclude Include="LogoMode.h" />
     <ClInclude Include="Mode.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="ModeManager.h" />

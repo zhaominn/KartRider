@@ -30,8 +30,8 @@ public:
 			mode->finish();
 	}
 
-	void keyboard() {
+	void keyboard(unsigned char key, int x, int y) {
 		if (mode)
-			mode->keyboard();
+			mode->keyboard(key, x, y);
 	}
 };
