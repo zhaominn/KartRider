@@ -89,6 +89,9 @@
     <ClInclude Include="LoadProgress.h">
       <Filter>헤더 파일\Debug</Filter>
     </ClInclude>
+    <ClInclude Include="KartModel.h">
+      <Filter>헤더 파일\Object</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">

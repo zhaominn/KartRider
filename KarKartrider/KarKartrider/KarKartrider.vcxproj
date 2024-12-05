@@ -146,6 +146,7 @@
     <ClInclude Include="CustomContactResultCallback.h" />
     <ClInclude Include="Debug.h" />
     <ClInclude Include="filetobuf.h" />
+    <ClInclude Include="KartModel.h" />
     <ClInclude Include="KeyBoard.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="LoadMtl.h" />
