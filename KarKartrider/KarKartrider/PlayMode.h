@@ -21,7 +21,7 @@ public:
 		initializeModelsWithPhysics(roads);
 	}
 
-	void keyboard() override {
+	void keyboard(unsigned char key, int x, int y) override {
 
 	}
 

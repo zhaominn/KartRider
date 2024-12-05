@@ -19,8 +19,15 @@ public:
 		initializeModelsWithPhysics(karts); // 모든 모델 Bullet world에 추가
 	}
 
-	void keyboard() override {
-
+	void keyboard(unsigned char key, int x, int y) override {
+		switch (key)
+		{
+		case 'k':
+			cout << "k" << endl;
+			break;
+		default:
+			break;
+		}
 	}
 
 	void draw_model() override {
