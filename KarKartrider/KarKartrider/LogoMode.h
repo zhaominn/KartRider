@@ -1,13 +1,11 @@
 #pragma once
 #include <iostream>
 #include "Mode.h"
-#include "RoadModel.h"
-#include "KartModel.h"
 #include "shaderMaker.h"
-#include "LoadProgress.h"
 #include "root.h"
 #include "KeyBoard.h"
 #include "PlayMode.h"
+#include "LoadVideo.h"
 
 class LogoMode : public Mode {
 public:
@@ -16,7 +14,7 @@ public:
 	LogoMode() {}
 
 	void init() override {
-
+		loadVideo("kartrider_intro.mp4", "./asset/");
 	}
 
 	void keyboard(unsigned char key, int x, int y) override {
