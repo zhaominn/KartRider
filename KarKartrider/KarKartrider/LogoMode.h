@@ -64,6 +64,6 @@ private:
 
     // 사운드 실행 함수
     void runSound() {
-        play_sound2D("./asset/", "kartrider_intro.MP3", false, &isRunning);
+        play_sound2D("./asset/", "kartrider_intro.WAV", false, &isRunning);
     }
 };
