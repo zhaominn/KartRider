@@ -6,8 +6,17 @@
 #include "KeyBoard.h"
 #include "PlayMode.h"
 
+
+
+void timer(int value) {
+	glm::vec3 map1CamerPos = glm::vec3(0.0, 0.0, 5.0);
+	glm::vec3 map2CamerPos = glm::vec3(1.0, 0.0, 5.0);
+}
+
 class SelectMapMode : public Mode {
 public:
+	
+	int map_num = 1;
 
 	glm::vec3 cameraPosMapMode = glm::vec3(0.0, 0.0, 5.0);
 	glm::vec3 cameraDirectionMapMode = glm::vec3(0.0, 0.0, 0.0);
@@ -18,14 +27,15 @@ public:
 	SelectMapMode() {}
 
 	void init() override {
-		// 카메라 위치를 Y축 기준으로 회전
-		float angleInRadians = glm::radians(-15.0f); // 10도 회전
-		glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), angleInRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		//// 카메라 위치를 Y축 기준으로 회전
+		//float angleInRadians = glm::radians(-15.0f); // 10도 회전
+		//glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), angleInRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 
-		glm::vec4 rotatedCameraPos = rotation * glm::vec4(cameraPosMapMode, 1.0f);
-		cameraPosMapMode = glm::vec3(rotatedCameraPos); // 회전된 위치를 카메라 위치로 적용
-
+		//glm::vec4 rotatedCameraPos = rotation * glm::vec4(cameraPosMapMode, 1.0f);
+		//cameraPosMapMode = glm::vec3(rotatedCameraPos); // 회전된 위치를 카메라 위치로 적용
+		glutTimerFunc(0, timer, 0);
 	}
+
 
 	void keyboard(unsigned char key, int x, int y) override {
 		switch (key) {
@@ -34,6 +44,18 @@ public:
 			MM.SetMode(playMode);
 			break;
 		}
+		case '[':
+			map_num--;
+			if (map_num < 1) {
+				map_num = 1;
+			}
+			break;
+		case ']':
+			map_num++;
+			if (map_num > 2) {
+				map_num = 2;
+			}
+			break;
 		default:
 			break;
 		}
