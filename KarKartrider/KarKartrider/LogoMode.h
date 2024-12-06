@@ -31,6 +31,11 @@ public:
 
         loadModelWithProgress<MapModel>("map1.obj", "asset/", "map1", "box", glm::scale(glm::mat4(1.0f), glm::vec3(1.0, 1.0, 1.0)), selectMaps);
 
+        glm::mat4 map2_matrix = glm::mat4(1.0f);
+        map2_matrix = glm::translate(map2_matrix, glm::vec3(2.5, 0.0, 0.0));
+        map2_matrix = glm::scale(map2_matrix, glm::vec3(1.0, 1.0, 1.0));
+        loadModelWithProgress<MapModel>("map2.obj", "asset/", "map2", "box", map2_matrix, selectMaps);
+
         initializeModelsWithPhysics(karts);
         initializeModelsWithPhysics(roads);
 
