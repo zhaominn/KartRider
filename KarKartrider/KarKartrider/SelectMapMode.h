@@ -82,7 +82,7 @@ public:
 		default:
 			break;
 		}
-		clickSoundThread.join();
+		clickSoundThread.detach();
 	}
 
 	void updateTargetCameraPos() {
