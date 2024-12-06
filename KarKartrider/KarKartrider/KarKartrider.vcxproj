@@ -163,6 +163,7 @@
     <ClInclude Include="PlayMode.h" />
     <ClInclude Include="RoadModel.h" />
     <ClInclude Include="root.h" />
+    <ClInclude Include="SelectMapMode.h" />
     <ClInclude Include="shaderMaker.h" />
   </ItemGroup>
   <ItemGroup>

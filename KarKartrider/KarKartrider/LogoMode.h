@@ -6,9 +6,10 @@
 #include "shaderMaker.h"
 #include "root.h"
 #include "KeyBoard.h"
-#include "PlayMode.h"
 #include "LoadVideo.h"
 #include "LoadSound.h"
+#include "SelectMapMode.h"
+#include "PlayMode.h"
 
 class LogoMode : public Mode {
 public:
@@ -42,6 +43,7 @@ public:
         switch (key) {
         case '\r': {
             PlayMode* playMode = new PlayMode();
+            SelectMapMode* selectMapMode = new SelectMapMode();
             MM.SetMode(playMode);
             break;
         }
