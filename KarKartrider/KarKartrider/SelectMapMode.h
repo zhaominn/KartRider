@@ -1,11 +1,13 @@
 #pragma once
 #include <iostream>
+#include <thread>
+#include <random>
+
 #include "Mode.h"
 #include "shaderMaker.h"
 #include "root.h"
 #include "KeyBoard.h"
 #include "PlayMode.h"
-
 
 bool isAnimating = false;  // 카메라가 이동 중인지 확인
 float animationSpeed = 0.05f; // 애니메이션 속도 (0.05 = 부드러운 이동)
@@ -31,7 +33,8 @@ void timer(int value) {
 
 class SelectMapMode : public Mode {
 public:
-	
+
+
 	int map_num = 1;
 
 	glm::vec3 map1CamerPos = glm::vec3(0.0, 0.0, 5.0);      // Map1 카메라 위치
@@ -43,11 +46,17 @@ public:
 	glm::mat4 viewMapMode = glm::mat4(1.0f);
 
 
+	bool isSoundRunning;
+	std::thread soundThread;
 
-	SelectMapMode() {}
+	bool isclickRunning;
 
+	SelectMapMode() :isSoundRunning(true), isclickRunning(true) {}
 
 	void init() override {
+
+		soundThread = std::thread(&SelectMapMode::runSound, this);
+
 		//// 카메라 위치를 Y축 기준으로 회전
 		//float angleInRadians = glm::radians(-15.0f); // 10도 회전
 		//glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), angleInRadians, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -56,19 +65,24 @@ public:
 		//cameraPosMapMode = glm::vec3(rotatedCameraPos); // 회전된 위치를 카메라 위치로 적용
 		targetCameraPos = cameraPosMapMode; // 시작 위치를 목표 위치로 설정
 		glutTimerFunc(0, timer, 0);         // 타이머 함수 시작
+
 	}
 
 
 	void keyboard(unsigned char key, int x, int y) override {
+		std::thread clickSoundThread(&SelectMapMode::clickSound, this);
 		switch (key) {
 		case '\r': {
+			isSoundRunning = false;
 			PlayMode* playMode = new PlayMode();
+			playMode->map_num = map_num;
 			MM.SetMode(playMode);
 			break;
 		}
 		default:
 			break;
 		}
+		clickSoundThread.detach();
 	}
 
 	void updateTargetCameraPos() {
@@ -83,6 +97,7 @@ public:
 	}
 
 	void keySpecial(int key, int x, int y) override {
+		std::thread clickSoundThread(&SelectMapMode::clickSound, this);
 		if (key == GLUT_KEY_LEFT) {
 			map_num--;
 			if (map_num < 1) {
@@ -97,8 +112,7 @@ public:
 			}
 			this->updateTargetCameraPos(); // 목표 카메라 위치 업데이트
 		}
-
-		cout << map_num << endl;
+		clickSoundThread.detach(); // 스레드 독립 실행 (메인 스레드 대기 없음)
 	}
 
 	void draw_model() override {
@@ -113,7 +127,7 @@ public:
 		if (error != GL_NO_ERROR) {
 			std::cout << "Error in glUseProgram: " << error << std::endl;
 		}
-		
+
 		// 정면을 바라보도록 고정 (Z축 -1 방향)
 		glm::vec3 fixedLookDirection = glm::vec3(0.0, 0.0, -1.0); // 항상 정면(-Z) 방향
 		glm::vec3 lookAtTarget = cameraPosMapMode + fixedLookDirection;
@@ -145,7 +159,47 @@ public:
 	}
 
 	void finish() override {
+		// 스레드 안전 종료 처리
+		if (soundThread.joinable()) {
+			isSoundRunning = false; // 사운드 실행 플래그 중지
+			soundThread.join();     // 스레드가 종료될 때까지 대기
+		}
+	}
+private:
+	// 사운드 실행 함수
+	void runSound() {
 
+		random_device rd;
+		mt19937 gen(rd());
+		uniform_int_distribution<> file_random_dis(0, 2);
+
+		std::string file1 = "title_xmas_01.ogg";
+		std::string file2 = "title_original.ogg";
+		std::string file3 = "title_world.ogg";
+		std::string file = "";
+
+		switch (file_random_dis(gen))
+		{
+		case 0:
+			file = file1;
+			break;
+		case 1:
+			file = file2;
+			break;
+		case 2:
+			file = file3;
+			break;
+		default:
+			file = file2;
+			break;
+		}
+
+		play_sound2D(file, "./asset/select_mode/", true, &isSoundRunning);
 	}
 
+	void clickSound() {
+		isclickRunning = true;
+		play_sound2D("click.wav", "./asset/select_mode/", false, &isclickRunning);
+		isclickRunning = false;
+	}
 };

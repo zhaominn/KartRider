@@ -17,6 +17,9 @@ int window_height = 780;
 int location_x = 0;
 int location_y = 0;
 
+// 소리 크기
+float volume = 0.5;
+
 GLvoid Reshape(int w, int h) {
     glViewport(location_x, location_y, w, h);
     width = w;

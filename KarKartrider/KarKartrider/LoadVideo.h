@@ -36,6 +36,7 @@ void loadVideo(const std::string& fileName, const std::string& path, bool* isRun
         }
 
         cv::moveWindow("Kartrider Intro", location_x, location_y);
+        cv::resizeWindow("Kartrider Intro", window_width, window_height);
 
         // 프레임 화면에 출력
         cv::imshow("Kartrider Intro", frame);
