@@ -33,32 +33,61 @@ public:
 
 	void moveCamera(unsigned char key, int x, int y) {
 		const float cameraSpeed = 0.1f; // 카메라 이동 속도
+		float angleInRadians = glm::radians(1.0f); // 10도 회전
+		// 카메라 전방 벡터
+		glm::vec3 forward = glm::normalize(cameraDirection - cameraPos);
+		// 카메라 오른쪽 벡터
+		glm::vec3 right = glm::normalize(glm::cross(forward, cameraUp));
 
 		switch (key) {
 		case 'w': // 전진
-			cameraPos.z -= cameraSpeed;
-			cameraDirection.z -= cameraSpeed;
+			cameraPos += cameraSpeed * forward;
+			cameraDirection += cameraSpeed * forward;
 			break;
 		case 's': // 후진
-			cameraPos.z += cameraSpeed;
-			cameraDirection.z += cameraSpeed;
+			cameraPos -= cameraSpeed * forward;
+			cameraDirection -= cameraSpeed * forward;
 			break;
 		case 'a': // 왼쪽 이동
-			cameraPos.x -= cameraSpeed;
-			cameraDirection.x -= cameraSpeed;
+			cameraPos -= cameraSpeed * right;
+			cameraDirection -= cameraSpeed * right;
 			break;
 		case 'd': // 오른쪽 이동
-			cameraPos.x += cameraSpeed;
-			cameraDirection.x += cameraSpeed;
+			cameraPos += cameraSpeed * right;
+			cameraDirection += cameraSpeed * right;
 			break;
-		case 'i':
+		case 'i': // 위로 회전 (X축 회전)
+		{
+			glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), angleInRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+			glm::vec4 rotatedDirection = rotation * glm::vec4(cameraDirection - cameraPos, 0.0f);
+			cameraDirection = cameraPos + glm::vec3(rotatedDirection);
+			cameraDirection = glm::normalize(cameraDirection - cameraPos) + cameraPos;
 			break;
-		case 'j':
+		}
+		case 'k': // 아래로 회전 (X축 반대 방향)
+		{
+			glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), -angleInRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+			glm::vec4 rotatedDirection = rotation * glm::vec4(cameraDirection - cameraPos, 0.0f);
+			cameraDirection = cameraPos + glm::vec3(rotatedDirection);
+			cameraDirection = glm::normalize(cameraDirection - cameraPos) + cameraPos;
 			break;
-		case 'k':
+		}
+		case 'j': // 왼쪽 회전 (Y축 회전)
+		{
+			glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), angleInRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+			glm::vec4 rotatedDirection = rotation * glm::vec4(cameraDirection - cameraPos, 0.0f);
+			cameraDirection = cameraPos + glm::vec3(rotatedDirection);
+			cameraDirection = glm::normalize(cameraDirection - cameraPos) + cameraPos;
 			break;
-		case 'l':
+		}
+		case 'l': // 오른쪽 회전 (Y축 반대 방향)
+		{
+			glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), -angleInRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+			glm::vec4 rotatedDirection = rotation * glm::vec4(cameraDirection - cameraPos, 0.0f);
+			cameraDirection = cameraPos + glm::vec3(rotatedDirection);
+			cameraDirection = glm::normalize(cameraDirection - cameraPos) + cameraPos;
 			break;
+		}
 		default:
 			break;
 		}
