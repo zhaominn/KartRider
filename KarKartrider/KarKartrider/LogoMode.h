@@ -29,12 +29,12 @@ public:
         loadModelWithProgress<KartModel>("kronos.obj", "obj/car/kronos/", "car", "sphere", glm::scale(glm::mat4(1.0f), glm::vec3(1.0, 1.0, 1.0)), karts);
         loadModelWithProgress<RoadModel>("road_all_1.obj", "obj/road/", "road_all", "cube", glm::scale(glm::mat4(1.0f), glm::vec3(100.0, 100.0, 100.0)), roads);
 
-        loadModelWithProgress<MapModel>("map1.obj", "asset/", "map1", "box", glm::scale(glm::mat4(1.0f), glm::vec3(1.0, 1.0, 1.0)), selectMaps);
+        loadModelWithProgress<MapModel>("village_road.obj", "asset/", "village_road", "box", glm::scale(glm::mat4(1.0f), glm::vec3(1.0, 1.0, 1.0)), selectMaps);
 
         glm::mat4 map2_matrix = glm::mat4(1.0f);
         map2_matrix = glm::translate(map2_matrix, glm::vec3(2.5, 0.0, 0.0));
         map2_matrix = glm::scale(map2_matrix, glm::vec3(1.0, 1.0, 1.0));
-        loadModelWithProgress<MapModel>("map2.obj", "asset/", "map2", "box", map2_matrix, selectMaps);
+        loadModelWithProgress<MapModel>("villiage_unha.obj", "asset/", "villiage_unha", "box", map2_matrix, selectMaps);
 
         initializeModelsWithPhysics(karts);
         initializeModelsWithPhysics(roads);

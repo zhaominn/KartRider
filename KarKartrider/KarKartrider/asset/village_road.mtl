@@ -10,4 +10,4 @@ newmtl wire_135110008
 	Ka 0.5294 0.4314 0.0314
 	Kd 0.5294 0.4314 0.0314
 	Ks 0.3500 0.3500 0.3500
-map_Kd map2.png
+map_Kd village_road.png

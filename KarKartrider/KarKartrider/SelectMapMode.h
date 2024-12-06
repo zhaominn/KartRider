@@ -41,7 +41,7 @@ public:
 
 		glm::mat4 viewMapMode = glm::mat4(1.0f);
 		viewMapMode = glm::lookAt(
-			glm::vec3(-2.0, 0.0, 3.0),
+			glm::vec3(-2.0, 0.0, 3.5),
 			glm::vec3(0.0, 0.0, 0.0),
 			glm::vec3(0.0, 1.0, 0.0)
 		);
