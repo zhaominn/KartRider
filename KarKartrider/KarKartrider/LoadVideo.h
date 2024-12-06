@@ -31,8 +31,11 @@ void loadVideo(const std::string& fileName, const std::string& path, bool* isRun
 
         // 창 상태 확인: 창이 닫히면 루프 종료
         if (cv::getWindowProperty("Kartrider Intro", cv::WND_PROP_VISIBLE) < 1) {
+            exit(0);
             break;
         }
+
+        cv::moveWindow("Kartrider Intro", location_x, location_y);
 
         // 프레임 화면에 출력
         cv::imshow("Kartrider Intro", frame);

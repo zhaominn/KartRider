@@ -24,12 +24,6 @@ bool isKeyPressed_s(const char& key) {
     return keyState[key];
 }
 
-GLvoid Reshape(int w, int h) {
-    glViewport(0, 0, w, h);
-    width = w;
-    height = h;
-}
-
 void keyUp(unsigned char key, int x, int y) {
     //keyUp_s(key);
     glutPostRedisplay();
