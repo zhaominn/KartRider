@@ -23,6 +23,10 @@ public:
 
 	}
 
+	void keySpecial(int key, int x, int y) override{
+	
+	}
+
 	void draw_model() override {
 
 		glClearColor(1.0, 1.0, 1.0, 1.0f);

@@ -67,6 +67,8 @@ public:
 
     void keyboard(unsigned char key, int x, int y) override {}
 
+    void keySpecial(int key, int x, int y) override {}
+
     void draw_model() override {}
 
     void draw_bb() override {}

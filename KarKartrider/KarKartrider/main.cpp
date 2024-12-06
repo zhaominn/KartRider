@@ -17,6 +17,7 @@ void InitBuffer();
 GLvoid drawScene(GLvoid);
 GLvoid Reshape(int w, int h);
 
+
 int main(int argc, char** argv) {
 
 	glutInit(&argc, argv);
