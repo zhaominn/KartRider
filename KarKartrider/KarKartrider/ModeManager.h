@@ -34,4 +34,9 @@ public:
 		if (mode)
 			mode->keyboard(key, x, y);
 	}
+
+	void keySpecial(int key, int x, int y) {
+		if (mode)
+			mode->keySpecial(key, x, y);
+	}
 };

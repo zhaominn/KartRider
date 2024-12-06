@@ -48,8 +48,9 @@ void keyDown(unsigned char key, int x, int y) {
 }
 
 void keySpecial(int key, int x, int y) {
+    MM.keySpecial(key, x, y);
 
-    glm::mat4 rotationMatrix;
+    /*glm::mat4 rotationMatrix;
     if (key == GLUT_KEY_LEFT) {
         rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(-1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     }
@@ -66,7 +67,7 @@ void keySpecial(int key, int x, int y) {
         return;
     }
 
-    cameraPos = glm::vec3(rotationMatrix * glm::vec4(cameraPos, 1.0f));
+    cameraPos = glm::vec3(rotationMatrix * glm::vec4(cameraPos, 1.0f));*/
 
     glutPostRedisplay();
 }
