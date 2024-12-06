@@ -25,9 +25,6 @@ public:
 
 	void draw_model() override {
 
-
-		glUseProgram(shaderProgramID);
-
 		GLenum error = glGetError();
 		if (error != GL_NO_ERROR) {
 			std::cout << "Error in glUseProgram: " << error << std::endl;
