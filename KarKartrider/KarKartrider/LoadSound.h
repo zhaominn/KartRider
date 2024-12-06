@@ -1,6 +1,9 @@
 #pragma once
 #include <iostream>
 #include <irrKlang.h>
+
+#include "root.h"
+
 using namespace irrklang;
 
 void play_sound2D(std::string name, std::string path, bool repeat, bool* isRunning) {
@@ -21,6 +24,11 @@ void play_sound2D(std::string name, std::string path, bool repeat, bool* isRunni
         engine->drop();
         return;
     }
+
+    // 볼륨 설정
+    if (volume < 0.0f) volume = 0.0f; // 최소 볼륨 제한
+    if (volume > 1.0f) volume = 1.0f; // 최대 볼륨 제한
+    sound->setVolume(volume);
 
     // 플래그가 true인 동안 사운드 재생 유지
     while (*isRunning) {

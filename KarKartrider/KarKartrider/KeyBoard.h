@@ -37,6 +37,12 @@ void keyDown(unsigned char key, int x, int y) {
 
     switch (key)
     {
+    case '[':
+        volume -= 0.05;
+        break;
+    case ']':
+        volume += 0.05;
+        break;
     case 'q':
         std::cout << " 프로그램 종료 " << std::endl;
         exit(0);
@@ -49,25 +55,6 @@ void keyDown(unsigned char key, int x, int y) {
 
 void keySpecial(int key, int x, int y) {
     MM.keySpecial(key, x, y);
-
-    /*glm::mat4 rotationMatrix;
-    if (key == GLUT_KEY_LEFT) {
-        rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(-1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    }
-    else if (key == GLUT_KEY_RIGHT) {
-        rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    }
-    else if (key == GLUT_KEY_UP) {
-        rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(1.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    }
-    else if (key == GLUT_KEY_DOWN) {
-        rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(-1.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    }
-    else {
-        return;
-    }
-
-    cameraPos = glm::vec3(rotationMatrix * glm::vec4(cameraPos, 1.0f));*/
 
     glutPostRedisplay();
 }
