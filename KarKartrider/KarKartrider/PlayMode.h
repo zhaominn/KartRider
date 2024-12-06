@@ -13,6 +13,8 @@
 class PlayMode : public Mode {
 public:
 
+	int map_num = 1;
+
 	PlayMode(){}
 
 	void init() override {

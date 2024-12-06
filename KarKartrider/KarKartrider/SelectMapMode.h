@@ -63,6 +63,7 @@ public:
 		switch (key) {
 		case '\r': {
 			PlayMode* playMode = new PlayMode();
+			playMode->map_num = map_num;
 			MM.SetMode(playMode);
 			break;
 		}
