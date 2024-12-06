@@ -29,12 +29,28 @@ public:
         loadModelWithProgress<KartModel>("kronos.obj", "obj/car/kronos/", "car", "sphere", glm::scale(glm::mat4(1.0f), glm::vec3(1.0, 1.0, 1.0)), karts);
         loadModelWithProgress<RoadModel>("road_all_1.obj", "obj/road/", "road_all", "cube", glm::scale(glm::mat4(1.0f), glm::vec3(100.0, 100.0, 100.0)), roads);
 
+
+        //∫Ù∏Æ¡ˆ ∑ŒµÂ ∏ 
         loadModelWithProgress<MapModel>("village_road.obj", "asset/", "village_road", "box", glm::scale(glm::mat4(1.0f), glm::vec3(1.0, 1.0, 1.0)), selectMaps);
 
+        //// ∫Ù∏Æ¡ˆ øÓ«œ ∏ 
         glm::mat4 map2_matrix = glm::mat4(1.0f);
         map2_matrix = glm::translate(map2_matrix, glm::vec3(2.5, 0.0, 0.0));
         map2_matrix = glm::scale(map2_matrix, glm::vec3(1.0, 1.0, 1.0));
         loadModelWithProgress<MapModel>("villiage_unha.obj", "asset/", "villiage_unha", "box", map2_matrix, selectMaps);
+
+        // ∏ º±≈√ ≈∞∫∏µÂ πÊ«‚≈∞
+        glm::mat4 arrow_matrix = glm::mat4(1.0f);
+        arrow_matrix = glm::translate(arrow_matrix, glm::vec3(0.0, -1.0, 1.0));
+        arrow_matrix = glm::scale(arrow_matrix, glm::vec3(0.5, 0.5, 0.5));
+        arrow_matrix = glm::rotate(arrow_matrix, glm::radians(-90.0f), glm::vec3(1.0, 0.0, 0.0));
+        loadModelWithProgress<MapModel>("arrow_key.obj", "asset/", "arrow_key", "box", arrow_matrix, selectMaps);
+
+        glm::mat4 enter_matrix = glm::mat4(1.0f);
+        enter_matrix = glm::translate(enter_matrix, glm::vec3(0.8, -1.0, 1.0));
+        enter_matrix = glm::scale(enter_matrix, glm::vec3(0.4, 0.3, 0.4));
+        enter_matrix = glm::rotate(enter_matrix, glm::radians(-90.0f), glm::vec3(1.0, 0.0, 0.0));
+        loadModelWithProgress<MapModel>("enter_key.obj", "asset/", "enter_key", "box", enter_matrix, selectMaps);
 
         initializeModelsWithPhysics(karts);
         initializeModelsWithPhysics(roads);
