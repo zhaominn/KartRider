@@ -9,7 +9,6 @@
 #include "LoadVideo.h"
 #include "LoadSound.h"
 #include "SelectMapMode.h"
-#include "PlayMode.h"
 
 class LogoMode : public Mode {
 public:
@@ -37,14 +36,15 @@ public:
 
         // 4. 프로그램 종료 플래그 설정
         isRunning = false;
+        SelectMapMode* selectMapMode = new SelectMapMode();
+        MM.SetMode(selectMapMode);
     }
 
     void keyboard(unsigned char key, int x, int y) override {
         switch (key) {
         case '\r': {
-            PlayMode* playMode = new PlayMode();
-            SelectMapMode* selectMapMode = new SelectMapMode();
-            MM.SetMode(playMode);
+             SelectMapMode* selectMapMode = new SelectMapMode();
+             MM.SetMode(selectMapMode);
             break;
         }
         default:

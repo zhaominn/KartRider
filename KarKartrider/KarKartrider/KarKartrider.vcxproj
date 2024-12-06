@@ -149,6 +149,7 @@
     <ClInclude Include="KartModel.h" />
     <ClInclude Include="KeyBoard.h" />
     <ClInclude Include="Light.h" />
+    <ClInclude Include="LoadImg.h" />
     <ClInclude Include="LoadMtl.h" />
     <ClInclude Include="LoadObj.h" />
     <ClInclude Include="LoadProgress.h" />
