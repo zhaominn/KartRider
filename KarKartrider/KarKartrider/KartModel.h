@@ -101,10 +101,6 @@ public:
         }
     }
 
-
-
-
-
     const void draw_rigidBody(GLuint shaderProgramID) override {
         if (this->rigidBody) {
             RenderCollisionBox(this, shaderProgramID); // 충돌 박스 그리기

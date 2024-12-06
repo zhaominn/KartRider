@@ -7,6 +7,7 @@
 // Models
 std::vector<Model*> karts;
 std::vector<Model*> roads;
+std::vector<Model*> selectMaps;
 
 // mode
 ModeManager MM;

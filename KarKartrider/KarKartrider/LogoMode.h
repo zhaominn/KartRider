@@ -9,6 +9,7 @@
 #include "LoadVideo.h"
 #include "LoadSound.h"
 #include "SelectMapMode.h"
+#include "MapModel.h"
 
 class LogoMode : public Mode {
 public:
@@ -27,6 +28,9 @@ public:
         // 3. 모델 로드 및 Bullet Physics 초기화 (메인 스레드에서 실행)
         loadModelWithProgress<KartModel>("kronos.obj", "obj/car/kronos/", "car", "sphere", glm::scale(glm::mat4(1.0f), glm::vec3(1.0, 1.0, 1.0)), karts);
         loadModelWithProgress<RoadModel>("road_all_1.obj", "obj/road/", "road_all", "cube", glm::scale(glm::mat4(1.0f), glm::vec3(100.0, 100.0, 100.0)), roads);
+
+        loadModelWithProgress<MapModel>("map1.obj", "asset/", "map1", "box", glm::scale(glm::mat4(1.0f), glm::vec3(1.0, 1.0, 1.0)), selectMaps);
+
         initializeModelsWithPhysics(karts);
         initializeModelsWithPhysics(roads);
 
@@ -40,17 +44,7 @@ public:
         MM.SetMode(selectMapMode);
     }
 
-    void keyboard(unsigned char key, int x, int y) override {
-        switch (key) {
-        case '\r': {
-             SelectMapMode* selectMapMode = new SelectMapMode();
-             MM.SetMode(selectMapMode);
-            break;
-        }
-        default:
-            break;
-        }
-    }
+    void keyboard(unsigned char key, int x, int y) override {}
 
     void draw_model() override {}
 

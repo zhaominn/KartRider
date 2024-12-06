@@ -158,6 +158,7 @@
     <ClInclude Include="DefaultModel.h" />
     <ClInclude Include="LoadVideo.h" />
     <ClInclude Include="LogoMode.h" />
+    <ClInclude Include="MapModel.h" />
     <ClInclude Include="Mode.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="ModeManager.h" />
