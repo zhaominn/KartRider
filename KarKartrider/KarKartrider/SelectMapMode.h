@@ -34,7 +34,6 @@ void timer(int value) {
 class SelectMapMode : public Mode {
 public:
 
-	bool isSoundRunning;
 
 	int map_num = 1;
 
@@ -47,10 +46,12 @@ public:
 	glm::mat4 viewMapMode = glm::mat4(1.0f);
 
 
-
-	SelectMapMode() :isSoundRunning(true) {}
-
+	bool isSoundRunning;
 	std::thread soundThread;
+
+	bool isclickRunning;
+
+	SelectMapMode() :isSoundRunning(true), isclickRunning(true) {}
 
 	void init() override {
 
@@ -64,11 +65,12 @@ public:
 		//cameraPosMapMode = glm::vec3(rotatedCameraPos); // 회전된 위치를 카메라 위치로 적용
 		targetCameraPos = cameraPosMapMode; // 시작 위치를 목표 위치로 설정
 		glutTimerFunc(0, timer, 0);         // 타이머 함수 시작
-		
+
 	}
 
 
 	void keyboard(unsigned char key, int x, int y) override {
+		std::thread clickSoundThread(&SelectMapMode::clickSound, this);
 		switch (key) {
 		case '\r': {
 			isSoundRunning = false;
@@ -80,6 +82,7 @@ public:
 		default:
 			break;
 		}
+		clickSoundThread.join();
 	}
 
 	void updateTargetCameraPos() {
@@ -94,6 +97,7 @@ public:
 	}
 
 	void keySpecial(int key, int x, int y) override {
+		std::thread clickSoundThread(&SelectMapMode::clickSound, this);
 		if (key == GLUT_KEY_LEFT) {
 			map_num--;
 			if (map_num < 1) {
@@ -108,7 +112,7 @@ public:
 			}
 			this->updateTargetCameraPos(); // 목표 카메라 위치 업데이트
 		}
-
+		clickSoundThread.detach(); // 스레드 독립 실행 (메인 스레드 대기 없음)
 	}
 
 	void draw_model() override {
@@ -189,7 +193,13 @@ private:
 			file = file2;
 			break;
 		}
-		
-		play_sound2D(file, "./asset/select_mode/", false, &isSoundRunning);
+
+		play_sound2D(file, "./asset/select_mode/", true, &isSoundRunning);
+	}
+
+	void clickSound() {
+		isclickRunning = true;
+		play_sound2D("click.wav", "./asset/select_mode/", false, &isclickRunning);
+		isclickRunning = false;
 	}
 };
