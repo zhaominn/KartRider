@@ -25,8 +25,8 @@ int main(int argc, char** argv) {
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
 	int screenWidth = glutGet(GLUT_SCREEN_WIDTH);  // 모니터의 가로 해상도
 	int screenHeight = glutGet(GLUT_SCREEN_HEIGHT); // 모니터의 세로 해상도
-	glutInitWindowPosition(0, 0);
-	glutInitWindowSize(800, 600); // 창 크기를 화면 크기로 설정
+	glutInitWindowPosition(location_x, location_y);
+	glutInitWindowSize(window_width, window_height); // 창 크기를 화면 크기로 설정
 	glutCreateWindow("KarKartrider");
 	//glutFullScreen(); // 전체 화면으로 전환
 
@@ -41,14 +41,6 @@ int main(int argc, char** argv) {
 	make_shaderProgram();
 
 	initPhysics(); // Bullet 초기화 함수 호출
-
-
-	// play mode에 필요한 모델 로드
-	loadModelWithProgress <KartModel>("kronos.obj", "obj/car/kronos/", "car", "sphere", glm::scale(glm::mat4(1.0f), glm::vec3(1.0, 1.0, 1.0)), karts);
-	loadModelWithProgress <RoadModel>("road_all_1.obj", "obj/road/", "road_all", "cube", glm::scale(glm::mat4(1.0f), glm::vec3(100.0, 100.0, 100.0)), roads);
-
-	initializeModelsWithPhysics(karts); // 모든 모델 Bullet world에 추가
-	initializeModelsWithPhysics(roads);
 
 	LogoMode* logoMode = new LogoMode();
 	MM.SetMode(logoMode); //초기 모드 세팅

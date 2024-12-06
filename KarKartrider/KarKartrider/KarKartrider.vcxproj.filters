@@ -119,6 +119,9 @@
     <ClInclude Include="LoadVideo.h">
       <Filter>헤더 파일\Load</Filter>
     </ClInclude>
+    <ClInclude Include="LoadSound.h">
+      <Filter>헤더 파일\Load</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
