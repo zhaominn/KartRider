@@ -41,15 +41,15 @@ public:
 
         // 맵선택 키보드 방향키
         glm::mat4 arrow_matrix = glm::mat4(1.0f);
-        arrow_matrix = glm::translate(arrow_matrix, glm::vec3(0.0, -1.0, 1.0));
+        arrow_matrix = glm::translate(arrow_matrix, glm::vec3(-0.2, -1.0, 1.0));
         arrow_matrix = glm::scale(arrow_matrix, glm::vec3(0.5, 0.5, 0.5));
-        arrow_matrix = glm::rotate(arrow_matrix, glm::radians(-90.0f), glm::vec3(1.0, 0.0, 0.0));
+        arrow_matrix = glm::rotate(arrow_matrix, glm::radians(-80.0f), glm::vec3(1.0, 0.0, 0.0));
         loadModelWithProgress<MapModel>("arrow_key.obj", "asset/", "arrow_key", "box", arrow_matrix, selectMaps);
 
         glm::mat4 enter_matrix = glm::mat4(1.0f);
-        enter_matrix = glm::translate(enter_matrix, glm::vec3(0.8, -1.0, 1.0));
+        enter_matrix = glm::translate(enter_matrix, glm::vec3(0.6, -1.0, 1.0));
         enter_matrix = glm::scale(enter_matrix, glm::vec3(0.4, 0.3, 0.4));
-        enter_matrix = glm::rotate(enter_matrix, glm::radians(-90.0f), glm::vec3(1.0, 0.0, 0.0));
+        enter_matrix = glm::rotate(enter_matrix, glm::radians(-80.0f), glm::vec3(1.0, 0.0, 0.0));
         loadModelWithProgress<MapModel>("enter_key.obj", "asset/", "enter_key", "box", enter_matrix, selectMaps);
 
         initializeModelsWithPhysics(karts);
