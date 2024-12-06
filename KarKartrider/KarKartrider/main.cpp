@@ -25,8 +25,8 @@ int main(int argc, char** argv) {
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
 	int screenWidth = glutGet(GLUT_SCREEN_WIDTH);  // 모니터의 가로 해상도
 	int screenHeight = glutGet(GLUT_SCREEN_HEIGHT); // 모니터의 세로 해상도
-	glutInitWindowPosition(0, 0);
-	glutInitWindowSize(800, 600); // 창 크기를 화면 크기로 설정
+	glutInitWindowPosition(location_x, location_y);
+	glutInitWindowSize(window_width, window_height); // 창 크기를 화면 크기로 설정
 	glutCreateWindow("KarKartrider");
 	//glutFullScreen(); // 전체 화면으로 전환
 
