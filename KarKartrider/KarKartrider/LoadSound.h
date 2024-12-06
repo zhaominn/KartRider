@@ -3,7 +3,7 @@
 #include <irrKlang.h>
 using namespace irrklang;
 
-void play_sound2D(std::string path, std::string name, bool repeat, bool* isRunning) {
+void play_sound2D(std::string name, std::string path, bool repeat, bool* isRunning) {
     ISoundEngine* engine = createIrrKlangDevice();
     if (!engine) {
         std::cerr << "Error: Could not initialize irrKlang engine!" << std::endl;
