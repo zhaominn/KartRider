@@ -4,8 +4,7 @@
 #include "shaderMaker.h"
 #include "root.h"
 #include "KeyBoard.h"
-#include "LoadImg.h"
-
+#include "PlayMode.h"
 
 class SelectMapMode : public Mode {
 public:
@@ -13,11 +12,18 @@ public:
 	SelectMapMode() {}
 
 	void init() override {
-
 	}
 
 	void keyboard(unsigned char key, int x, int y) override {
-
+		switch (key) {
+		case '\r': {
+			PlayMode* playMode = new PlayMode();
+			MM.SetMode(playMode);
+			break;
+		}
+		default:
+			break;
+		}
 	}
 
 	void draw_model() override {
