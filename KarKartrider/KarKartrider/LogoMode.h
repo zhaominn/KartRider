@@ -6,6 +6,7 @@
 #include "KeyBoard.h"
 #include "PlayMode.h"
 #include "LoadVideo.h"
+#include "LoadSound.h"
 
 class LogoMode : public Mode {
 public:
@@ -15,6 +16,7 @@ public:
 
 	void init() override {
 		loadVideo("kartrider_intro.mp4", "./asset/");
+		play_sound2D("./asset/", "kartrider_intro.MP3", false);
 	}
 
 	void keyboard(unsigned char key, int x, int y) override {
