@@ -2,7 +2,6 @@
 #include <iostream>
 #include <opencv2/opencv.hpp>
 
-
 void loadVideo(const std::string& fileName, const std::string& path, bool* isRunning) {
     // 1. OpenCV 버전 출력
     std::cout << "OpenCV Version: " << CV_VERSION << std::endl;
