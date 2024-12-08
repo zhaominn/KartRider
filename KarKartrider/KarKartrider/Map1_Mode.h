@@ -45,16 +45,30 @@ public:
 	}
 
 	void updateCameraDirection() {
+		glm::mat3 rotationMatrix = glm::mat3(karts[0]->translateMatrix);
 
+		// 기본 카메라 방향 벡터 계산
 		glm::vec3 direction;
 		direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
 		direction.y = sin(glm::radians(pitch));
 		direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-		cameraDirection = glm::normalize(direction) + cameraPos;
+
+		// 회전 행렬을 적용한 방향 벡터 계산
+		glm::vec3 rotatedDirection = rotationMatrix * direction;
+
+		// 카메라의 방향을 회전된 방향으로 설정
+		cameraDirection = glm::normalize(rotatedDirection) + cameraPos;
 	}
 
 	void setCamera() {
-		cameraPos = glm::vec3(karts[0]->translateMatrix[3][0], karts[0]->translateMatrix[3][1] + 1.0, karts[0]->translateMatrix[3][2] + 5.0);
+		glm::vec3 carPosition = glm::vec3(karts[0]->translateMatrix[3]);
+
+		// 오프셋 벡터에 회전 행렬을 적용
+		glm::vec3 rotatedOffset = glm::mat3(karts[0]->translateMatrix) * glm::vec3(0.0f, 1.0f, 5.0f);
+
+		// 카메라 위치는 카트 위치에 회전된 오프셋을 더한 값
+		cameraPos = carPosition + rotatedOffset;
+
 		updateCameraDirection();
 	}
 
