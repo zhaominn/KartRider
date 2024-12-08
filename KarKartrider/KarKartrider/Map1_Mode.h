@@ -25,6 +25,11 @@ public:
 	float yaw = -90.0f; // 수평 회전 (기본: -Z축)
 	float pitch = 0.0f; // 수직 회전 (기본: 수평)
 
+	bool up = false;
+	bool down = false;
+	bool left = false;
+	bool right = false;
+
 	Map1_Mode() {}
 
 	void init() override {
@@ -107,8 +112,38 @@ public:
 		moveCamera(key, x, y);
 	}
 
-	void keySpecial(int key, int x, int y) override {
+	void specialKey(int key, int x, int y) override {
+		switch (key) {
+		case GLUT_KEY_UP:
+			up = true;
+			break;
+		case GLUT_KEY_DOWN:
+			down = true;
+			break;
+		case GLUT_KEY_LEFT:
+			left = true;
+			break;
+		case GLUT_KEY_RIGHT:
+			right = true;
+			break;
+		}
+	}
 
+	void specialKeyUp(int key, int x, int y) override {
+		switch (key) {
+		case GLUT_KEY_UP:
+			up = false;
+			break;
+		case GLUT_KEY_DOWN:
+			down = false;
+			break;
+		case GLUT_KEY_LEFT:
+			left = false;
+			break;
+		case GLUT_KEY_RIGHT:
+			right = false;
+			break;
+		}
 	}
 
 	void draw_model() override {

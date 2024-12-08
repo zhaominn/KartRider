@@ -53,8 +53,14 @@ void keyDown(unsigned char key, int x, int y) {
     glutPostRedisplay();
 }
 
-void keySpecial(int key, int x, int y) {
-    MM.keySpecial(key, x, y);
+void specialKey(int key, int x, int y) {
+    MM.specialKey(key, x, y);
+
+    glutPostRedisplay();
+}
+
+void specialKeyUp(int key, int x, int y) {
+    MM.specialKeyUp(key, x, y);
 
     glutPostRedisplay();
 }

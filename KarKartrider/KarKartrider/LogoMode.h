@@ -69,7 +69,9 @@ public:
 
     void keyboard(unsigned char key, int x, int y) override {}
 
-    void keySpecial(int key, int x, int y) override {}
+    void specialKey(int key, int x, int y) override {}
+
+    void specialKeyUp(int key, int x, int y) override {}
 
     void draw_model() override {}
 

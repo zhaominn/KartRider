@@ -35,8 +35,13 @@ public:
 			mode->keyboard(key, x, y);
 	}
 
-	void keySpecial(int key, int x, int y) {
+	void specialKey(int key, int x, int y) {
 		if (mode)
-			mode->keySpecial(key, x, y);
+			mode->specialKey(key, x, y);
+	}
+
+	void specialKeyUp(int key, int x, int y) {
+		if (mode)
+			mode->specialKeyUp(key, x, y);
 	}
 };

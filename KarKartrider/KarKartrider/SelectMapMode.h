@@ -71,7 +71,6 @@ public:
 
 	}
 
-
 	void keyboard(unsigned char key, int x, int y) override {
 		std::thread clickSoundThread(&SelectMapMode::clickSound, this);
 		switch (key) {
@@ -98,6 +97,7 @@ public:
 		clickSoundThread.detach();
 	}
 
+
 	void updateTargetCameraPos() {
 		if (map_num == 1) {
 			targetCameraPos = map1CamerPos;
@@ -109,7 +109,7 @@ public:
 		isAnimating = true; // 애니메이션 시작
 	}
 
-	void keySpecial(int key, int x, int y) override {
+	void specialKey(int key, int x, int y) override {
 		std::thread clickSoundThread(&SelectMapMode::clickSound, this);
 		if (key == GLUT_KEY_LEFT) {
 			map_num--;
@@ -127,6 +127,8 @@ public:
 		}
 		clickSoundThread.detach(); // 스레드 독립 실행 (메인 스레드 대기 없음)
 	}
+
+	void specialKeyUp(int key, int x, int y) override {}
 
 	void draw_model() override {
 
