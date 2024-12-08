@@ -72,6 +72,8 @@ public:
 	}
 
 	void timer() {
+		UpdateRigidBodyTransform(karts[0]);
+
 		if (up) {
 			for (const auto& kart : karts) {
 				kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, -0.1));
