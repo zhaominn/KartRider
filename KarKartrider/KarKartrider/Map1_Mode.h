@@ -10,7 +10,7 @@
 #include "Light.h"
 
 
-class PlayMode : public Mode {
+class Map1_Mode : public Mode {
 public:
 
 	glm::vec3 cameraPos = glm::vec3(0.0, 0.0, 5.0);
@@ -25,7 +25,7 @@ public:
 	float yaw = -90.0f; // 수평 회전 (기본: -Z축)
 	float pitch = 0.0f; // 수직 회전 (기본: 수평)
 
-	PlayMode(){}
+	Map1_Mode() {}
 
 	void init() override {
 
@@ -100,8 +100,8 @@ public:
 		moveCamera(key, x, y);
 	}
 
-	void keySpecial(int key, int x, int y) override{
-		
+	void keySpecial(int key, int x, int y) override {
+
 	}
 
 	void draw_model() override {
@@ -141,7 +141,7 @@ public:
 		for (const auto& kart : karts) { // 실제 모델 draw
 			kart->draw(shaderProgramID, isKeyPressed_s);
 		}
-		for (const auto& road : roads) { // 실제 모델 draw
+		for (const auto& road : road1) { // 실제 모델 draw
 			road->draw(shaderProgramID, isKeyPressed_s);
 		}
 
@@ -153,7 +153,7 @@ public:
 		for (const auto& model : karts) { // 모델 bb draw
 			model->draw_rigidBody(shaderProgramID);
 		}
-		for (const auto& road : roads) { // 모델 bb draw
+		for (const auto& road : road1) { // 모델 bb draw
 			road->draw_rigidBody(shaderProgramID);
 		}
 	}
