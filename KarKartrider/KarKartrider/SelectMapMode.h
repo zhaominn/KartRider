@@ -17,7 +17,7 @@ float animationSpeed = 0.05f; // 애니메이션 속도 (0.05 = 부드러운 이동)
 glm::vec3 targetCameraPos = glm::vec3(0.0, 0.0, 5.0);   // 목표 카메라 위치
 glm::vec3 cameraPosMapMode = glm::vec3(0.0, 0.0, 5.0);
 
-void timer(int value) {
+void SelectMap_timer(int value) {
 	if (isAnimating) {
 		// 현재 카메라 위치와 목표 위치(targetCameraPos)를 LERP
 		cameraPosMapMode = glm::mix(cameraPosMapMode, targetCameraPos, animationSpeed);
@@ -30,7 +30,7 @@ void timer(int value) {
 	}
 
 	glutPostRedisplay();            // 화면 업데이트 요청
-	glutTimerFunc(16, timer, 0);    // 약 60FPS로 타이머 반복 호출
+	glutTimerFunc(16, SelectMap_timer, 0);    // 약 60FPS로 타이머 반복 호출
 }
 
 
@@ -67,9 +67,10 @@ public:
 		//glm::vec4 rotatedCameraPos = rotation * glm::vec4(cameraPosMapMode, 1.0f);
 		//cameraPosMapMode = glm::vec3(rotatedCameraPos); // 회전된 위치를 카메라 위치로 적용
 		targetCameraPos = cameraPosMapMode; // 시작 위치를 목표 위치로 설정
-		glutTimerFunc(0, timer, 0);         // 타이머 함수 시작
+		glutTimerFunc(0, SelectMap_timer, 0);         // 타이머 함수 시작
 
 	}
+
 
 	void keyboard(unsigned char key, int x, int y) override {
 		std::thread clickSoundThread(&SelectMapMode::clickSound, this);

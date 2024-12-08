@@ -142,5 +142,8 @@
     <ClCompile Include="filetobuf.cpp">
       <Filter>소스 파일\Load</Filter>
     </ClCompile>
+    <ClCompile Include="Mode.cpp">
+      <Filter>헤더 파일\Mode</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

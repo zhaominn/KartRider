@@ -19,8 +19,6 @@ public:
 	glm::mat4 projection = glm::mat4(1.0f);
 	glm::mat4 view = glm::mat4(1.0f);
 
-	int map_num = 1;
-
 	// 카메라 회전 각도
 	float yaw = -90.0f; // 수평 회전 (기본: -Z축)
 	float pitch = 0.0f; // 수직 회전 (기본: 수평)

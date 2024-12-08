@@ -13,24 +13,24 @@
 class Map1_Mode : public Mode {
 public:
 
+	bool up = false;
+	bool down = false;
+	bool left = false;
+	bool right = false;
+
 	glm::vec3 cameraPos = glm::vec3(0.0, 0.0, 5.0);
 	glm::vec3 cameraDirection = glm::vec3(0.0, 0.0, -1.0);
 	glm::vec3 cameraUp = glm::vec3(0.0, 1.0, 0.0);
 	glm::mat4 projection = glm::mat4(1.0f);
 	glm::mat4 view = glm::mat4(1.0f);
 
-	int map_num = 1;
-
 	// 카메라 회전 각도
 	float yaw = -90.0f; // 수평 회전 (기본: -Z축)
 	float pitch = 0.0f; // 수직 회전 (기본: 수평)
 
-	bool up = false;
-	bool down = false;
-	bool left = false;
-	bool right = false;
-
-	Map1_Mode() {}
+	Map1_Mode() {
+		Mode::currentInstance = this;  // Map1_Mode 인스턴스를 currentInstance에 할당
+	}
 
 	void init() override {
 		for (const auto& kart : karts) { // 카트 위치 초기화
@@ -39,6 +39,8 @@ public:
 			cameraPos = glm::vec3(0.0, 3.6, 243.0);
 			updateCameraDirection();
 
+			// 비정적 timer 함수 호출
+			glutTimerFunc(0, Map1_Mode::timerHelper, 0);
 		}
 	}
 
@@ -49,6 +51,38 @@ public:
 		direction.y = sin(glm::radians(pitch));
 		direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
 		cameraDirection = glm::normalize(direction) + cameraPos;
+	}
+
+	void setCamera() {
+		cameraPos = glm::vec3(karts[0]->translateMatrix[3][0], karts[0]->translateMatrix[3][1] + 1.0, karts[0]->translateMatrix[3][2] + 5.0);
+		updateCameraDirection();
+	}
+
+	void timer() {
+		if (up) {
+			for (const auto& kart : karts) {
+				kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, -0.1));
+			}
+			setCamera();
+		}
+		if (down) {
+			for (const auto& kart : karts) {
+				kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, 0.1));
+			}
+			setCamera();
+		}
+		if (left) {
+			for (const auto& kart : karts) {
+				kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(-0.1, 0.0, 0.0));
+			}
+			setCamera();
+		}
+		if (right) {
+			for (const auto& kart : karts) {
+				kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.1, 0.0, 0.0));
+			}
+			setCamera();
+		}
 	}
 
 	void moveCamera(unsigned char key, int x, int y) {
@@ -202,6 +236,15 @@ public:
 
 	void finish() override {
 
+	}
+private:
+
+	static void timerHelper(int value) {
+		if (Map1_Mode* instance = dynamic_cast<Map1_Mode*>(Mode::currentInstance)) {
+			instance->timer(); // 인스턴스의 timer 호출
+		}
+		glutPostRedisplay();
+		glutTimerFunc(16, timerHelper, value); // 타이머 반복 호출
 	}
 
 };
