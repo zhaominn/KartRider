@@ -73,13 +73,15 @@ public:
 		}
 		if (left) {
 			for (const auto& kart : karts) {
-				kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(-0.1, 0.0, 0.0));
+				//kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(-0.1, 0.0, 0.0));
+				kart->translateMatrix = glm::rotate(kart->translateMatrix, glm::radians(1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 			}
 			setCamera();
 		}
 		if (right) {
 			for (const auto& kart : karts) {
-				kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.1, 0.0, 0.0));
+				//kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.1, 0.0, 0.0));
+				kart->translateMatrix = glm::rotate(kart->translateMatrix, glm::radians(-1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 			}
 			setCamera();
 		}

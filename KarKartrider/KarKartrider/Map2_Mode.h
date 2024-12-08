@@ -13,6 +13,11 @@
 class Map2_Mode : public Mode {
 public:
 
+	bool up = false;
+	bool down = false;
+	bool left = false;
+	bool right = false;
+
 	glm::vec3 cameraPos = glm::vec3(0.0, 0.0, 5.0);
 	glm::vec3 cameraDirection = glm::vec3(0.0, 0.0, -1.0);
 	glm::vec3 cameraUp = glm::vec3(0.0, 1.0, 0.0);
@@ -23,7 +28,9 @@ public:
 	float yaw = -90.0f; // 수평 회전 (기본: -Z축)
 	float pitch = 0.0f; // 수직 회전 (기본: 수평)
 
-	Map2_Mode() {}
+	Map2_Mode() {
+		Mode::currentInstance = this;  // Map1_Mode 인스턴스를 currentInstance에 할당
+	}
 
 	void init() override {
 		for (const auto& kart : karts) { // 카트 위치 초기화
@@ -31,6 +38,8 @@ public:
 			kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(165.0, 2.0, 0.0));
 			cameraPos = glm::vec3(165.0, 3.0, 5.0);
 			updateCameraDirection();
+
+			glutTimerFunc(0, Map2_Mode::timerHelper, 0);
 		}
 	}
 
@@ -40,6 +49,38 @@ public:
 		direction.y = sin(glm::radians(pitch));
 		direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
 		cameraDirection = glm::normalize(direction) + cameraPos;
+	}
+
+	void setCamera() {
+		cameraPos = glm::vec3(karts[0]->translateMatrix[3][0], karts[0]->translateMatrix[3][1] + 1.0, karts[0]->translateMatrix[3][2] + 5.0);
+		updateCameraDirection();
+	}
+
+	void timer() {
+		if (up) {
+			for (const auto& kart : karts) {
+				kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, -0.1));
+			}
+			setCamera();
+		}
+		if (down) {
+			for (const auto& kart : karts) {
+				kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, 0.1));
+			}
+			setCamera();
+		}
+		if (left) {
+			for (const auto& kart : karts) {
+				kart->translateMatrix = glm::rotate(kart->translateMatrix, glm::radians(1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+			}
+			setCamera();
+		}
+		if (right) {
+			for (const auto& kart : karts) {
+				kart->translateMatrix = glm::rotate(kart->translateMatrix, glm::radians(-1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+			}
+			setCamera();
+		}
 	}
 
 	void moveCamera(unsigned char key, int x, int y) {
@@ -104,10 +145,38 @@ public:
 	}
 
 	void specialKey(int key, int x, int y) override {
-
+		switch (key) {
+		case GLUT_KEY_UP:
+			up = true;
+			break;
+		case GLUT_KEY_DOWN:
+			down = true;
+			break;
+		case GLUT_KEY_LEFT:
+			left = true;
+			break;
+		case GLUT_KEY_RIGHT:
+			right = true;
+			break;
+		}
 	}
 
-	void specialKeyUp(int key, int x, int y) override {}
+	void specialKeyUp(int key, int x, int y) override {
+		switch (key) {
+		case GLUT_KEY_UP:
+			up = false;
+			break;
+		case GLUT_KEY_DOWN:
+			down = false;
+			break;
+		case GLUT_KEY_LEFT:
+			left = false;
+			break;
+		case GLUT_KEY_RIGHT:
+			right = false;
+			break;
+		}
+	}
 
 	void draw_model() override {
 
@@ -165,6 +234,16 @@ public:
 
 	void finish() override {
 
+	}
+
+private:
+
+	static void timerHelper(int value) {
+		if (Map2_Mode* instance = dynamic_cast<Map2_Mode*>(Mode::currentInstance)) {
+			instance->timer(); // 인스턴스의 timer 호출
+		}
+		glutPostRedisplay();
+		glutTimerFunc(16, timerHelper, value); // 타이머 반복 호출
 	}
 
 };
