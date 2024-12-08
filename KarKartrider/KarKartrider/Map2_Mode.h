@@ -28,7 +28,12 @@ public:
 	Map2_Mode() {}
 
 	void init() override {
-
+		for (const auto& kart : karts) { // 카트 위치 초기화
+			kart->translateMatrix = glm::mat4(1.0f);
+			kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(165.0, 2.0, 0.0));
+			cameraPos = glm::vec3(165.0, 3.0, 5.0);
+			updateCameraDirection();
+		}
 	}
 
 	void updateCameraDirection() {
