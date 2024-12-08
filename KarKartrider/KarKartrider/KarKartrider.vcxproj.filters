@@ -104,9 +104,6 @@
     <ClInclude Include="Mode.h">
       <Filter>헤더 파일\Mode</Filter>
     </ClInclude>
-    <ClInclude Include="PlayMode.h">
-      <Filter>헤더 파일\Mode</Filter>
-    </ClInclude>
     <ClInclude Include="ModeManager.h">
       <Filter>헤더 파일\Mode</Filter>
     </ClInclude>

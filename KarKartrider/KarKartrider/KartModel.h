@@ -41,7 +41,8 @@ public:
             glUniformMatrix3fv(normalLoc, 1, GL_FALSE, glm::value_ptr(normalMatrix));
 
             // **모델 행렬 갱신**
-            glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(this->matrix));
+            glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(this->translateMatrix));
+            
 
             GLuint lastBoundTextureID = 0; // 이전 텍스처 ID 추적
             for (const auto& [materialName, ebo] : this->textureEBOs) {

@@ -28,10 +28,17 @@ public:
 	Map1_Mode() {}
 
 	void init() override {
+		for (const auto& kart : karts) { // 카트 위치 초기화
+			kart->translateMatrix = glm::mat4(1.0f);
+			kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 2.6, 238.0));
+			cameraPos = glm::vec3(0.0, 3.6, 243.0);
+			updateCameraDirection();
 
+		}
 	}
 
 	void updateCameraDirection() {
+
 		glm::vec3 direction;
 		direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
 		direction.y = sin(glm::radians(pitch));
