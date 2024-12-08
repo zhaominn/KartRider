@@ -7,7 +7,10 @@
 #include "shaderMaker.h"
 #include "root.h"
 #include "KeyBoard.h"
-#include "PlayMode.h"
+//#include "PlayMode.h"
+#include "Map1_Mode.h"
+#include "Map2_Mode.h"
+
 
 bool isAnimating = false;  // 카메라가 이동 중인지 확인
 float animationSpeed = 0.05f; // 애니메이션 속도 (0.05 = 부드러운 이동)
@@ -74,9 +77,19 @@ public:
 		switch (key) {
 		case '\r': {
 			isSoundRunning = false;
+			/*
 			PlayMode* playMode = new PlayMode();
 			playMode->map_num = map_num;
 			MM.SetMode(playMode);
+			*/
+			if (map_num == 1) {
+				Map1_Mode* map1Mode = new Map1_Mode();
+				MM.SetMode(map1Mode);
+			}
+			else if (map_num == 2) {
+				Map2_Mode* map2Mode = new Map2_Mode();
+				MM.SetMode(map2Mode);
+			}
 			break;
 		}
 		default:

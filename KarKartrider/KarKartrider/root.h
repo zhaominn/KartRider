@@ -6,7 +6,9 @@
 #include "KartModel.h"
 // Models
 std::vector<Model*> karts;
-std::vector<Model*> roads;
+//std::vector<Model*> roads;
+std::vector<Model*> road1;
+std::vector<Model*> road2;
 std::vector<Model*> selectMaps;
 
 // mode

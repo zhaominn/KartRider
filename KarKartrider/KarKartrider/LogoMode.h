@@ -27,7 +27,8 @@ public:
 
         // 3. 모델 로드 및 Bullet Physics 초기화 (메인 스레드에서 실행)
         loadModelWithProgress<KartModel>("kronos.obj", "obj/car/kronos/", "car", "sphere", glm::scale(glm::mat4(1.0f), glm::vec3(1.0, 1.0, 1.0)), karts);
-        loadModelWithProgress<RoadModel>("road_all_2.obj", "obj/road/", "road_all", "cube", glm::scale(glm::mat4(1.0f), glm::vec3(5.0, 5.0, 5.0)), roads);
+        loadModelWithProgress<RoadModel>("road_all_1.obj", "obj/road/", "road_all", "cube", glm::scale(glm::mat4(1.0f), glm::vec3(5.0, 5.0, 5.0)), road2);
+        loadModelWithProgress<RoadModel>("road_all_2.obj", "obj/road/", "road_all", "cube", glm::scale(glm::mat4(1.0f), glm::vec3(5.0, 5.0, 5.0)), road1);
 
 
         //빌리지 로드 맵
@@ -53,7 +54,8 @@ public:
         loadModelWithProgress<MapModel>("enter_key.obj", "asset/select_mode/", "enter_key", "box", enter_matrix, selectMaps);
 
         initializeModelsWithPhysics(karts);
-        initializeModelsWithPhysics(roads);
+        initializeModelsWithPhysics(road1);
+        initializeModelsWithPhysics(road2);
 
         // 5. 동영상 및 사운드 스레드 종료 대기
         videoThread.join();

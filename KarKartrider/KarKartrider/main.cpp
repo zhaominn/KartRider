@@ -85,9 +85,14 @@ void InitBuffer() {
 		model->initBuffer();
 	}
 
-	for (const auto& model : roads) { // ¸ðµç ¸ðµ¨ initBuffer
+	for (const auto& model : road1) { // ¸ðµç ¸ðµ¨ initBuffer
 		model->initBuffer();
 	}
+
+	for (const auto& model : road2) { // ¸ðµç ¸ðµ¨ initBuffer
+		model->initBuffer();
+	}
+
 	for (const auto& model : selectMaps) { // ¸ðµç ¸ðµ¨ initBuffer
 		model->initBuffer();
 	}

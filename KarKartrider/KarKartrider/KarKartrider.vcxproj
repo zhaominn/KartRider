@@ -158,11 +158,15 @@
     <ClInclude Include="DefaultModel.h" />
     <ClInclude Include="LoadVideo.h" />
     <ClInclude Include="LogoMode.h" />
+    <ClInclude Include="Map1_Mode.h" />
+    <ClInclude Include="Map2_Mode.h" />
     <ClInclude Include="MapModel.h" />
     <ClInclude Include="Mode.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="ModeManager.h" />
-    <ClInclude Include="PlayMode.h" />
+    <ClInclude Include="PlayMode.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="RoadModel.h" />
     <ClInclude Include="root.h" />
     <ClInclude Include="SelectMapMode.h" />
