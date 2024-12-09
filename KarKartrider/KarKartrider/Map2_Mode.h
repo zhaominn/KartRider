@@ -36,7 +36,7 @@ public:
 		for (const auto& kart : karts) { // 카트 위치 초기화
 			kart->translateMatrix = glm::mat4(1.0f);
 			kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(165.0, 1.0, 0.0));
-			cameraPos = glm::vec3(165.0, 2.0, 5.0);
+			cameraPos = glm::vec3(165.0, 4.0, 15.0);
 			updateCameraDirection();
 
 			glutTimerFunc(0, Map2_Mode::timerHelper, 0);
@@ -63,7 +63,7 @@ public:
 		glm::vec3 carPosition = glm::vec3(karts[0]->translateMatrix[3]);
 
 		// 오프셋 벡터에 회전 행렬을 적용
-		glm::vec3 rotatedOffset = glm::mat3(karts[0]->translateMatrix) * glm::vec3(0.0f, 1.0f, 5.0f);
+		glm::vec3 rotatedOffset = glm::mat3(karts[0]->translateMatrix) * glm::vec3(0.0f, 3.0f, 15.0f);
 
 		// 카메라 위치는 카트 위치에 회전된 오프셋을 더한 값
 		cameraPos = carPosition + rotatedOffset;
