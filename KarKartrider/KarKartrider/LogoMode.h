@@ -26,11 +26,11 @@ public:
         std::thread soundThread(&LogoMode::runSound, this);
 
         // 3. 모델 로드 및 Bullet Physics 초기화 (메인 스레드에서 실행)
-        loadModelWithProgress<KartModel>("kronos.obj", "obj/car/kronos/", "car", "sphere", glm::scale(glm::mat4(1.0f), glm::vec3(1.0, 1.0, 1.0)), karts, true);
+        loadModelWithProgress<KartModel>("kronos.obj", "obj/car/kronos/", "car", "box", glm::scale(glm::mat4(1.0f), glm::vec3(1.0, 1.0, 1.0)), karts, true);
         loadModelWithProgress<RoadModel>("road_all_02.obj", "obj/road/", "road_all_2", "cube", glm::scale(glm::mat4(1.0f), glm::vec3(20.0, 20.0, 20.0)), road2, false);
         loadModelWithProgress<RoadModel>("road_all_01.obj", "obj/road/", "road_all_1", "cube", glm::scale(glm::mat4(1.0f), glm::vec3(15.0, 15.0, 15.0)), road1, false);
 
-
+         
         //빌리지 로드 맵
         loadModelWithProgress<MapModel>("village_road.obj", "asset/select_mode/", "village_road", "box", glm::scale(glm::mat4(1.0f), glm::vec3(1.0, 1.0, 1.0)), selectMaps, false);
 
@@ -52,10 +52,6 @@ public:
         enter_matrix = glm::scale(enter_matrix, glm::vec3(0.4, 0.3, 0.4));
         enter_matrix = glm::rotate(enter_matrix, glm::radians(-80.0f), glm::vec3(1.0, 0.0, 0.0));
         loadModelWithProgress<MapModel>("enter_key.obj", "asset/select_mode/", "enter_key", "box", enter_matrix, selectMaps, false);
-
-        /*initializeModelsWithPhysics(karts);
-        initializeModelsWithPhysics(road1);
-        initializeModelsWithPhysics(road2);*/
 
         // 5. 동영상 및 사운드 스레드 종료 대기
         videoThread.join();
