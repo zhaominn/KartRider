@@ -23,7 +23,7 @@ public:
 
 	GLfloat kart_speed = 0.0f;
 
-	enum Move{ NONE_M, UP, DOWN, };
+	enum Move { NONE_M, UP, DOWN, };
 	enum Direction { NONE_D, LEFT, RIGHT };
 	Move prev_move = NONE_M;
 	Direction prev_dir = NONE_D;
@@ -142,7 +142,9 @@ public:
 			if (kart_speed >= 0.0f) // 속도 제한
 				kart_speed -= DECELERATION;
 			else if (kart_speed == 0.0f)
-				prev_dir = NONE_D;
+				prev_move = NONE_M;
+
+			prev_dir = NONE_D;
 
 			if (reducedRotationInfluence <= 1.0f)
 				reducedRotationInfluence += 0.01f;
@@ -158,17 +160,21 @@ public:
 			}
 		}
 		if (prev_dir == LEFT) {
-			for (const auto& kart : karts) {
-				kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, -1.5));
-				kart->translateMatrix = glm::rotate(kart->translateMatrix, glm::radians(kart_speed * 5), glm::vec3(0.0f, 1.0f, 0.0f));
-				kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, 1.5));
+			if (kart_speed != 0.0f) {
+				for (const auto& kart : karts) {
+					kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, -1.5));
+					kart->translateMatrix = glm::rotate(kart->translateMatrix, glm::radians(1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+					kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, 1.5));
+				}
 			}
 		}
 		if (prev_dir == RIGHT) {
-			for (const auto& kart : karts) {
-				kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, -1.5));
-				kart->translateMatrix = glm::rotate(kart->translateMatrix, glm::radians(-kart_speed * 5), glm::vec3(0.0f, 1.0f, 0.0f));
-				kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, 1.5));
+			if (kart_speed != 0.0f) {
+				for (const auto& kart : karts) {
+					kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, -1.5));
+					kart->translateMatrix = glm::rotate(kart->translateMatrix, glm::radians(-1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+					kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, 1.5));
+				}
 			}
 		}
 		setCamera();
