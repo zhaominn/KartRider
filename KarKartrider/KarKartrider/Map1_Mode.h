@@ -11,6 +11,7 @@
 
 #include <gl/glm/glm/gtc/quaternion.hpp> // 쿼터니언 관련
 #include <gl/glm/glm/gtx/quaternion.hpp> // SLERP(Spherical Linear Interpolation)
+#include <unordered_map> // keystate
 
 #define MAX_SPEED 0.3
 #define ACCELERATION 0.002f
@@ -23,10 +24,12 @@ public:
 
 	GLfloat kart_speed = 0.0f;
 
-	enum Move { NONE_M, UP, DOWN, };
-	enum Direction { NONE_D, LEFT, RIGHT };
+	enum Move { NONE_M, UP, DOWN, LEFT, RIGHT };
 	Move prev_move = NONE_M;
-	Direction prev_dir = NONE_D;
+	//Direction prev_dir = NONE_D;
+
+	//키
+	std::unordered_map<Move, bool> kart_keyState;
 
 	bool up = false;
 	bool down = false;
@@ -48,6 +51,13 @@ public:
 	}
 
 	void init() override {
+
+		// Move 상태 초기화
+		kart_keyState[UP] = false;
+		kart_keyState[DOWN] = false;
+		kart_keyState[LEFT] = false;
+		kart_keyState[RIGHT] = false;
+
 		for (const auto& kart : karts) { // 카트 위치 초기화
 			kart->translateMatrix = glm::mat4(1.0f);
 			kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 2.6, 238.0));
@@ -82,17 +92,6 @@ public:
 	}
 
 	void setCamera() {
-		/*
-		glm::vec3 carPosition = glm::vec3(karts[0]->translateMatrix[3]);
-
-		// 오프셋 벡터에 회전 행렬을 적용
-		glm::vec3 rotatedOffset = glm::mat3(karts[0]->translateMatrix) * glm::vec3(0.0f, 3.0f, 15.0f);
-
-		// 카메라 위치는 카트 위치에 회전된 오프셋을 더한 값
-		cameraPos = carPosition + rotatedOffset;
-
-		updateCameraDirection();*/
-		//-------------------------------------
 		glm::vec3 carPosition = glm::vec3(karts[0]->translateMatrix[3]);
 
 		// 자동차의 회전 행렬 추출 (3x3 행렬)
@@ -100,8 +99,6 @@ public:
 
 		// 자동차 회전 행렬을 쿼터니언으로 변환
 		glm::quat carRotationQuat = glm::quat_cast(carRotationMatrix);
-
-		// 카메라 회전
 
 		// 자동차 회전과 기본 회전을 보간
 		glm::quat interpolatedRotation = glm::slerp(cameraRotationQuat, carRotationQuat, reducedRotationInfluence);
@@ -111,8 +108,8 @@ public:
 		// 보간된 회전을 행렬로 변환
 		glm::mat3 adjustedRotationMatrix = glm::mat3_cast(interpolatedRotation);
 
-		// 카메라 기본 오프셋 정의
-		glm::vec3 baseOffset = glm::vec3(0.0f, 3.0f, 15.0f);
+		// 카메라 기본 오프셋 정의 (속도에 따라 동적으로 조정)
+		glm::vec3 baseOffset = glm::vec3(0.0f, 3.0f, 15.0f + (kart_speed * 50.0f)); // 속도에 따라 뒤로 더 멀어짐
 
 		// 조정된 회전을 오프셋에 적용
 		glm::vec3 rotatedOffset = adjustedRotationMatrix * baseOffset;
@@ -121,45 +118,48 @@ public:
 		cameraPos = carPosition + rotatedOffset;
 
 		// 카메라가 자동차를 바라보도록 방향 업데이트
-		updateCameraDirection();
+		cameraDirection = carPosition; // 자동차를 항상 바라봄
 	}
 
 	void timer() {
 		UpdateRigidBodyTransform(karts[0]);
-		if (up || down || left || right) {
-			if (up) prev_move = UP;
-			if (down) prev_move = DOWN;
-			if (left) prev_dir = LEFT;
-			if (right) prev_dir = RIGHT;
 
-			reducedRotationInfluence = 0.1f;
-
-			if ((up || down) && kart_speed <= MAX_SPEED) { // 속도 제한
+		// 가속/감속 처리
+		if (kart_keyState[UP]) {
+			if (kart_speed < MAX_SPEED) {
 				kart_speed += ACCELERATION;
 			}
 		}
-		else {
-			if (kart_speed >= 0.0f) // 속도 제한
-				kart_speed -= DECELERATION;
-			else if (kart_speed == 0.0f)
-				prev_move = NONE_M;
-
-			prev_dir = NONE_D;
-
-			if (reducedRotationInfluence <= 1.0f)
-				reducedRotationInfluence += 0.01f;
+		else if (kart_keyState[DOWN]) {
+			if (kart_speed > -MAX_SPEED / 2.0f) { // 후진 속도는 전진의 절반까지만 허용
+				kart_speed -= ACCELERATION;
+			}
 		}
-		if (prev_move == UP) {
+		else {
+			if (kart_speed > 0.0f) {
+				kart_speed -= DECELERATION; // 전진 감속
+				if (kart_speed < 0.0f) kart_speed = 0.0f;
+			}
+			else if (kart_speed < 0.0f) {
+				kart_speed += DECELERATION; // 후진 감속
+				if (kart_speed > 0.0f) kart_speed = 0.0f;
+			}
+		}
+
+		// 카트 이동 처리
+		if (kart_speed > 0.0f) { // 전진
 			for (const auto& kart : karts) {
 				kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, -kart_speed));
 			}
 		}
-		if (prev_move == DOWN) {
+		else if (kart_speed < 0.0f) { // 후진
 			for (const auto& kart : karts) {
-				kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, kart_speed));
+				kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, -kart_speed));
 			}
 		}
-		if (prev_dir == LEFT) {
+
+		// 방향 전환 처리
+		if (kart_keyState[LEFT]) {
 			if (kart_speed != 0.0f) {
 				for (const auto& kart : karts) {
 					kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, -1.5));
@@ -168,7 +168,8 @@ public:
 				}
 			}
 		}
-		if (prev_dir == RIGHT) {
+
+		if (kart_keyState[RIGHT]) {
 			if (kart_speed != 0.0f) {
 				for (const auto& kart : karts) {
 					kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, -1.5));
@@ -177,6 +178,17 @@ public:
 				}
 			}
 		}
+
+		// 카메라 회전 보간율 업데이트 (속도에 따라 카메라 회전이 빨라짐)
+		if (kart_speed != 0.0f) {
+			reducedRotationInfluence = 0.1f + (std::abs(kart_speed) / MAX_SPEED) * 0.4f; // 속도 비례 보간율
+		}
+		else {
+			reducedRotationInfluence += 0.01f; // 키가 안 눌릴 때 천천히 회복
+			if (reducedRotationInfluence > 1.0f) reducedRotationInfluence = 1.0f;
+		}
+
+		// 카메라 업데이트
 		setCamera();
 	}
 
@@ -244,16 +256,16 @@ public:
 	void specialKey(int key, int x, int y) override {
 		switch (key) {
 		case GLUT_KEY_UP:
-			up = true;
+			kart_keyState[UP] = true;
 			break;
 		case GLUT_KEY_DOWN:
-			down = true;
+			kart_keyState[DOWN] = true;
 			break;
 		case GLUT_KEY_LEFT:
-			left = true;
+			kart_keyState[LEFT] = true;
 			break;
 		case GLUT_KEY_RIGHT:
-			right = true;
+			kart_keyState[RIGHT] = true;
 			break;
 		}
 	}
@@ -261,16 +273,16 @@ public:
 	void specialKeyUp(int key, int x, int y) override {
 		switch (key) {
 		case GLUT_KEY_UP:
-			up = false;
+			kart_keyState[UP] = false;
 			break;
 		case GLUT_KEY_DOWN:
-			down = false;
+			kart_keyState[DOWN] = false;
 			break;
 		case GLUT_KEY_LEFT:
-			left = false;
+			kart_keyState[LEFT] = false;
 			break;
 		case GLUT_KEY_RIGHT:
-			right = false;
+			kart_keyState[RIGHT] = false;
 			break;
 		}
 	}
