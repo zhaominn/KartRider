@@ -6,8 +6,8 @@ C:\Users\somin\OneDrive\KartRider\KarKartrider\KarKartrider\KeyBoard.h(44,19): w
   (소스 파일 'main.cpp'을(를) 컴파일하는 중)
   
   코드를 생성하고 있습니다.
-  2 of 2198 functions (<0.1%) were compiled, the rest were copied from previous compilation.
+  23 of 2198 functions ( 1.0%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    18 functions had inline decision re-evaluated but remain unchanged
+    16 functions had inline decision re-evaluated but remain unchanged
   코드를 생성했습니다.
   KarKartrider.vcxproj -> C:\Users\somin\OneDrive\KartRider\KarKartrider\x64\Release\KarKartrider.exe

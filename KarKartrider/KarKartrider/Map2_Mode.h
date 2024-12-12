@@ -22,8 +22,11 @@ public:
 	float reducedRotationInfluence = 0.0f; // 보간할 퍼센트
 
 	GLfloat kart_speed = 0.0f;
-	enum Direction { NONE = -1, UP, DOWN, LEFT, RIGHT };
-	Direction prev_dir = NONE;
+
+	enum Move { NONE_M, UP, DOWN, };
+	enum Direction { NONE_D, LEFT, RIGHT };
+	Move prev_move = NONE_M;
+	Direction prev_dir = NONE_D;
 
 	bool up = false;
 	bool down = false;
@@ -98,8 +101,8 @@ public:
 	void timer() {
 		UpdateRigidBodyTransform(karts[0]);
 		if (up || down || left || right) {
-			if (up) prev_dir = UP;
-			if (down) prev_dir = DOWN;
+			if (up) prev_move = UP;
+			if (down) prev_move = DOWN;
 			if (left) prev_dir = LEFT;
 			if (right) prev_dir = RIGHT;
 
@@ -113,17 +116,17 @@ public:
 			if (kart_speed >= 0.0f) // 속도 제한
 				kart_speed -= DECELERATION;
 			else if (kart_speed == 0.0f)
-				prev_dir = NONE;
+				prev_dir = NONE_D;
 
 			if (reducedRotationInfluence <= 1.0f)
 				reducedRotationInfluence += 0.01f;
 		}
-		if (prev_dir == UP) {
+		if (prev_move == UP) {
 			for (const auto& kart : karts) {
 				kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, -kart_speed));
 			}
 		}
-		if (prev_dir == DOWN) {
+		if (prev_move == DOWN) {
 			for (const auto& kart : karts) {
 				kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, kart_speed));
 			}
