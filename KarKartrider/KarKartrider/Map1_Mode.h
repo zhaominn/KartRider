@@ -157,14 +157,14 @@ public:
 		if (prev_dir == LEFT) {
 			for (const auto& kart : karts) {
 				kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, -1.5));
-				kart->translateMatrix = glm::rotate(kart->translateMatrix, glm::radians(kart_speed * 10), glm::vec3(0.0f, 1.0f, 0.0f));
+				kart->translateMatrix = glm::rotate(kart->translateMatrix, glm::radians(kart_speed * 5), glm::vec3(0.0f, 1.0f, 0.0f));
 				kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, 1.5));
 			}
 		}
 		if (prev_dir == RIGHT) {
 			for (const auto& kart : karts) {
 				kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, -1.5));
-				kart->translateMatrix = glm::rotate(kart->translateMatrix, glm::radians(-kart_speed * 10), glm::vec3(0.0f, 1.0f, 0.0f));
+				kart->translateMatrix = glm::rotate(kart->translateMatrix, glm::radians(-kart_speed * 5), glm::vec3(0.0f, 1.0f, 0.0f));
 				kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, 1.5));
 			}
 		}
