@@ -1,1 +1,16 @@
-﻿  KarKartrider.vcxproj -> C:\Users\neneee\KartRider\KarKartrider\x64\Release\KarKartrider.exe
+﻿  main.cpp
+C:\Users\neneee\KartRider\KarKartrider\KarKartrider\KeyBoard.h(41,19): warning C4305: '-=': 'double'에서 'float'(으)로 잘립니다.
+  (소스 파일 'main.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\neneee\KartRider\KarKartrider\KarKartrider\KeyBoard.h(44,19): warning C4305: '+=': 'double'에서 'float'(으)로 잘립니다.
+  (소스 파일 'main.cpp'을(를) 컴파일하는 중)
+  
+C:\Users\neneee\KartRider\KarKartrider\KarKartrider\Map1_Mode.h(184,36): warning C4244: '=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  (소스 파일 'main.cpp'을(를) 컴파일하는 중)
+  
+  코드를 생성하고 있습니다.
+  3 of 2344 functions ( 0.1%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    17 functions had inline decision re-evaluated but remain unchanged
+  코드를 생성했습니다.
+  KarKartrider.vcxproj -> C:\Users\neneee\KartRider\KarKartrider\x64\Release\KarKartrider.exe
