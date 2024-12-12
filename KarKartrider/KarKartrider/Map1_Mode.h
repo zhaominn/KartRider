@@ -406,11 +406,4 @@ private:
 		play_sound2D("village_04.ogg", "./asset/map_1/", true, &isBackgroundSound);
 	}
 
-	void count_nSound() {
-		play_sound2D("count_n.wav", "./asset/map_1/", true, &isCountNSound);
-	}
-
-	void count_goSound() {
-		play_sound2D("count_go.wav", "./asset/map_1/", true, &isCountGoSound);
-	}
 };
