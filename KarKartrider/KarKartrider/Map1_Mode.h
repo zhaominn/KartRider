@@ -61,6 +61,7 @@ public:
 	}
 
 	void setCamera() {
+		/*
 		glm::vec3 carPosition = glm::vec3(karts[0]->translateMatrix[3]);
 
 		// 오프셋 벡터에 회전 행렬을 적용
@@ -70,6 +71,25 @@ public:
 		cameraPos = carPosition + rotatedOffset;
 
 		updateCameraDirection();
+		*/
+		glm::vec3 carPosition = glm::vec3(karts[0]->translateMatrix[3]);
+
+		// 자동차의 회전 행렬 추출 (3x3 행렬)
+		glm::mat3 carRotation = glm::mat3(karts[0]->translateMatrix);
+
+		// 카메라 오프셋 정의 (기본 위치)
+		glm::vec3 baseOffset = glm::vec3(0.0f, 3.0f, 15.0f);
+
+		// 자동차의 회전 방향 적용 (80% 비율로 반영)
+		float rotationInfluence = 0.6f; // 자동차 회전 반영 비율
+		glm::vec3 rotatedOffset = glm::mix(baseOffset, carRotation * baseOffset, rotationInfluence);
+
+		// 카메라 위치 계산
+		cameraPos = carPosition + rotatedOffset;
+
+		// 카메라 방향 업데이트
+		//updateCameraDirection();
+		cameraDirection = carPosition;
 	}
 
 	void timer() {
@@ -89,15 +109,17 @@ public:
 		}
 		if (left) {
 			for (const auto& kart : karts) {
-				//kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(-0.1, 0.0, 0.0));
+				kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, -1.5));
 				kart->translateMatrix = glm::rotate(kart->translateMatrix, glm::radians(1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+				kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, 1.5));
 			}
 			setCamera();
 		}
 		if (right) {
 			for (const auto& kart : karts) {
-				//kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.1, 0.0, 0.0));
+				kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, -1.5));
 				kart->translateMatrix = glm::rotate(kart->translateMatrix, glm::radians(-1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+				kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, 1.5));
 			}
 			setCamera();
 		}
