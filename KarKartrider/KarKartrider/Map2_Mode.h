@@ -9,9 +9,24 @@
 #include "KeyBoard.h"
 #include "Light.h"
 
+#include <gl/glm/glm/gtc/quaternion.hpp> // 쿼터니언 관련
+#include <gl/glm/glm/gtx/quaternion.hpp> // SLERP(Spherical Linear Interpolation)
+
+#define MAX_SPEED 0.3
+#define ACCELERATION 0.002f
+#define DECELERATION 0.001f
 
 class Map2_Mode : public Mode {
 public:
+	glm::quat cameraRotationQuat = glm::quat(glm::vec3(0.0f, 0.0f, 0.0f)); // 현재 카메라 행렬을 쿼터니언으로 저장
+	float reducedRotationInfluence = 0.0f; // 보간할 퍼센트
+
+	GLfloat kart_speed = 0.0f;
+
+	enum Move { NONE_M, UP, DOWN, };
+	enum Direction { NONE_D, LEFT, RIGHT };
+	Move prev_move = NONE_M;
+	Direction prev_dir = NONE_D;
 
 	bool up = false;
 	bool down = false;
@@ -36,36 +51,48 @@ public:
 		for (const auto& kart : karts) { // 카트 위치 초기화
 			kart->translateMatrix = glm::mat4(1.0f);
 			kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(165.0, 1.0, 0.0));
-			cameraPos = glm::vec3(165.0, 4.0, 15.0);
-			updateCameraDirection();
 
+			// 비정적 timer 함수 호출
 			glutTimerFunc(0, Map2_Mode::timerHelper, 0);
 		}
+
+		kart_speed = 0.0f;
+		cameraPos = glm::vec3(0.0, 5.6, 253.0);
+		updateCameraDirection();
 	}
 
 	void updateCameraDirection() {
 		glm::mat3 rotationMatrix = glm::mat3(karts[0]->translateMatrix);
 
-		// 기본 카메라 방향 벡터 계산
 		glm::vec3 direction;
 		direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
 		direction.y = sin(glm::radians(pitch));
 		direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
 
-		// 회전 행렬을 적용한 방향 벡터 계산
 		glm::vec3 rotatedDirection = rotationMatrix * direction;
 
-		// 카메라의 방향을 회전된 방향으로 설정
-		cameraDirection = glm::normalize(rotatedDirection) + cameraPos;
+		glm::vec3 carPosition = glm::vec3(karts[0]->translateMatrix[3]);
+
+		cameraDirection = glm::normalize(rotatedDirection) + carPosition;
 	}
 
 	void setCamera() {
 		glm::vec3 carPosition = glm::vec3(karts[0]->translateMatrix[3]);
 
-		// 오프셋 벡터에 회전 행렬을 적용
-		glm::vec3 rotatedOffset = glm::mat3(karts[0]->translateMatrix) * glm::vec3(0.0f, 3.0f, 15.0f);
+		glm::mat3 carRotationMatrix = glm::mat3(karts[0]->translateMatrix);
 
-		// 카메라 위치는 카트 위치에 회전된 오프셋을 더한 값
+		glm::quat carRotationQuat = glm::quat_cast(carRotationMatrix);
+
+		glm::quat interpolatedRotation = glm::slerp(cameraRotationQuat, carRotationQuat, reducedRotationInfluence);
+
+		cameraRotationQuat = interpolatedRotation;
+
+		glm::mat3 adjustedRotationMatrix = glm::mat3_cast(interpolatedRotation);
+
+		glm::vec3 baseOffset = glm::vec3(0.0f, 3.0f, 15.0f);
+
+		glm::vec3 rotatedOffset = adjustedRotationMatrix * baseOffset;
+
 		cameraPos = carPosition + rotatedOffset;
 
 		updateCameraDirection();
@@ -73,31 +100,52 @@ public:
 
 	void timer() {
 		UpdateRigidBodyTransform(karts[0]);
+		if (up || down || left || right) {
+			if (up) prev_move = UP;
+			if (down) prev_move = DOWN;
+			if (left) prev_dir = LEFT;
+			if (right) prev_dir = RIGHT;
 
-		if (up) {
-			for (const auto& kart : karts) {
-				kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, -0.1));
+			reducedRotationInfluence = 0.1f;
+
+			if ((up || down) && kart_speed <= MAX_SPEED) { // 속도 제한
+				kart_speed += ACCELERATION;
 			}
-			setCamera();
 		}
-		if (down) {
+		else {
+			if (kart_speed >= 0.0f) // 속도 제한
+				kart_speed -= DECELERATION;
+			else if (kart_speed == 0.0f)
+				prev_dir = NONE_D;
+
+			if (reducedRotationInfluence <= 1.0f)
+				reducedRotationInfluence += 0.01f;
+		}
+		if (prev_move == UP) {
 			for (const auto& kart : karts) {
-				kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, 0.1));
+				kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, -kart_speed));
 			}
-			setCamera();
 		}
-		if (left) {
+		if (prev_move == DOWN) {
 			for (const auto& kart : karts) {
-				kart->translateMatrix = glm::rotate(kart->translateMatrix, glm::radians(1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+				kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, kart_speed));
 			}
-			setCamera();
 		}
-		if (right) {
+		if (prev_dir == LEFT) {
 			for (const auto& kart : karts) {
-				kart->translateMatrix = glm::rotate(kart->translateMatrix, glm::radians(-1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+				kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, -1.5));
+				kart->translateMatrix = glm::rotate(kart->translateMatrix, glm::radians(kart_speed *5), glm::vec3(0.0f, 1.0f, 0.0f));
+				kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, 1.5));
 			}
-			setCamera();
 		}
+		if (prev_dir == RIGHT) {
+			for (const auto& kart : karts) {
+				kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, -1.5));
+				kart->translateMatrix = glm::rotate(kart->translateMatrix, glm::radians(-kart_speed * 5), glm::vec3(0.0f, 1.0f, 0.0f));
+				kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, 1.5));
+			}
+		}
+		setCamera();
 	}
 
 	void moveCamera(unsigned char key, int x, int y) {
@@ -252,7 +300,6 @@ public:
 	void finish() override {
 
 	}
-
 private:
 
 	static void timerHelper(int value) {
