@@ -67,7 +67,7 @@ public:
 		}
 
 		kart_speed = 0.0f;
-		cameraPos = glm::vec3(0.0, 5.6, 253.0);
+		cameraPos = glm::vec3(0.0, 6.0, 253.0);
 		updateCameraDirection();
 	}
 
@@ -109,7 +109,7 @@ public:
 		glm::mat3 adjustedRotationMatrix = glm::mat3_cast(interpolatedRotation);
 
 		// 카메라 기본 오프셋 정의 (속도에 따라 동적으로 조정)
-		glm::vec3 baseOffset = glm::vec3(0.0f, 3.0f, 15.0f + (kart_speed * 10.0f)); // 속도에 따라 뒤로 더 멀어짐
+		glm::vec3 baseOffset = glm::vec3(0.0f, 6.0f + (kart_speed * 2.0f), 15.0f + (kart_speed * 10.0f)); // 속도에 따라 뒤로 더 멀어짐
 
 		// 조정된 회전을 오프셋에 적용
 		glm::vec3 rotatedOffset = adjustedRotationMatrix * baseOffset;
