@@ -9,6 +9,7 @@
 #include "KeyBoard.h"
 #include "Light.h"
 
+#include <thread>
 #include <gl/glm/glm/gtc/quaternion.hpp> // 쿼터니언 관련
 #include <gl/glm/glm/gtx/quaternion.hpp> // SLERP(Spherical Linear Interpolation)
 #include <unordered_map> // keystate
@@ -46,8 +47,18 @@ public:
 	float pitch = 0.0f; // 수직 회전 (기본: 수평)
 	float TURN_ANGLE = 1.0f; // 회전 각도 (기본 1도) (카트 회전 각도)
 
+	//sound
+	bool isBackgroundSound = false;
+	std::thread backgroundSoundThread;
+	bool isCountNSound = false;
+	std::thread countNSoundThread;
+	bool isCountGoSound = false;
+	std::thread countGoSoundThread;
+
 	Map1_Mode() {
 		Mode::currentInstance = this;  // Map1_Mode 인스턴스를 currentInstance에 할당
+		isCountNSound = true;
+		isCountGoSound = true;
 	}
 
 	void init() override {
@@ -62,13 +73,47 @@ public:
 			kart->translateMatrix = glm::mat4(1.0f);
 			kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 2.6, 238.0));
 
-			// 비정적 timer 함수 호출
-			glutTimerFunc(0, Map1_Mode::timerHelper, 0);
+			playCountdown(0); // 첫 번째 카운트 사운드 실행
 		}
 
 		kart_speed = 0.0f;
 		cameraPos = glm::vec3(0.0, 6.0, 253.0);
 		updateCameraDirection();
+	}
+
+	void playCountdown(int count) {
+		if (count < 3) { // count_n 사운드 3번 실행
+			if (countNSoundThread.joinable()) {
+				countNSoundThread.join();
+			}
+
+			countNSoundThread = std::thread([this]() {
+				play_sound2D("count_n.wav", "./asset/map_1/", false, &isCountNSound);
+				});
+
+			glutTimerFunc(1000, [](int value) {
+				if (Map1_Mode* instance = dynamic_cast<Map1_Mode*>(Mode::currentInstance)) {
+					instance->playCountdown(value);
+				}
+				}, count + 1);
+		}
+		else { // count_go 사운드 실행
+			if (countGoSoundThread.joinable()) {
+				countGoSoundThread.join();
+			}
+			glutTimerFunc(0, timerHelper, 0);
+
+			countGoSoundThread = std::thread([this]() {
+				play_sound2D("count_go.wav", "./asset/map_1/", false, &isCountGoSound);
+				});
+
+			countGoSoundThread.join(); // `count_go` 재생이 끝날 때까지 기다림
+
+			isCountGoSound = false;
+			isCountNSound = false;
+			isBackgroundSound = true;
+			backgroundSoundThread = std::thread(&Map1_Mode::backgroundSound, this);	
+		}
 	}
 
 	void updateCameraDirection() {
@@ -311,7 +356,7 @@ public:
 		glUniformMatrix4fv(viewLocation, 1, GL_FALSE, &view[0][0]);
 
 		this->projection = glm::mat4(1.0f);
-		this->projection = glm::perspective(glm::radians(45.0f), static_cast<float>(width) / static_cast<float>(height), 0.1f, 300.0f);
+		this->projection = glm::perspective(glm::radians(45.0f), static_cast<float>(width) / static_cast<float>(height), 0.1f, 10000.0f);
 		unsigned int projectionLocation = glGetUniformLocation(shaderProgramID, "projectionTransform");
 		glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, &projection[0][0]);
 
@@ -355,4 +400,17 @@ private:
 		glutTimerFunc(16, timerHelper, value); // 타이머 반복 호출
 	}
 
+
+	// bgm 실행 함수
+	void backgroundSound() {
+		play_sound2D("village_04.ogg", "./asset/map_1/", true, &isBackgroundSound);
+	}
+
+	void count_nSound() {
+		play_sound2D("count_n.wav", "./asset/map_1/", true, &isCountNSound);
+	}
+
+	void count_goSound() {
+		play_sound2D("count_go.wav", "./asset/map_1/", true, &isCountGoSound);
+	}
 };
