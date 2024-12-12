@@ -18,6 +18,9 @@
 
 class Map1_Mode : public Mode {
 public:
+	glm::quat cameraRotationQuat = glm::quat(glm::vec3(0.0f, 0.0f, 0.0f)); // 현재 카메라 행렬을 쿼터니언으로 저장
+	float reducedRotationInfluence = 0.0f; // 보간할 퍼센트
+
 	GLfloat kart_speed = 0.0f;
 	enum Direction { NONE = -1, UP, DOWN, LEFT, RIGHT };
 	Direction prev_dir = NONE;
@@ -95,12 +98,12 @@ public:
 		// 자동차 회전 행렬을 쿼터니언으로 변환
 		glm::quat carRotationQuat = glm::quat_cast(carRotationMatrix);
 
-		// 기본 회전 (카메라의 초기 회전, 회전 없음)
-		glm::quat baseRotation = glm::quat(glm::vec3(0.0f, 0.0f, 0.0f)); // 단위 회전
+		// 카메라 회전
 
 		// 자동차 회전과 기본 회전을 보간
-		float reducedRotationInfluence = 0.8f; // 80% 회전 반영
-		glm::quat interpolatedRotation = glm::slerp(baseRotation, carRotationQuat, reducedRotationInfluence);
+		glm::quat interpolatedRotation = glm::slerp(cameraRotationQuat, carRotationQuat, reducedRotationInfluence);
+
+		cameraRotationQuat = interpolatedRotation;
 
 		// 보간된 회전을 행렬로 변환
 		glm::mat3 adjustedRotationMatrix = glm::mat3_cast(interpolatedRotation);
@@ -126,6 +129,8 @@ public:
 			if (left) prev_dir = LEFT;
 			if (right) prev_dir = RIGHT;
 
+			reducedRotationInfluence = 0.1f;
+
 			if ((up || down) && kart_speed <= MAX_SPEED) { // 속도 제한
 				kart_speed += ACCELERATION;
 			}
@@ -135,6 +140,9 @@ public:
 				kart_speed -= DECELERATION;
 			else if (kart_speed == 0.0f)
 				prev_dir = NONE;
+
+			if (reducedRotationInfluence <= 1.0f)
+				reducedRotationInfluence += 0.01f;
 		}
 		if (prev_dir == UP) {
 			for (const auto& kart : karts) {
