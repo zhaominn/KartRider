@@ -9,6 +9,7 @@
 #include "KeyBoard.h"
 #include "Light.h"
 
+#include <thread>
 #include <gl/glm/glm/gtc/quaternion.hpp> // 쿼터니언 관련
 #include <gl/glm/glm/gtx/quaternion.hpp> // SLERP(Spherical Linear Interpolation)
 #include <unordered_map> // keystate
@@ -46,8 +47,13 @@ public:
 	float pitch = 0.0f; // 수직 회전 (기본: 수평)
 	float TURN_ANGLE = 1.0f; // 회전 각도 (기본 1도) (카트 회전 각도)
 
+	//sound
+	bool isBackgroundSound = false;
+	std::thread backgroundSoundThread;
+		
 	Map1_Mode() {
 		Mode::currentInstance = this;  // Map1_Mode 인스턴스를 currentInstance에 할당
+		isBackgroundSound = true;
 	}
 
 	void init() override {
@@ -69,6 +75,10 @@ public:
 		kart_speed = 0.0f;
 		cameraPos = glm::vec3(0.0, 6.0, 253.0);
 		updateCameraDirection();
+
+		//sound
+		backgroundSoundThread = std::thread(&Map1_Mode::backgroundSound, this);
+
 	}
 
 	void updateCameraDirection() {
@@ -355,4 +365,9 @@ private:
 		glutTimerFunc(16, timerHelper, value); // 타이머 반복 호출
 	}
 
+
+	// bgm 실행 함수
+	void backgroundSound() {
+		play_sound2D("village_04.ogg", "./asset/map_1/", true, &isBackgroundSound);
+	}
 };
