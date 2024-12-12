@@ -24,7 +24,6 @@ public:
 	GLfloat kart_speed = 0.0f;
 
 	enum Move { NONE_M, UP, DOWN, LEFT, RIGHT };
-	Move prev_move = NONE_M;
 	float MAX_SPEED = 0.5;
 
 	//키
@@ -35,7 +34,8 @@ public:
 	bool left = false;
 	bool right = false;
 
-	glm::vec3 cameraPos = glm::vec3(0.0, 0.0, 5.0);
+	glm::vec3 cameraTargetPos = glm::vec3(0.0, 0.0, 5.0); // 카메라의 목표 위치
+	glm::vec3 cameraPos = glm::vec3(0.0, 0.0, 5.0);       // 카메라의 현재 위치
 	glm::vec3 cameraDirection = glm::vec3(0.0, 0.0, -1.0);
 	glm::vec3 cameraUp = glm::vec3(0.0, 1.0, 0.0);
 	glm::mat4 projection = glm::mat4(1.0f);
@@ -102,24 +102,22 @@ public:
 
 		// 자동차 회전과 기본 회전을 보간
 		glm::quat interpolatedRotation = glm::slerp(cameraRotationQuat, carRotationQuat, reducedRotationInfluence);
-
 		cameraRotationQuat = interpolatedRotation;
 
 		// 보간된 회전을 행렬로 변환
 		glm::mat3 adjustedRotationMatrix = glm::mat3_cast(interpolatedRotation);
 
-		// 카메라 기본 오프셋 정의 (속도에 따라 동적으로 조정)
-		glm::vec3 baseOffset = glm::vec3(0.0f, 6.0f + (kart_speed * 2.0f), 15.0f + (kart_speed * 10.0f)); // 속도에 따라 뒤로 더 멀어짐
-
-		// 조정된 회전을 오프셋에 적용
+		// 카메라 목표 위치 정의 (속도에 따라 동적으로 조정)
+		glm::vec3 baseOffset = glm::vec3(0.0f, 6.0f + (kart_speed * 2.0f), 14.0f + (kart_speed * 10.0f));
 		glm::vec3 rotatedOffset = adjustedRotationMatrix * baseOffset;
 
-		// 최종 카메라 위치 계산 (자동차 위치 + 회전된 오프셋)
-		cameraPos = carPosition + rotatedOffset;
+		// 카메라 목표 위치 계산 (자동차 위치 + 회전된 오프셋)
+		cameraTargetPos = carPosition + rotatedOffset;
 
 		// 카메라가 자동차를 바라보도록 방향 업데이트
 		cameraDirection = carPosition; // 자동차를 항상 바라봄
 	}
+
 
 	void timer() {
 		UpdateRigidBodyTransform(karts[0]);
@@ -190,6 +188,9 @@ public:
 
 		// 카메라 업데이트
 		setCamera();
+		// 현재 카메라 위치를 목표 위치로 점진적으로 이동
+		float cameraFollowSpeed = 0.1f; // 카메라가 따라가는 속도 (0.0 ~ 1.0 사이의 값)
+		cameraPos = glm::mix(cameraPos, cameraTargetPos, cameraFollowSpeed);
 	}
 
 	void moveCamera(unsigned char key, int x, int y) {
