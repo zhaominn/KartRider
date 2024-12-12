@@ -50,14 +50,14 @@ public:
 	void init() override {
 		for (const auto& kart : karts) { // 카트 위치 초기화
 			kart->translateMatrix = glm::mat4(1.0f);
-			kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(165.0, 1.0, 0.0));
+			kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(165.0, 1.0, 30.0));
 
 			// 비정적 timer 함수 호출
 			glutTimerFunc(0, Map2_Mode::timerHelper, 0);
 		}
 
 		kart_speed = 0.0f;
-		cameraPos = glm::vec3(0.0, 5.6, 253.0);
+		cameraPos = glm::vec3(0.0, 5.6, 283.0);
 		updateCameraDirection();
 	}
 
