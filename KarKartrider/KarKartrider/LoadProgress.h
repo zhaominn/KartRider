@@ -71,5 +71,13 @@ void loadModelWithProgress(const std::string& modelPath, const std::string path,
 
     // 모델 로드 완료
     std::cout << "\nModel loaded successfully!" << std::endl;
+
+    if (rigid_status) {
+        addModelToPhysicsWorld(model);
+
+        //충돌 세계 추가완료
+        std::cout << "\nModel add PhysicsWorld add!" << std::endl;
+    }
+
     models.push_back(model);
 }
