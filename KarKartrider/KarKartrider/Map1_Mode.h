@@ -50,7 +50,11 @@ public:
 	//sound
 	bool isBackgroundSound = false;
 	std::thread backgroundSoundThread;
-		
+	bool isCountNSound = false;
+	std::thread countNSoundThread;
+	bool isCountGoSound = false;
+	std::thread countGoSoundThread;
+
 	Map1_Mode() {
 		Mode::currentInstance = this;  // Map1_Mode 인스턴스를 currentInstance에 할당
 		isBackgroundSound = true;
@@ -369,5 +373,13 @@ private:
 	// bgm 실행 함수
 	void backgroundSound() {
 		play_sound2D("village_04.ogg", "./asset/map_1/", true, &isBackgroundSound);
+	}
+
+	void count_nSound() {
+		play_sound2D("count_n.wav", "./asset/map_1/", true, &isBackgroundSound);
+	}
+
+	void count_goSound() {
+		play_sound2D("count_go.wav", "./asset/map_1/", true, &isBackgroundSound);
 	}
 };
