@@ -56,7 +56,7 @@ glm::vec3 calculateModelSize(const Model* model) {
 }
 
 // 모델에 대한 충돌 객체와 강체 생성 및 물리 세계에 추가
-void addModelToPhysicsWorld(Model*& model) {
+void addModelToPhysicsWorld(Model* model) {
     // 모델의 크기 계산 (AABB)
     glm::vec3 size = calculateModelSize(model);
     btCollisionShape* shape = nullptr;

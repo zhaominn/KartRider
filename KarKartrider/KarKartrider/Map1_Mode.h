@@ -165,7 +165,7 @@ public:
 
 
 	void timer() {
-		UpdateRigidBodyTransform(karts[0]);
+		UpdateRigidBodyTransforms(karts);
 
 		// 啊加/皑加 贸府
 		if (kart_keyState[UP]) {
@@ -406,11 +406,4 @@ private:
 		play_sound2D("village_04.ogg", "./asset/map_1/", true, &isBackgroundSound);
 	}
 
-	void count_nSound() {
-		play_sound2D("count_n.wav", "./asset/map_1/", true, &isCountNSound);
-	}
-
-	void count_goSound() {
-		play_sound2D("count_go.wav", "./asset/map_1/", true, &isCountGoSound);
-	}
 };

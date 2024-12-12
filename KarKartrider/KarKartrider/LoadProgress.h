@@ -21,7 +21,7 @@ void printProgressBar(int progress, int total) {
 }
 
 template <typename T, typename = std::enable_if<std::is_base_of<Model, T>::value>>
-void loadModelWithProgress(const std::string& modelPath, const std::string path, const std::string& modelName, const std::string& modelType, glm::mat4 scale, std::vector<Model*>& models) {
+void loadModelWithProgress(const std::string& modelPath, const std::string path, const std::string& modelName, const std::string& modelType, glm::mat4 scale, std::vector<Model*>& models, bool rigid_status) {
     std::cout << "Loading model: " << modelName << std::endl;
 
     const int totalSteps = 4; // 총 작업 단계 수
@@ -29,7 +29,7 @@ void loadModelWithProgress(const std::string& modelPath, const std::string path,
 
     // Step 1: OBJ 파일 로드
     std::cout << "Step 1/4: Reading OBJ file..." << std::endl;
-    T* model = new T(modelPath, path, modelName, modelType, scale);  // 템플릿으로 모델 생성
+    T* model = new T(modelPath, path, modelName, modelType, rigid_status, scale);  // 템플릿으로 모델 생성
     currentStep++;
     printProgressBar(currentStep, totalSteps);
 
@@ -71,5 +71,13 @@ void loadModelWithProgress(const std::string& modelPath, const std::string path,
 
     // 모델 로드 완료
     std::cout << "\nModel loaded successfully!" << std::endl;
+
+    if (rigid_status) {
+        addModelToPhysicsWorld(model);
+
+        //충돌 세계 추가완료
+        std::cout << "\nModel add PhysicsWorld add!" << std::endl;
+    }
+
     models.push_back(model);
 }
