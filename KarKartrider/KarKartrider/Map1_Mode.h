@@ -13,7 +13,6 @@
 #include <gl/glm/glm/gtx/quaternion.hpp> // SLERP(Spherical Linear Interpolation)
 #include <unordered_map> // keystate
 
-#define MAX_SPEED 0.3
 #define ACCELERATION 0.002f
 #define DECELERATION 0.001f
 
@@ -26,7 +25,7 @@ public:
 
 	enum Move { NONE_M, UP, DOWN, LEFT, RIGHT };
 	Move prev_move = NONE_M;
-	//Direction prev_dir = NONE_D;
+	float MAX_SPEED = 0.5;
 
 	//Ű
 	std::unordered_map<Move, bool> kart_keyState;
