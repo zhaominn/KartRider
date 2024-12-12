@@ -101,7 +101,7 @@ public:
 			if (countGoSoundThread.joinable()) {
 				countGoSoundThread.join();
 			}
-			glutTimerFunc(0, timerHelper, 0);
+			//glutTimerFunc(0, timerHelper, 0);
 
 			countGoSoundThread = std::thread([this]() {
 				play_sound2D("count_go.wav", "./asset/map_1/", false, &isCountGoSound);
