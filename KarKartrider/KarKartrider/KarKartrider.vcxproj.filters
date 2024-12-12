@@ -125,13 +125,13 @@
     <ClInclude Include="LoadImg.h">
       <Filter>헤더 파일\Load</Filter>
     </ClInclude>
-    <ClInclude Include="MapModel.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="Map1_Mode.h">
       <Filter>헤더 파일\Mode</Filter>
     </ClInclude>
     <ClInclude Include="Map2_Mode.h">
+      <Filter>헤더 파일\Mode</Filter>
+    </ClInclude>
+    <ClInclude Include="MapModel.h">
       <Filter>헤더 파일\Mode</Filter>
     </ClInclude>
   </ItemGroup>

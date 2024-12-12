@@ -165,7 +165,7 @@ public:
 
 
 	void timer() {
-		UpdateRigidBodyTransform(karts[0]);
+		UpdateRigidBodyTransforms(karts);
 
 		// 啊加/皑加 贸府
 		if (kart_keyState[UP]) {
