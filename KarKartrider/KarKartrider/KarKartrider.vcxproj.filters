@@ -43,6 +43,9 @@
     <Filter Include="헤더 파일\root">
       <UniqueIdentifier>{242ec515-613e-49db-a45b-66b49812ae62}</UniqueIdentifier>
     </Filter>
+    <Filter Include="헤더 파일\Ui">
+      <UniqueIdentifier>{787089d8-9e04-4a73-92e4-84e195661579}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="vertex.glsl">
@@ -136,6 +139,12 @@
     </ClInclude>
     <ClInclude Include="CharacterModel.h">
       <Filter>헤더 파일\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="BarricateMap1Model.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Ui.h">
+      <Filter>헤더 파일\Ui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
