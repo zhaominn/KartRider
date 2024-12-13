@@ -204,27 +204,16 @@ public:
 					normalVec.y = 0.0f;
 					forwardDirection.y = 0.0f;
 
-					// 두 벡터의 내적(dot product)을 통해 방향 비교
-					float dotProduct = glm::dot(forwardDirection, normalVec);
-					float angle = glm::degrees(acos(glm::clamp(dotProduct, -1.0f, 1.0f))); // 두 벡터의 각도
-
-					if (angle < 90.0f) { // 90도 이내로 충돌(정면 또는 비슷한 방향으로 충돌)
-						std::cout << "정면 충돌: 이동 차단" << std::endl;
-
-						// 침투 깊이를 가져와 밀어내기
-						float penetrationDepth = resultCallback.penetrationDepth;
-						if (penetrationDepth < 0.0f) {
-							glm::vec3 penetrationCorrection = -normalVec * (penetrationDepth * 1.01f);
-							kart->translateMatrix = glm::translate(kart->translateMatrix, penetrationCorrection);
-						}
-
-						// 속도를 감소 또는 차단
-						//kart_speed = 0.0f; // 속도를 완전히 멈추거나
-						kart_speed *= 0.99f; // 속도를 줄이기 (선택 사항)
+					// 침투 깊이를 가져와 밀어내기
+					float penetrationDepth = resultCallback.penetrationDepth;
+					if (penetrationDepth < 0.0f) {
+						glm::vec3 penetrationCorrection = -normalVec * (penetrationDepth * 1.01f);
+						kart->translateMatrix = glm::translate(kart->translateMatrix, penetrationCorrection);
 					}
-					else {
-						std::cout << "측면 충돌: 회전 가능" << std::endl;
-					}
+
+					// 속도를 감소 또는 차단
+					//kart_speed = 0.0f; // 속도를 완전히 멈추거나
+					kart_speed *= 0.99f; // 속도를 줄이기 (선택 사항)
 				}
 			}
 		}
