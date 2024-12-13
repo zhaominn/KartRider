@@ -385,7 +385,9 @@ public:
 		for (const auto& c : character) { // ½ÇÁ¦ ¸ðµ¨ draw
 			c->draw(shaderProgramID, isKeyPressed_s);
 		}
-
+		for (const auto& barricate : road1_barricate) { // ½ÇÁ¦ ¸ðµ¨ draw
+			barricate->draw(shaderProgramID, isKeyPressed_s);
+		}
 
 		glDisable(GL_DEPTH_TEST);
 	}
@@ -396,6 +398,9 @@ public:
 		}
 		for (const auto& road : road1) { // ¸ðµ¨ bb draw
 			road->draw_rigidBody(shaderProgramID);
+		}
+		for (const auto& barricate : road1_barricate) { // ¸ðµ¨ bb draw
+			barricate->draw_rigidBody(shaderProgramID);
 		}
 	}
 
