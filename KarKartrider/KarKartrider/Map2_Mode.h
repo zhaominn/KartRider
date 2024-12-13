@@ -211,6 +211,8 @@ public:
 		}
 	}
 
+	void mouseClick(int button, int state, int x, int y) override {}
+
 	void keyboard(unsigned char key, int x, int y) override {
 		moveCamera(key, x, y);
 	}

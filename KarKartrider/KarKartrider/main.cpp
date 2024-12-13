@@ -60,6 +60,7 @@ int main(int argc, char** argv) {
 	glutKeyboardUpFunc(keyUp);
 	glutSpecialFunc(specialKey);
 	glutSpecialUpFunc(specialKeyUp);
+	glutMouseFunc(mouseClick);
 	glutMainLoop();
 
 	return 0;
