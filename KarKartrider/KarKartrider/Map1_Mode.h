@@ -338,7 +338,11 @@ public:
 		}
 	}
 
-	void mouseClick(int button, int state, int x, int y) override {}
+	void mouseClick(int button, int state, int x, int y) override {
+		if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+
+		}
+	}
 
 	void keyboard(unsigned char key, int x, int y) override {
 		moveCamera(key, x, y);
