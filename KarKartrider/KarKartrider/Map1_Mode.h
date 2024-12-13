@@ -29,7 +29,7 @@ public:
 
 	int start_count;
 
-	bool pause;
+	bool Pause;
 
 	//키
 	std::unordered_map<Move, bool> kart_keyState;
@@ -78,7 +78,7 @@ public:
 
 		start_count = -1;
 
-		pause = false;
+		Pause = false;
 
 		for (const auto& kart : karts) { // 카트 위치 초기화
 			kart->translateMatrix = glm::mat4(1.0f);
@@ -341,10 +341,22 @@ public:
 	void keyboard(unsigned char key, int x, int y) override {
 		moveCamera(key, x, y);
 		if (key == 27) { //esc
-			if(pause)
-			glutTimerFunc(16, timerHelper, 0); // 타이머 호출
+			if (Pause) {
+				glutTimerFunc(16, timerHelper, 0); // 타이머 호출
+			}
+			else {
+				glm::vec3 temp = cameraPos;
+				temp.z = temp.z - 10.0f;
+				// 카메라의 뷰 행렬 계산
+				glm::mat4 viewMatrix = glm::lookAt(temp, temp + cameraDirection, cameraUp);
 
-			pause = !pause;
+				// 뷰 행렬의 역행렬로 모델 행렬 생성
+				glm::mat4 cameraModelMatrix = glm::inverse(viewMatrix);
+
+				// pause 모델의 변환 행렬을 카메라의 모델 행렬로 설정
+				pause[0]->translateMatrix = cameraModelMatrix;
+			}
+			Pause = !Pause;
 		}
 	}
 
@@ -431,6 +443,8 @@ public:
 		if (start_count >= 0 && start_count < 4) {
 			countDown[start_count]->draw(shaderProgramID, isKeyPressed_s);
 		}
+		if (Pause)
+			pause[0]->draw(shaderProgramID, isKeyPressed_s);
 
 		glDisable(GL_DEPTH_TEST);
 	}
@@ -452,8 +466,8 @@ private:
 
 	static void timerHelper(int value) {
 		if (Map1_Mode* instance = dynamic_cast<Map1_Mode*>(Mode::currentInstance)) {
-				instance->timer(); // 인스턴스의 timer 호출
-			if (!instance->pause) {
+			instance->timer(); // 인스턴스의 timer 호출
+			if (!instance->Pause) {
 				glutTimerFunc(16, timerHelper, value); // 타이머 반복 호출
 			}
 		}
