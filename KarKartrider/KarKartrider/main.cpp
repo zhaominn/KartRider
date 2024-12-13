@@ -97,4 +97,8 @@ void InitBuffer() {
 	for (const auto& model : selectMaps) { // ¸ðµç ¸ðµ¨ initBuffer
 		model->initBuffer();
 	}
+
+	for (const auto& model : countDown) { // ¸ðµç ¸ðµ¨ initBuffer
+		model->initBuffer();
+	}
 }
