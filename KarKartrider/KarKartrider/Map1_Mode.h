@@ -58,6 +58,8 @@ public:
     std::thread countNSoundThread;
     bool isCountGoSound = false;
     std::thread countGoSoundThread;
+    bool isMotorsound = false;
+    std::thread motorSoundThread;
 
     // ----- game ------
 
@@ -242,6 +244,22 @@ public:
         }
     }
 
+    void checkEngineSound() {
+        if (kart_speed != 0.0f) {
+            if (!isMotorsound) { // 엔진 사운드가 재생 중이지 않을 때만 실행
+                isMotorsound = true;
+                motorSoundThread = std::thread(&Map1_Mode::engine_sound, this); // 엔진 사운드 시작
+            }
+        }
+        else { // 속도가 0일 경우
+            if (isMotorsound) {
+                isMotorsound = false;
+                if (motorSoundThread.joinable()) {
+                    motorSoundThread.detach(); // 스레드 종료 (필요한 경우 detach)
+                }
+            }
+        }
+    }
 
     void timer() {
         if (start_count < 4) {
@@ -327,6 +345,7 @@ public:
             cameraPos = glm::mix(cameraPos, cameraTargetPos, cameraFollowSpeed);
 
             checkCollisionKart();
+            checkEngineSound();
         }
     }
 
@@ -581,5 +600,8 @@ private:
     }
     void count_n() {
         play_sound2D("count_n.wav", "./asset/map_1/", false, &isCountNSound);
+    }
+    void engine_sound() {
+        play_sound2D("motor_x.ogg", "./asset/map_1/", true, &isMotorsound);
     }
 };

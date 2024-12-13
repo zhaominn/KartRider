@@ -6,8 +6,8 @@ C:\Users\neneee\KartRider\KarKartrider\KarKartrider\KeyBoard.h(44,13): warning C
   (소스 파일 'main.cpp'을(를) 컴파일하는 중)
   
   코드를 생성하고 있습니다.
-  4 of 2441 functions ( 0.2%) were compiled, the rest were copied from previous compilation.
-    1 functions were new in current compilation
-    55 functions had inline decision re-evaluated but remain unchanged
+  3 of 2443 functions ( 0.1%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    19 functions had inline decision re-evaluated but remain unchanged
   코드를 생성했습니다.
   KarKartrider.vcxproj -> C:\Users\neneee\KartRider\KarKartrider\x64\Release\KarKartrider.exe
