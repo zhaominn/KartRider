@@ -267,13 +267,14 @@ public:
 				if (reducedRotationInfluence > 1.0f) reducedRotationInfluence = 1.0f;
 			}
 
-		// 카메라 업데이트
-		setCamera();
-		// 현재 카메라 위치를 목표 위치로 점진적으로 이동
-		float cameraFollowSpeed = 0.1f; // 카메라가 따라가는 속도 (0.0 ~ 1.0 사이의 값)
-		cameraPos = glm::mix(cameraPos, cameraTargetPos, cameraFollowSpeed);
+			// 카메라 업데이트
+			setCamera();
+			// 현재 카메라 위치를 목표 위치로 점진적으로 이동
+			float cameraFollowSpeed = 0.1f; // 카메라가 따라가는 속도 (0.0 ~ 1.0 사이의 값)
+			cameraPos = glm::mix(cameraPos, cameraTargetPos, cameraFollowSpeed);
 
-		checkCollisionKart();
+			checkCollisionKart();
+		}
 	}
 
 	void moveCamera(unsigned char key, int x, int y) {
