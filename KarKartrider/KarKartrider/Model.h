@@ -82,6 +82,7 @@ public:
     bool model_status = true;
     btRigidBody* rigidBody = nullptr;  // 각 모델의 강체
     bool rigid_status = true;
+    bool draw_status = true;
 
     GLuint vao;
     GLuint vbos[4];

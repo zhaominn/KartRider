@@ -47,6 +47,8 @@ public:
     }
 
     const void draw(GLint shaderProgramID, bool (*isKeyPressed_s)(const char&)) override {
+        if (!this->draw_status) return;
+
         GLint modelLoc = glGetUniformLocation(shaderProgramID, "model");
         GLint normalLoc = glGetUniformLocation(shaderProgramID, "normalMatrix");
         if (this->model_status) {
