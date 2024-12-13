@@ -340,10 +340,9 @@ public:
 
 	void keyboard(unsigned char key, int x, int y) override {
 		moveCamera(key, x, y);
-
 		if (key == 27) { //esc
-			if (pause)
-				glutTimerFunc(0, Map1_Mode::timerHelper, 0);
+			if(pause)
+			glutTimerFunc(16, timerHelper, 0); // 타이머 호출
 
 			pause = !pause;
 		}
