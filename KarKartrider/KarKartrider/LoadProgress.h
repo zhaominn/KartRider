@@ -21,7 +21,7 @@ void printProgressBar(int progress, int total) {
 }
 
 template <typename T, typename = std::enable_if<std::is_base_of<Model, T>::value>>
-void loadModelWithProgress(const std::string& modelPath, const std::string path, const std::string& modelName, const std::string& modelType, glm::mat4 scale, std::vector<Model*>& models, bool rigid_status) {
+void loadModelWithProgress(const std::string& modelPath, const std::string path, const std::string& modelName, const std::string& modelType, glm::mat4 scale, std::vector<Model*>& models, bool rigid_status, bool draw_status) {
     std::cout << "Loading model: " << modelName << std::endl;
 
     const int totalSteps = 4; // 총 작업 단계 수
@@ -78,6 +78,8 @@ void loadModelWithProgress(const std::string& modelPath, const std::string path,
         //충돌 세계 추가완료
         std::cout << "\nModel add PhysicsWorld add!" << std::endl;
     }
+
+    model->draw_status = draw_status;
 
     models.push_back(model);
 }
