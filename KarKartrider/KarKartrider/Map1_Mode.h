@@ -29,6 +29,8 @@ public:
 
 	int start_count;
 
+	bool pause;
+
 	//키
 	std::unordered_map<Move, bool> kart_keyState;
 
@@ -75,6 +77,8 @@ public:
 		kart_keyState[RIGHT] = false;
 
 		start_count = -1;
+
+		pause = false;
 
 		for (const auto& kart : karts) { // 카트 위치 초기화
 			kart->translateMatrix = glm::mat4(1.0f);
@@ -174,7 +178,7 @@ public:
 		// 카메라가 자동차를 바라보도록 방향 업데이트
 		cameraDirection = carPosition; // 자동차를 항상 바라봄
 	}
-	
+
 	void checkCollisionKart() {
 		for (auto& kart : karts) {
 			if (kart->name != "car") continue;
@@ -336,6 +340,13 @@ public:
 
 	void keyboard(unsigned char key, int x, int y) override {
 		moveCamera(key, x, y);
+
+		if (key == 27) { //esc
+			if (pause)
+				glutTimerFunc(0, Map1_Mode::timerHelper, 0);
+
+			pause = !pause;
+		}
 	}
 
 	void specialKey(int key, int x, int y) override {
@@ -418,7 +429,7 @@ public:
 		for (const auto& barricate : road1_barricate) { // 실제 모델 draw
 			barricate->draw(shaderProgramID, isKeyPressed_s);
 		}
-		if (start_count>=0&&start_count < 4) {
+		if (start_count >= 0 && start_count < 4) {
 			countDown[start_count]->draw(shaderProgramID, isKeyPressed_s);
 		}
 
@@ -442,10 +453,13 @@ private:
 
 	static void timerHelper(int value) {
 		if (Map1_Mode* instance = dynamic_cast<Map1_Mode*>(Mode::currentInstance)) {
-			instance->timer(); // 인스턴스의 timer 호출
+			if (instance->pause) {
+				instance->timer(); // 인스턴스의 timer 호출
+				glutTimerFunc(16, timerHelper, value); // 타이머 반복 호출
+			}
 		}
 		glutPostRedisplay();
-		glutTimerFunc(16, timerHelper, value); // 타이머 반복 호출
+
 	}
 
 
