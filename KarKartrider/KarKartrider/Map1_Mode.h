@@ -174,7 +174,20 @@ public:
 		// 카메라가 자동차를 바라보도록 방향 업데이트
 		cameraDirection = carPosition; // 자동차를 항상 바라봄
 	}
-
+	
+	void checkCollisionKart() {
+		for (auto& kart : karts) {
+			if (kart->name != "car") continue;
+			for (const auto& barri : road1_barricate) {
+				if (barri->name != "baricate") continue;
+				CustomContactResultCallback resultCallback;
+				dynamicsWorld->contactPairTest(kart->rigidBody, barri->rigidBody, resultCallback);
+				if (resultCallback.hitDetected) {
+					cout << "충돌!!!!" << endl;
+				}
+			}
+		}
+	}
 
 	void timer() {
 		if (start_count < 4) {
@@ -254,12 +267,13 @@ public:
 				if (reducedRotationInfluence > 1.0f) reducedRotationInfluence = 1.0f;
 			}
 
-			// 카메라 업데이트
-			setCamera();
-			// 현재 카메라 위치를 목표 위치로 점진적으로 이동
-			float cameraFollowSpeed = 0.1f; // 카메라가 따라가는 속도 (0.0 ~ 1.0 사이의 값)
-			cameraPos = glm::mix(cameraPos, cameraTargetPos, cameraFollowSpeed);
-		}
+		// 카메라 업데이트
+		setCamera();
+		// 현재 카메라 위치를 목표 위치로 점진적으로 이동
+		float cameraFollowSpeed = 0.1f; // 카메라가 따라가는 속도 (0.0 ~ 1.0 사이의 값)
+		cameraPos = glm::mix(cameraPos, cameraTargetPos, cameraFollowSpeed);
+
+		checkCollisionKart();
 	}
 
 	void moveCamera(unsigned char key, int x, int y) {
