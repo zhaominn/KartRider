@@ -453,8 +453,8 @@ private:
 
 	static void timerHelper(int value) {
 		if (Map1_Mode* instance = dynamic_cast<Map1_Mode*>(Mode::currentInstance)) {
-			if (instance->pause) {
 				instance->timer(); // 인스턴스의 timer 호출
+			if (!instance->pause) {
 				glutTimerFunc(16, timerHelper, value); // 타이머 반복 호출
 			}
 		}
