@@ -49,9 +49,9 @@ public:
 			for (const auto& [materialName, ebo] : this->textureEBOs) {
 				auto it = this->materials.find(materialName);
 				if (it == this->materials.end()) {
-#ifdef DEBUG_MODE
+					#ifdef DEBUG_MODE
 					std::cerr << "No material found for: " << materialName << std::endl;
-#endif
+					#endif
 					continue;
 				}
 

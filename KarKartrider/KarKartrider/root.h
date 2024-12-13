@@ -4,6 +4,7 @@
 #include "RoadModel.h"
 #include "KartModel.h"
 #include "CharacterModel.h"
+#include "Ui.h"
 // Models
 std::vector<Model*> karts;
 //std::vector<Model*> roads;
@@ -11,6 +12,7 @@ std::vector<Model*> road1;
 std::vector<Model*> road2;
 std::vector<Model*> selectMaps;
 std::vector<Model*> character;
+std::vector<Model*> countDown;
 
 // mode
 ModeManager MM;
