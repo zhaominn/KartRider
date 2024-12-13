@@ -180,13 +180,47 @@ public:
 
     void checkCollisionKart() {
         for (auto& kart : karts) {
-            if (kart->name != "car") continue;
+            if (kart->name != "car") continue; // 카트가 "car" 이름이 아니면 스킵
+
+            // 중력을 제거 (한 번만 설정)
+            kart->rigidBody->setGravity(btVector3(0.0f, 0.0f, 0.0f));
+
             for (const auto& barri : road1_barricate) {
-                if (barri->name != "baricate") continue;
+                if (barri->name != "baricate") continue; // 바리케이트가 "baricate" 이름이 아니면 스킵
+
+                // 충돌 콜백 객체 생성
                 CustomContactResultCallback resultCallback;
+
+                // 두 객체의 충돌 감지
                 dynamicsWorld->contactPairTest(kart->rigidBody, barri->rigidBody, resultCallback);
-                if (resultCallback.hitDetected) {
-                    cout << "충돌!!!!" << endl;
+
+                if (resultCallback.hitDetected) { // 충돌이 감지되었을 때
+                    // 1. 충돌 시 카트의 속도를 멈춤
+                    kart_speed = 0.0f;
+
+                    // 2. 충돌 후 위치 보정
+                    // 카트의 현재 Transform 가져오기
+                    btTransform kartTransform;
+                    kart->rigidBody->getMotionState()->getWorldTransform(kartTransform);
+                    btVector3 kartPos = kartTransform.getOrigin();
+
+                    // 충돌 법선 벡터(Normal)를 사용해 카트를 밀어냄 (xz 평면만 수정)
+                    btVector3 correction = resultCallback.collisionNormal * std::abs(resultCallback.penetrationDepth);
+                    correction.setY(0.0f); // y축 이동을 제거
+
+                    // 바리케이트 반대 방향으로 카트 위치 보정 (y축 값 유지)
+                    btVector3 newKartPos = kartPos + correction;
+                    newKartPos.setY(2.6f); // y축을 고정된 값으로 설정 (예: 초기 y값 2.6)
+                    kartTransform.setOrigin(newKartPos);
+
+                    // 수정된 Transform을 카트에 적용
+                    kart->rigidBody->getMotionState()->setWorldTransform(kartTransform);
+                    kart->rigidBody->setWorldTransform(kartTransform);
+
+                    // 3. 카트의 변환 행렬에도 반영
+                    btScalar transformMatrix[16];
+                    kartTransform.getOpenGLMatrix(transformMatrix);
+                    kart->translateMatrix = glm::make_mat4(transformMatrix);
                 }
             }
         }
