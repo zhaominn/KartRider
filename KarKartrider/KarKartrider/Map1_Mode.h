@@ -16,6 +16,7 @@
 
 class Map1_Mode : public Mode {
 public:
+
     glm::quat cameraRotationQuat = glm::quat(glm::vec3(0.0f, 0.0f, 0.0f)); // 현재 카메라 행렬을 쿼터니언으로 저장
     float reducedRotationInfluence = 0.0f; // 보간할 퍼센트
 
@@ -67,7 +68,6 @@ public:
     std::thread boosterSoundThread;
 
     // ----- game ------
-
     int booster_cnt = 10;
 
     Map1_Mode() {
@@ -485,7 +485,6 @@ public:
             std::cout << "Booster ended. MAX_SPEED restored to: " << MAX_SPEED << std::endl;
             }).detach(); // 스레드 분리
     }
-
 
     void specialKey(int key, int x, int y) override {
 
