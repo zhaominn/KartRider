@@ -199,7 +199,6 @@ public:
             ++start_count;
         }
         else {
-            UpdateRigidBodyTransforms(karts);
 
             // 가속/감속 처리
             if (kart_keyState[UP]) {
@@ -483,15 +482,34 @@ public:
     }
 private:
 
+    void updatePhysics(float deltaTime) {
+        // 물리 엔진 업데이트 (deltaTime에 따라 정확도 조절)
+        dynamicsWorld->stepSimulation(deltaTime);
+
+        // 물리 엔진에서 객체의 Transform 업데이트
+        UpdateRigidBodyTransforms(karts);
+        UpdateRigidBodyTransforms(road1_barricate);
+
+        // 충돌 처리 (물리 엔진 업데이트 후 실행)
+        checkCollisionKart();
+    }
+
     static void timerHelper(int value) {
         if (Map1_Mode* instance = dynamic_cast<Map1_Mode*>(Mode::currentInstance)) {
-            instance->timer(); // 인스턴스의 timer 호출
-            if (!instance->Pause) {
-                glutTimerFunc(16, timerHelper, value); // 타이머 반복 호출
-            }
-        }
-        glutPostRedisplay();
+            // 물리 시뮬레이션을 여러 번 실행하여 높은 정확도 유지
+            const int physicsSteps = 2;  // 물리 엔진을 렌더링 프레임마다 두 번 실행
+            const float deltaTime = 1.0f / 120.0f; // 120FPS (1초에 120번 업데이트)
 
+            for (int i = 0; i < physicsSteps; ++i) {
+                instance->updatePhysics(deltaTime); // 물리 시뮬레이션 업데이트
+            }
+
+            instance->timer(); // 렌더링 관련 업데이트
+        }
+
+        // 렌더링 업데이트를 60FPS로 유지
+        glutPostRedisplay();
+        glutTimerFunc(16, timerHelper, value); // 60FPS 렌더링 주기
     }
 
 
