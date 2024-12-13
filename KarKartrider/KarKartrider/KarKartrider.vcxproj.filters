@@ -134,6 +134,9 @@
     <ClInclude Include="MapModel.h">
       <Filter>헤더 파일\Mode</Filter>
     </ClInclude>
+    <ClInclude Include="CharacterModel.h">
+      <Filter>헤더 파일\Object</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">

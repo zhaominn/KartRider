@@ -143,6 +143,7 @@
   <ItemGroup>
     <ClInclude Include="BulletPhysics.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="CharacterModel.h" />
     <ClInclude Include="CustomContactResultCallback.h" />
     <ClInclude Include="Debug.h" />
     <ClInclude Include="filetobuf.h" />

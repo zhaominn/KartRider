@@ -75,6 +75,10 @@ public:
 
 			playCountdown(0); // 첫 번째 카운트 사운드 실행
 		}
+		for (const auto& c : character) { //카트와 같은 행렬 적용
+			c->translateMatrix = karts[0]->translateMatrix;
+		}
+
 
 		kart_speed = 0.0f;
 		cameraPos = glm::vec3(0.0, 6.0, 253.0);
@@ -220,6 +224,11 @@ public:
 					kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, 1.5));
 				}
 			}
+		}
+
+		//캐릭터 
+		for (const auto& c : character) { //카트와 같은 행렬 적용
+			c->translateMatrix = karts[0]->translateMatrix;
 		}
 
 		// 카메라 회전 보간율 업데이트 (속도에 따라 카메라 회전이 빨라짐)
@@ -372,6 +381,9 @@ public:
 		}
 		for (const auto& road : road1) { // 실제 모델 draw
 			road->draw(shaderProgramID, isKeyPressed_s);
+		}
+		for (const auto& c : character) { // 실제 모델 draw
+			c->draw(shaderProgramID, isKeyPressed_s);
 		}
 
 
