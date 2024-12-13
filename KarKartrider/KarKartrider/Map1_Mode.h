@@ -14,17 +14,19 @@
 #include <gl/glm/glm/gtx/quaternion.hpp> // SLERP(Spherical Linear Interpolation)
 #include <unordered_map> // keystate
 
-#define ACCELERATION 0.002f
-#define DECELERATION 0.001f
-
 class Map1_Mode : public Mode {
 public:
+
     glm::quat cameraRotationQuat = glm::quat(glm::vec3(0.0f, 0.0f, 0.0f)); // 현재 카메라 행렬을 쿼터니언으로 저장
     float reducedRotationInfluence = 0.0f; // 보간할 퍼센트
 
     GLfloat kart_speed = 0.0f;
 
-    enum Move { NONE_M, UP, DOWN, LEFT, RIGHT };
+    enum Move { NONE_M, UP, DOWN, LEFT, RIGHT, CTRL };
+    float ACCELERATION = 0.004f;
+    float DECELERATION = 0.003f;
+    float LIMIT_SPEED = 0.5;
+    float BOOSTER_SPEED = 4.0;
     float MAX_SPEED = 0.5;
 
     int start_count;
@@ -58,6 +60,15 @@ public:
     std::thread countNSoundThread;
     bool isCountGoSound = false;
     std::thread countGoSoundThread;
+    bool isMotorSound = false;
+    std::thread motorSoundThread;
+    bool isCrashSound = false;
+    std::thread crashSoundThread;
+    bool isBoosterSound = false;
+    std::thread boosterSoundThread;
+
+    // ----- game ------
+    int booster_cnt = 10;
 
     Map1_Mode() {
         Mode::currentInstance = this;  // Map1_Mode 인스턴스를 currentInstance에 할당
@@ -92,6 +103,9 @@ public:
             c->translateMatrix = glm::translate(c->translateMatrix, glm::vec3(0.0, 4.0, 0.0));
         }
 
+        isBackgroundSound = true;
+        backgroundSoundThread = std::thread(&Map1_Mode::backgroundSound, this);
+
         kart_speed = 0.0f;
         draw_model();
         glutTimerFunc(0, Map1_Mode::timerHelper, 0);
@@ -106,30 +120,24 @@ public:
                 countNSoundThread.join();
             }
 
-            countNSoundThread = std::thread([this]() {
-                play_sound2D("count_n.wav", "./asset/map_1/", false, &isCountNSound);
-                });
+            countNSoundThread = std::thread(&Map1_Mode::count_n, this);
 
-            countNSoundThread.join();
-
+            countNSoundThread.join(); // 이 부분은 count_n.wav가 끝날 때까지 기다립니다.
         }
-        else { // count_go 사운드 실행
+        else if (count == 3) { // count_go 사운드 실행
             if (countGoSoundThread.joinable()) {
                 countGoSoundThread.join();
             }
 
-            countGoSoundThread = std::thread([this]() {
-                play_sound2D("count_go.wav", "./asset/map_1/", false, &isCountGoSound);
-                });
-
-            countGoSoundThread.join(); // `count_go` 재생이 끝날 때까지 기다림
-
-            isCountGoSound = false;
+            countGoSoundThread = std::thread(&Map1_Mode::count_go, this);
+            
+            // 플래그 초기화
+            //isCountGoSound = false;
             isCountNSound = false;
             isBackgroundSound = true;
-            backgroundSoundThread = std::thread(&Map1_Mode::backgroundSound, this);
         }
     }
+
 
     void updateCameraDirection() {
         glm::mat3 rotationMatrix = glm::mat3(karts[0]->translateMatrix);
@@ -180,13 +188,87 @@ public:
 
     void checkCollisionKart() {
         for (auto& kart : karts) {
-            if (kart->name != "car") continue;
+            if (kart->name != "car") continue; // 카트가 "car" 이름이 아니면 스킵
+
+            // 중력을 제거 (한 번만 설정)
+            kart->rigidBody->setGravity(btVector3(0.0f, 0.0f, 0.0f));
+
             for (const auto& barri : road1_barricate) {
-                if (barri->name != "baricate") continue;
+                if (barri->name != "baricate") continue; // 바리케이드가 "baricate" 이름이 아니면 스킵
+
+                // 충돌 콜백 객체 생성
                 CustomContactResultCallback resultCallback;
+
+                // 두 객체의 충돌 감지
                 dynamicsWorld->contactPairTest(kart->rigidBody, barri->rigidBody, resultCallback);
-                if (resultCallback.hitDetected) {
-                    cout << "충돌!!!!" << endl;
+
+                if (resultCallback.hitDetected) { // 충돌이 감지되었을 때
+                    // 충돌 사운드 재생 (isCrashSound로 중복 재생 방지)
+                    if (!isCrashSound) {
+                        isCrashSound = true;
+                        crashSoundThread = std::thread(&Map1_Mode::crash_sound, this);
+                        crashSoundThread.detach(); // 스레드를 분리하여 비동기 재생
+                    }
+
+                    // 1. 충돌 지점 및 법선 벡터 가져오기
+                    btVector3 collisionNormal = resultCallback.collisionNormal; // 충돌 방향
+                    collisionNormal.setY(0.0f); // y축 방향 제거 (xz 평면에서만 처리)
+
+                    // 2. 진행 방향과 충돌 방향 계산
+                    glm::vec3 kartDirection = glm::normalize(glm::vec3(-kart->translateMatrix[2])); // 진행 방향 (Z축 기준)
+                    glm::vec3 collisionDirection = glm::normalize(glm::vec3(collisionNormal.x(), collisionNormal.y(), collisionNormal.z()));
+
+                    // 진행 방향과 충돌 방향이 거의 일치하는 경우만 속도 감소
+                    float dotProduct = glm::dot(kartDirection, collisionDirection);
+
+                    // 3. 감속 처리 (충돌 강도에 따라 속도를 감소)
+                    if (dotProduct < 0.0f) { // 충돌 방향이 진행 방향과 반대일 때만 처리
+                        float decelerationFactor = 0.05f; // 감속 비율
+                        kart_speed *= 1.0f - decelerationFactor; // 속도를 천천히 줄임
+
+                        if (kart_speed < 0.01f) { // 너무 느려지면 멈춤
+                            kart_speed = 0.0f;
+                        }
+                    }
+
+                    // 4. 충돌 위치 보정 (침투 깊이만큼 이동)
+                    btTransform kartTransform;
+                    kart->rigidBody->getMotionState()->getWorldTransform(kartTransform);
+                    btVector3 kartPos = kartTransform.getOrigin();
+
+                    btVector3 correction = collisionNormal * std::abs(resultCallback.penetrationDepth);
+                    correction.setY(0.0f); // y축 이동 제거
+                    btVector3 newKartPos = kartPos + correction;
+                    newKartPos.setY(2.6f); // y축 고정
+
+                    kartTransform.setOrigin(newKartPos);
+
+                    // 업데이트된 Transform을 카트에 적용
+                    kart->rigidBody->getMotionState()->setWorldTransform(kartTransform);
+                    kart->rigidBody->setWorldTransform(kartTransform);
+
+                    // OpenGL 변환 행렬에도 반영
+                    btScalar transformMatrix[16];
+                    kartTransform.getOpenGLMatrix(transformMatrix);
+                    kart->translateMatrix = glm::make_mat4(transformMatrix);
+                }
+            }
+        }
+    }
+
+
+    void checkEngineSound() {
+        if (kart_speed != 0.0f) {
+            if (!isMotorSound) { // 엔진 사운드가 재생 중이지 않을 때만 실행
+                isMotorSound = true;
+                motorSoundThread = std::thread(&Map1_Mode::engine_sound, this); // 엔진 사운드 시작
+            }
+        }
+        else { // 속도가 0일 경우
+            if (isMotorSound) {
+                isMotorSound = false;
+                if (motorSoundThread.joinable()) {
+                    motorSoundThread.detach(); // 스레드 종료 (필요한 경우 detach)
                 }
             }
         }
@@ -199,7 +281,6 @@ public:
             ++start_count;
         }
         else {
-            UpdateRigidBodyTransforms(karts);
 
             // 가속/감속 처리
             if (kart_keyState[UP]) {
@@ -277,6 +358,7 @@ public:
             cameraPos = glm::mix(cameraPos, cameraTargetPos, cameraFollowSpeed);
 
             checkCollisionKart();
+            checkEngineSound();
         }
     }
 
@@ -379,7 +461,47 @@ public:
         }
     }
 
+    // 부스터 실행 함수
+    void activateBooster() {
+        std::cout << "Booster activated! Remaining boosters: " << booster_cnt << std::endl;
+
+        // 기존 MAX_SPEED 값을 저장
+        float originalMaxSpeed = MAX_SPEED;
+
+        // MAX_SPEED를 BOOSTER_SPEED로 설정
+        MAX_SPEED = BOOSTER_SPEED;
+
+        // 부스터 사운드 재생 (isBoosterSound 플래그를 사용해 중복 방지)
+        if (!isBoosterSound) {
+            isBoosterSound = true;
+            boosterSoundThread = std::thread(&Map1_Mode::booster_sound, this);
+            boosterSoundThread.detach(); // 스레드 분리하여 비동기 실행
+        }
+
+        // 부스터가 활성화된 상태를 알리기
+        std::thread([this, originalMaxSpeed]() {
+            std::this_thread::sleep_for(std::chrono::seconds(3)); // 3초 대기
+            MAX_SPEED = originalMaxSpeed; // 원래 속도로 복구
+            std::cout << "Booster ended. MAX_SPEED restored to: " << MAX_SPEED << std::endl;
+            }).detach(); // 스레드 분리
+    }
+
     void specialKey(int key, int x, int y) override {
+
+        int modifiers = glutGetModifiers();
+
+        // Ctrl 단독 감지
+         // Ctrl 단독 감지
+        if (modifiers & GLUT_ACTIVE_CTRL) {
+            if (booster_cnt > 0) { // 부스터가 남아 있는 경우
+                booster_cnt--; // 부스터 개수 감소
+                activateBooster(); // 부스터 활성화
+            }
+            else {
+                std::cout << "No boosters left!" << std::endl;
+            }
+        }
+
         switch (key) {
         case GLUT_KEY_UP:
             kart_keyState[UP] = true;
@@ -483,15 +605,34 @@ public:
     }
 private:
 
+    void updatePhysics(float deltaTime) {
+        // 물리 엔진 업데이트 (deltaTime에 따라 정확도 조절)
+        dynamicsWorld->stepSimulation(deltaTime);
+
+        // 물리 엔진에서 객체의 Transform 업데이트
+        UpdateRigidBodyTransforms(karts);
+        UpdateRigidBodyTransforms(road1_barricate);
+
+        // 충돌 처리 (물리 엔진 업데이트 후 실행)
+        checkCollisionKart();
+    }
+
     static void timerHelper(int value) {
         if (Map1_Mode* instance = dynamic_cast<Map1_Mode*>(Mode::currentInstance)) {
-            instance->timer(); // 인스턴스의 timer 호출
-            if (!instance->Pause) {
-                glutTimerFunc(16, timerHelper, value); // 타이머 반복 호출
-            }
-        }
-        glutPostRedisplay();
+            // 물리 시뮬레이션을 여러 번 실행하여 높은 정확도 유지
+            const int physicsSteps = 2;  // 물리 엔진을 렌더링 프레임마다 두 번 실행
+            const float deltaTime = 1.0f / 120.0f; // 120FPS (1초에 120번 업데이트)
 
+            for (int i = 0; i < physicsSteps; ++i) {
+                instance->updatePhysics(deltaTime); // 물리 시뮬레이션 업데이트
+            }
+
+            instance->timer(); // 렌더링 관련 업데이트
+        }
+
+        // 렌더링 업데이트를 60FPS로 유지
+        glutPostRedisplay();
+        glutTimerFunc(16, timerHelper, value); // 60FPS 렌더링 주기
     }
 
 
@@ -499,5 +640,21 @@ private:
     void backgroundSound() {
         play_sound2D("village_04.ogg", "./asset/map_1/", true, &isBackgroundSound);
     }
-
+    void count_go() {
+        play_sound2D("count_go.wav", "./asset/map_1/", false, &isCountGoSound);
+    }
+    void count_n() {
+        play_sound2D("count_n.wav", "./asset/map_1/", false, &isCountNSound);
+    }
+    void engine_sound() {
+        play_sound2D("motor_x.ogg", "./asset/map_1/", true, &isMotorSound);
+    }
+    void crash_sound() {
+        play_sound2D("crash.ogg", "./asset/map_1/", false, &isCrashSound);
+        isCrashSound = false;
+    }
+    void booster_sound() {
+        play_sound2D("booster.ogg", "./asset/map_1/", false, &isBoosterSound);
+        isBoosterSound = false;
+    }
 };
