@@ -14,9 +14,6 @@
 #include <gl/glm/glm/gtx/quaternion.hpp> // SLERP(Spherical Linear Interpolation)
 #include <unordered_map> // keystate
 
-#define ACCELERATION 0.002f
-#define DECELERATION 0.001f
-
 class Map1_Mode : public Mode {
 public:
     glm::quat cameraRotationQuat = glm::quat(glm::vec3(0.0f, 0.0f, 0.0f)); // 현재 카메라 행렬을 쿼터니언으로 저장
@@ -25,8 +22,10 @@ public:
     GLfloat kart_speed = 0.0f;
 
     enum Move { NONE_M, UP, DOWN, LEFT, RIGHT, CTRL };
+    float ACCELERATION = 0.004f;
+    float DECELERATION = 0.003f;
     float LIMIT_SPEED = 0.5;
-    float BOOSTER_SPEED = 0.7;
+    float BOOSTER_SPEED = 4.0;
     float MAX_SPEED = 0.5;
 
     int start_count;
@@ -64,10 +63,12 @@ public:
     std::thread motorSoundThread;
     bool isCrashSound = false;
     std::thread crashSoundThread;
+    bool isBoosterSound = false;
+    std::thread boosterSoundThread;
 
     // ----- game ------
 
-    int booster_cnt = 2;
+    int booster_cnt = 10;
 
     Map1_Mode() {
         Mode::currentInstance = this;  // Map1_Mode 인스턴스를 currentInstance에 할당
@@ -460,13 +461,46 @@ public:
         }
     }
 
+    // 부스터 실행 함수
+    void activateBooster() {
+        std::cout << "Booster activated! Remaining boosters: " << booster_cnt << std::endl;
+
+        // 기존 MAX_SPEED 값을 저장
+        float originalMaxSpeed = MAX_SPEED;
+
+        // MAX_SPEED를 BOOSTER_SPEED로 설정
+        MAX_SPEED = BOOSTER_SPEED;
+
+        // 부스터 사운드 재생 (isBoosterSound 플래그를 사용해 중복 방지)
+        if (!isBoosterSound) {
+            isBoosterSound = true;
+            boosterSoundThread = std::thread(&Map1_Mode::booster_sound, this);
+            boosterSoundThread.detach(); // 스레드 분리하여 비동기 실행
+        }
+
+        // 부스터가 활성화된 상태를 알리기
+        std::thread([this, originalMaxSpeed]() {
+            std::this_thread::sleep_for(std::chrono::seconds(3)); // 3초 대기
+            MAX_SPEED = originalMaxSpeed; // 원래 속도로 복구
+            std::cout << "Booster ended. MAX_SPEED restored to: " << MAX_SPEED << std::endl;
+            }).detach(); // 스레드 분리
+    }
+
+
     void specialKey(int key, int x, int y) override {
 
         int modifiers = glutGetModifiers();
 
         // Ctrl 단독 감지
+         // Ctrl 단독 감지
         if (modifiers & GLUT_ACTIVE_CTRL) {
-            std::cout << "Ctrl key is pressed (with special key: " << key << ")" << std::endl;
+            if (booster_cnt > 0) { // 부스터가 남아 있는 경우
+                booster_cnt--; // 부스터 개수 감소
+                activateBooster(); // 부스터 활성화
+            }
+            else {
+                std::cout << "No boosters left!" << std::endl;
+            }
         }
 
         switch (key) {
@@ -619,5 +653,9 @@ private:
     void crash_sound() {
         play_sound2D("crash.ogg", "./asset/map_1/", false, &isCrashSound);
         isCrashSound = false;
+    }
+    void booster_sound() {
+        play_sound2D("booster.ogg", "./asset/map_1/", false, &isBoosterSound);
+        isBoosterSound = false;
     }
 };
