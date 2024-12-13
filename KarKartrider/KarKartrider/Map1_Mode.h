@@ -374,7 +374,7 @@ public:
 				modelMatrix[3] = glm::vec4(cameraPos, 1.0f);          // 위치 추가
 
 				pause[0]->translateMatrix= modelMatrix;
-				pause[0]->translateMatrix = glm::translate(pause[0]->translateMatrix, glm::vec3(0.0,0.0,-10.0));
+				pause[0]->translateMatrix = glm::translate(pause[0]->translateMatrix, glm::vec3(0.0,0.0,-15.0));
 			}
 			Pause = !Pause;
 		}
