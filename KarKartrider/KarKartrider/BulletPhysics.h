@@ -189,7 +189,7 @@ void UpdateRigidBodyTransforms(std::vector<Model*>models) {
 
         if (!model->rigidBody) return;
 
-        glm::mat4 modelMatrix = model->matrix;
+        glm::mat4 modelMatrix = model->translateMatrix;
         btTransform transform;
         transform.setFromOpenGLMatrix(glm::value_ptr(modelMatrix));
 
