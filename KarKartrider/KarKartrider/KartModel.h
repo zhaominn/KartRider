@@ -19,7 +19,7 @@ public:
 
     KartModel(string name, string path, string obj_name, string obj_type, bool rigid_status, glm::mat4 start_matrix = glm::mat4(1.0f)) {
         read_obj_file(name, path, this, obj_name, obj_type);
-        this->matrix = start_matrix * this->matrix;
+        this->translateMatrix = start_matrix * this->translateMatrix;
         this->rigid_status = rigid_status;
     }
 
@@ -27,11 +27,10 @@ public:
 
     void load_obj(string name, string path, string obj_name, string obj_type, glm::mat4 start_matrix = glm::mat4(1.0f)) override {
         read_obj_file(name, path, this, obj_name, obj_type);
-        this->matrix = start_matrix * this->matrix;
+        this->translateMatrix = start_matrix * this->translateMatrix;
     }
 
     const void draw(GLint shaderProgramID, bool (*isKeyPressed_s)(const char&)) override {
-
         if (!this->draw_status) return;
 
         GLint modelLoc = glGetUniformLocation(shaderProgramID, "model");
@@ -46,7 +45,6 @@ public:
 
             // **모델 행렬 갱신**
             glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(this->translateMatrix));
-            
 
             GLuint lastBoundTextureID = 0; // 이전 텍스처 ID 추적
             for (const auto& [materialName, ebo] : this->textureEBOs) {

@@ -63,6 +63,9 @@ public:
 
 	void init() override {
 
+		UpdateRigidBodyTransforms(road1_barricate);
+		UpdateRigidBodyTransforms(karts);
+
 		// Move »óÅÂ ÃÊ±âÈ­
 		kart_keyState[UP] = false;
 		kart_keyState[DOWN] = false;
@@ -393,11 +396,12 @@ public:
 	}
 
 	void draw_bb() override {
-		for (const auto& barricate : road1_barricate) { // ¸ðµ¨ bb draw
-			barricate->draw_rigidBody(shaderProgramID);
-		}
+		
 		for (const auto& model : karts) { // ¸ðµ¨ bb draw
 			model->draw_rigidBody(shaderProgramID);
+		}
+		for (const auto& barricate : road1_barricate) { // ¸ðµ¨ bb draw
+			barricate->draw_rigidBody(shaderProgramID);
 		}
 	}
 

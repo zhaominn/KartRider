@@ -267,15 +267,25 @@ void RenderCollisionBox(const Model* model, GLuint shaderProgram) {
     // 셰이더 사용 및 유니폼 설정
     glUseProgram(shaderProgram);
 
+    // 이전 행렬의 영향을 없애기 위해 identity 행렬로 설정
+    glm::mat4 identityMatrix = glm::mat4(1.0f);
+    GLint modelLoc = glGetUniformLocation(shaderProgram, "model");
+    GLint viewLoc = glGetUniformLocation(shaderProgram, "view");
+    GLint projectionLoc = glGetUniformLocation(shaderProgram, "projection");
+    if (modelLoc != -1) glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(identityMatrix));
+    if (viewLoc != -1) glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(identityMatrix));
+    if (projectionLoc != -1) glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(identityMatrix));
+
+    // AABB 렌더링 플래그 활성화
     GLint isRigidBodyLoc = glGetUniformLocation(shaderProgram, "isRigidBody");
-    glUniform1i(isRigidBodyLoc, 1); // Rigid body 렌더링 활성화
+    if (isRigidBodyLoc != -1) glUniform1i(isRigidBodyLoc, 1);
 
     // AABB 박스 렌더링
     glBindVertexArray(vao);
     glDrawElements(GL_LINES, 24, GL_UNSIGNED_INT, 0);
 
     // 상태 복원 및 리소스 정리
-    glUniform1i(isRigidBodyLoc, 0);
+    if (isRigidBodyLoc != -1) glUniform1i(isRigidBodyLoc, 0);
     glBindVertexArray(0);
     glDeleteVertexArrays(1, &vao);
     glDeleteBuffers(1, &vbo);
