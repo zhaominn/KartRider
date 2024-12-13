@@ -13,54 +13,60 @@
 std::unordered_map<char, bool> keyState;
 
 void keyDown_s(const char& key) {
-    keyState[key] = !keyState[key];
+	keyState[key] = !keyState[key];
 }
 
 void keyUp_s(const char& key) {
-    keyState[key] = false;
+	keyState[key] = false;
 }
 
 bool isKeyPressed_s(const char& key) {
-    return keyState[key];
+	return keyState[key];
 }
 
 void keyUp(unsigned char key, int x, int y) {
-    //keyUp_s(key);
-    glutPostRedisplay();
+	//keyUp_s(key);
+	glutPostRedisplay();
 }
 
 void keyDown(unsigned char key, int x, int y) {
 
-    MM.keyboard(key, x, y);
+	MM.keyboard(key, x, y);
 
-    keyDown_s(key);
+	keyDown_s(key);
 
-    switch (key)
-    {
-    case '[':
-        volume -= 0.05;
-        break;
-    case ']':
-        volume += 0.05;
-        break;
-    case 'q':
-        std::cout << " 프로그램 종료 " << std::endl;
-        exit(0);
-        break;
-    default:
-        break;
-    }
-    glutPostRedisplay();
+	switch (key)
+	{
+	case '[':
+		volume -= 0.05;
+		break;
+	case ']':
+		volume += 0.05;
+		break;
+	case 'q':
+		std::cout << " 프로그램 종료 " << std::endl;
+		exit(0);
+		break;
+	default:
+		break;
+	}
+	glutPostRedisplay();
 }
 
 void specialKey(int key, int x, int y) {
-    MM.specialKey(key, x, y);
+	MM.specialKey(key, x, y);
 
-    glutPostRedisplay();
+	glutPostRedisplay();
 }
 
 void specialKeyUp(int key, int x, int y) {
-    MM.specialKeyUp(key, x, y);
+	MM.specialKeyUp(key, x, y);
 
-    glutPostRedisplay();
+	glutPostRedisplay();
+}
+
+void mouseClick(int button, int state, int x, int y) {
+	MM.mouseClick(button, state, x, y);
+
+	glutPostRedisplay();
 }

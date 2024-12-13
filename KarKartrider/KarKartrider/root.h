@@ -19,6 +19,7 @@ std::vector<Model*> selectMaps;
 std::vector<Model*> character;
 
 std::vector<Model*> countDown;
+std::vector<Model*> pause;
 // mode
 ModeManager MM;
 

@@ -25,7 +25,7 @@ public:
 			mode->draw_bb();
 	}
 
-	void finish(){
+	void finish() {
 		if (mode)
 			mode->finish();
 	}
@@ -43,5 +43,10 @@ public:
 	void specialKeyUp(int key, int x, int y) {
 		if (mode)
 			mode->specialKeyUp(key, x, y);
+	}
+
+	void mouseClick(int button, int state, int x, int y) {
+		if (mode)
+			mode->mouseClick(button, state, x, y);
 	}
 };

@@ -71,6 +71,7 @@ public:
 
 	}
 
+	void mouseClick(int button, int state, int x, int y) override {}
 
 	void keyboard(unsigned char key, int x, int y) override {
 		std::thread clickSoundThread(&SelectMapMode::clickSound, this);
