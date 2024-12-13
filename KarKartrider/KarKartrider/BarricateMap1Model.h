@@ -20,7 +20,7 @@ public:
 
 	BarricateMap1Model(string name, string path, string obj_name, string obj_type, bool rigid_status, glm::mat4 start_matrix = glm::mat4(1.0f)) {
 		read_obj_file(name, path, this, obj_name, obj_type);
-		this->matrix = start_matrix * this->matrix;
+		this->translateMatrix = start_matrix * this->matrix;
 		this->rigid_status = rigid_status;
 	}
 
@@ -28,10 +28,11 @@ public:
 
 	void load_obj(string name, string path, string obj_name, string obj_type, glm::mat4 start_matrix = glm::mat4(1.0f)) override {
 		read_obj_file(name, path, this, obj_name, obj_type);
-		this->matrix = start_matrix * this->matrix;
+		this->translateMatrix = start_matrix * this->matrix;
 	}
 
 	const void draw(GLint shaderProgramID, bool (*isKeyPressed_s)(const char&)) override {
+
 		if (!this->draw_status) return;
 
 		GLint modelLoc = glGetUniformLocation(shaderProgramID, "model");
@@ -45,7 +46,8 @@ public:
 			glUniformMatrix3fv(normalLoc, 1, GL_FALSE, glm::value_ptr(normalMatrix));
 
 			// **모델 행렬 갱신**
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(this->matrix));
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(this->translateMatrix));
+
 
 			GLuint lastBoundTextureID = 0; // 이전 텍스처 ID 추적
 			for (const auto& [materialName, ebo] : this->textureEBOs) {
@@ -55,7 +57,7 @@ public:
 					std::cerr << "No material found for: " << materialName << std::endl;
 #endif
 					continue;
-				}
+			}
 
 				const Material& material = it->second;
 
@@ -91,20 +93,19 @@ public:
 				// **EBO 렌더링**
 				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 				glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(textureGroups[materialName].size()), GL_UNSIGNED_INT, 0);
-			}
+		}
 
 			// **렌더링 후 상태 복구**
 			glDepthMask(GL_TRUE);
-			glEnable(GL_BLEND);
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glDisable(GL_BLEND);
 
 			// OpenGL 상태 초기화
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, 0);
 			glBindVertexArray(0);
-		}
 	}
+}
 
 	const void draw_rigidBody(GLuint shaderProgramID) override {
 		if (this->rigidBody) {

@@ -393,14 +393,11 @@ public:
 	}
 
 	void draw_bb() override {
-		for (const auto& model : karts) { // ¸ðµ¨ bb draw
-			model->draw_rigidBody(shaderProgramID);
-		}
-		for (const auto& road : road1) { // ¸ðµ¨ bb draw
-			road->draw_rigidBody(shaderProgramID);
-		}
 		for (const auto& barricate : road1_barricate) { // ¸ðµ¨ bb draw
 			barricate->draw_rigidBody(shaderProgramID);
+		}
+		for (const auto& model : karts) { // ¸ðµ¨ bb draw
+			model->draw_rigidBody(shaderProgramID);
 		}
 	}
 
