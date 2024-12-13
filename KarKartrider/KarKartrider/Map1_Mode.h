@@ -92,6 +92,9 @@ public:
             c->translateMatrix = glm::translate(c->translateMatrix, glm::vec3(0.0, 4.0, 0.0));
         }
 
+        isBackgroundSound = true;
+        backgroundSoundThread = std::thread(&Map1_Mode::backgroundSound, this);
+
         kart_speed = 0.0f;
         draw_model();
         glutTimerFunc(0, Map1_Mode::timerHelper, 0);
@@ -106,30 +109,24 @@ public:
                 countNSoundThread.join();
             }
 
-            countNSoundThread = std::thread([this]() {
-                play_sound2D("count_n.wav", "./asset/map_1/", false, &isCountNSound);
-                });
+            countNSoundThread = std::thread(&Map1_Mode::count_n, this);
 
-            countNSoundThread.join();
-
+            countNSoundThread.join(); // 이 부분은 count_n.wav가 끝날 때까지 기다립니다.
         }
-        else { // count_go 사운드 실행
+        else if (count == 3) { // count_go 사운드 실행
             if (countGoSoundThread.joinable()) {
                 countGoSoundThread.join();
             }
 
-            countGoSoundThread = std::thread([this]() {
-                play_sound2D("count_go.wav", "./asset/map_1/", false, &isCountGoSound);
-                });
-
-            countGoSoundThread.join(); // `count_go` 재생이 끝날 때까지 기다림
-
-            isCountGoSound = false;
+            countGoSoundThread = std::thread(&Map1_Mode::count_go, this);
+            
+            // 플래그 초기화
+            //isCountGoSound = false;
             isCountNSound = false;
             isBackgroundSound = true;
-            backgroundSoundThread = std::thread(&Map1_Mode::backgroundSound, this);
         }
     }
+
 
     void updateCameraDirection() {
         glm::mat3 rotationMatrix = glm::mat3(karts[0]->translateMatrix);
@@ -567,5 +564,10 @@ private:
     void backgroundSound() {
         play_sound2D("village_04.ogg", "./asset/map_1/", true, &isBackgroundSound);
     }
-
+    void count_go() {
+        play_sound2D("count_go.wav", "./asset/map_1/", false, &isCountGoSound);
+    }
+    void count_n() {
+        play_sound2D("count_n.wav", "./asset/map_1/", false, &isCountNSound);
+    }
 };
