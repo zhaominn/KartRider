@@ -141,6 +141,7 @@
     <None Include="vertex.glsl" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BarricateMap1Model.h" />
     <ClInclude Include="BulletPhysics.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CharacterModel.h" />
@@ -169,7 +170,6 @@
     <ClInclude Include="root.h" />
     <ClInclude Include="SelectMapMode.h" />
     <ClInclude Include="shaderMaker.h" />
-    <ClInclude Include="Ui.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="filetobuf.cpp" />

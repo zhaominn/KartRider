@@ -14,8 +14,6 @@
 #include <gl/glm/glm/gtx/quaternion.hpp> // SLERP(Spherical Linear Interpolation)
 #include <unordered_map> // keystate
 
-#include <windows.h>
-
 #define ACCELERATION 0.002f
 #define DECELERATION 0.001f
 
@@ -28,8 +26,6 @@ public:
 
 	enum Move { NONE_M, UP, DOWN, LEFT, RIGHT };
 	float MAX_SPEED = 0.5;
-
-	int start_count;
 
 	//키
 	std::unordered_map<Move, bool> kart_keyState;
@@ -66,7 +62,9 @@ public:
 	}
 
 	void init() override {
-		glutTimerFunc(0, Map1_Mode::timerHelper, 0);
+
+		UpdateRigidBodyTransforms(road1_barricate);
+		UpdateRigidBodyTransforms(karts);
 
 		// Move 상태 초기화
 		kart_keyState[UP] = false;
@@ -77,16 +75,14 @@ public:
 		for (const auto& kart : karts) { // 카트 위치 초기화
 			kart->translateMatrix = glm::mat4(1.0f);
 			kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 2.6, 238.0));
+
+			playCountdown(0); // 첫 번째 카운트 사운드 실행
 		}
 		for (const auto& c : character) { //카트와 같은 행렬 적용
 			c->translateMatrix = karts[0]->translateMatrix;
 		}
-		for (const auto& c : countDown) { //카트와 같은 행렬 적용
-			c->translateMatrix = karts[0]->translateMatrix;
-			c->translateMatrix = glm::translate(c->translateMatrix, glm::vec3(0.0, 10.0, 0.0));
-		}
 
-		start_count = 0;
+
 		kart_speed = 0.0f;
 		cameraPos = glm::vec3(0.0, 6.0, 253.0);
 		updateCameraDirection();
@@ -102,12 +98,17 @@ public:
 				play_sound2D("count_n.wav", "./asset/map_1/", false, &isCountNSound);
 				});
 
-			countNSoundThread.join();
+			glutTimerFunc(1000, [](int value) {
+				if (Map1_Mode* instance = dynamic_cast<Map1_Mode*>(Mode::currentInstance)) {
+					instance->playCountdown(value);
+				}
+				}, count + 1);
 		}
 		else { // count_go 사운드 실행
 			if (countGoSoundThread.joinable()) {
 				countGoSoundThread.join();
 			}
+			glutTimerFunc(0, timerHelper, 0);
 
 			countGoSoundThread = std::thread([this]() {
 				play_sound2D("count_go.wav", "./asset/map_1/", false, &isCountGoSound);
@@ -118,7 +119,7 @@ public:
 			isCountGoSound = false;
 			isCountNSound = false;
 			isBackgroundSound = true;
-			backgroundSoundThread = std::thread(&Map1_Mode::backgroundSound, this);
+			backgroundSoundThread = std::thread(&Map1_Mode::backgroundSound, this);	
 		}
 	}
 
@@ -171,89 +172,82 @@ public:
 
 
 	void timer() {
-		if (start_count < 4) {
-			Sleep(1000);
-			playCountdown(start_count); // 첫 번째 카운트 사운드 실행
-			++start_count;
+		UpdateRigidBodyTransforms(karts);
+
+		// 가속/감속 처리
+		if (kart_keyState[UP]) {
+			if (kart_speed < MAX_SPEED) {
+				kart_speed += ACCELERATION;
+			}
+		}
+		else if (kart_keyState[DOWN]) {
+			if (kart_speed > -MAX_SPEED / 2.0f) { // 후진 속도는 전진의 절반까지만 허용
+				kart_speed -= ACCELERATION;
+			}
 		}
 		else {
-			UpdateRigidBodyTransforms(karts);
-
-			// 가속/감속 처리
-			if (kart_keyState[UP]) {
-				if (kart_speed < MAX_SPEED) {
-					kart_speed += ACCELERATION;
-				}
+			if (kart_speed > 0.0f) {
+				kart_speed -= DECELERATION; // 전진 감속
+				if (kart_speed < 0.0f) kart_speed = 0.0f;
 			}
-			else if (kart_keyState[DOWN]) {
-				if (kart_speed > -MAX_SPEED / 2.0f) { // 후진 속도는 전진의 절반까지만 허용
-					kart_speed -= ACCELERATION;
-				}
+			else if (kart_speed < 0.0f) {
+				kart_speed += DECELERATION; // 후진 감속
+				if (kart_speed > 0.0f) kart_speed = 0.0f;
 			}
-			else {
-				if (kart_speed > 0.0f) {
-					kart_speed -= DECELERATION; // 전진 감속
-					if (kart_speed < 0.0f) kart_speed = 0.0f;
-				}
-				else if (kart_speed < 0.0f) {
-					kart_speed += DECELERATION; // 후진 감속
-					if (kart_speed > 0.0f) kart_speed = 0.0f;
-				}
-			}
-
-			// 카트 이동 처리
-			if (kart_speed > 0.0f) { // 전진
-				for (const auto& kart : karts) {
-					kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, -kart_speed));
-				}
-			}
-			else if (kart_speed < 0.0f) { // 후진
-				for (const auto& kart : karts) {
-					kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, -kart_speed));
-				}
-			}
-
-			// 방향 전환 처리
-			if (kart_keyState[LEFT]) {
-				if (kart_speed != 0.0f) {
-					for (const auto& kart : karts) {
-						kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, -1.5));
-						kart->translateMatrix = glm::rotate(kart->translateMatrix, glm::radians(TURN_ANGLE), glm::vec3(0.0f, 1.0f, 0.0f));
-						kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, 1.5));
-					}
-				}
-			}
-
-			if (kart_keyState[RIGHT]) {
-				if (kart_speed != 0.0f) {
-					for (const auto& kart : karts) {
-						kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, -1.5));
-						kart->translateMatrix = glm::rotate(kart->translateMatrix, glm::radians(-TURN_ANGLE), glm::vec3(0.0f, 1.0f, 0.0f));
-						kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, 1.5));
-					}
-				}
-			}
-
-			//캐릭터 
-			for (const auto& c : character) { //카트와 같은 행렬 적용
-				c->translateMatrix = karts[0]->translateMatrix;
-			}
-
-			// 카메라 회전 보간율 업데이트 (속도에 따라 카메라 회전이 빨라짐)
-			if (kart_speed != 0.0f) {
-				reducedRotationInfluence = 0.1f + (std::abs(kart_speed) / MAX_SPEED) * 0.4f; // 속도 비례 보간율
-			}
-			else {
-				reducedRotationInfluence += 0.01f; // 키가 안 눌릴 때 천천히 회복
-				if (reducedRotationInfluence > 1.0f) reducedRotationInfluence = 1.0f;
-			}
-
-			// 카메라 업데이트
-			setCamera();
-			// 현재 카메라 위치를 목표 위치로 점진적으로 이동
-			float cameraFollowSpeed = 0.1f; // 카메라가 따라가는 속도 (0.0 ~ 1.0 사이의 값)
-			cameraPos = glm::mix(cameraPos, cameraTargetPos, cameraFollowSpeed);
 		}
+
+		// 카트 이동 처리
+		if (kart_speed > 0.0f) { // 전진
+			for (const auto& kart : karts) {
+				kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, -kart_speed));
+			}
+		}
+		else if (kart_speed < 0.0f) { // 후진
+			for (const auto& kart : karts) {
+				kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, -kart_speed));
+			}
+		}
+
+		// 방향 전환 처리
+		if (kart_keyState[LEFT]) {
+			if (kart_speed != 0.0f) {
+				for (const auto& kart : karts) {
+					kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, -1.5));
+					kart->translateMatrix = glm::rotate(kart->translateMatrix, glm::radians(TURN_ANGLE), glm::vec3(0.0f, 1.0f, 0.0f));
+					kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, 1.5));
+				}
+			}
+		}
+
+		if (kart_keyState[RIGHT]) {
+			if (kart_speed != 0.0f) {
+				for (const auto& kart : karts) {
+					kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, -1.5));
+					kart->translateMatrix = glm::rotate(kart->translateMatrix, glm::radians(-TURN_ANGLE), glm::vec3(0.0f, 1.0f, 0.0f));
+					kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, 1.5));
+				}
+			}
+		}
+
+		//캐릭터 
+		for (const auto& c : character) { //카트와 같은 행렬 적용
+			c->translateMatrix = karts[0]->translateMatrix;
+		}
+
+		// 카메라 회전 보간율 업데이트 (속도에 따라 카메라 회전이 빨라짐)
+		if (kart_speed != 0.0f) {
+			reducedRotationInfluence = 0.1f + (std::abs(kart_speed) / MAX_SPEED) * 0.4f; // 속도 비례 보간율
+		}
+		else {
+			reducedRotationInfluence += 0.01f; // 키가 안 눌릴 때 천천히 회복
+			if (reducedRotationInfluence > 1.0f) reducedRotationInfluence = 1.0f;
+		}
+
+		// 카메라 업데이트
+		setCamera();
+		// 현재 카메라 위치를 목표 위치로 점진적으로 이동
+		float cameraFollowSpeed = 0.1f; // 카메라가 따라가는 속도 (0.0 ~ 1.0 사이의 값)
+		cameraPos = glm::mix(cameraPos, cameraTargetPos, cameraFollowSpeed);
 	}
 
 	void moveCamera(unsigned char key, int x, int y) {
@@ -394,19 +388,20 @@ public:
 		for (const auto& c : character) { // 실제 모델 draw
 			c->draw(shaderProgramID, isKeyPressed_s);
 		}
-
-		if (start_count < 4) {
-			countDown[start_count]->draw(shaderProgramID, isKeyPressed_s);
+		for (const auto& barricate : road1_barricate) { // 실제 모델 draw
+			barricate->draw(shaderProgramID, isKeyPressed_s);
 		}
+
 		glDisable(GL_DEPTH_TEST);
 	}
 
 	void draw_bb() override {
+		
 		for (const auto& model : karts) { // 모델 bb draw
 			model->draw_rigidBody(shaderProgramID);
 		}
-		for (const auto& road : road1) { // 모델 bb draw
-			road->draw_rigidBody(shaderProgramID);
+		for (const auto& barricate : road1_barricate) { // 모델 bb draw
+			barricate->draw_rigidBody(shaderProgramID);
 		}
 	}
 
