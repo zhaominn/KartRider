@@ -58,8 +58,10 @@ public:
     std::thread countNSoundThread;
     bool isCountGoSound = false;
     std::thread countGoSoundThread;
-    bool isMotorsound = false;
+    bool isMotorSound = false;
     std::thread motorSoundThread;
+    bool isCrashSound = false;
+    std::thread crashSoundThread;
 
     // ----- game ------
 
@@ -198,6 +200,13 @@ public:
                 dynamicsWorld->contactPairTest(kart->rigidBody, barri->rigidBody, resultCallback);
 
                 if (resultCallback.hitDetected) { // 충돌이 감지되었을 때
+                    // 충돌 사운드 재생 (isCrashSound로 중복 재생 방지)
+                    if (!isCrashSound) {
+                        isCrashSound = true;
+                        crashSoundThread = std::thread(&Map1_Mode::crash_sound, this);
+                        crashSoundThread.detach(); // 스레드를 분리하여 비동기 재생
+                    }
+
                     // 1. 충돌 지점 및 법선 벡터 가져오기
                     btVector3 collisionNormal = resultCallback.collisionNormal; // 충돌 방향
                     collisionNormal.setY(0.0f); // y축 방향 제거 (xz 평면에서만 처리)
@@ -244,16 +253,17 @@ public:
         }
     }
 
+
     void checkEngineSound() {
         if (kart_speed != 0.0f) {
-            if (!isMotorsound) { // 엔진 사운드가 재생 중이지 않을 때만 실행
-                isMotorsound = true;
+            if (!isMotorSound) { // 엔진 사운드가 재생 중이지 않을 때만 실행
+                isMotorSound = true;
                 motorSoundThread = std::thread(&Map1_Mode::engine_sound, this); // 엔진 사운드 시작
             }
         }
         else { // 속도가 0일 경우
-            if (isMotorsound) {
-                isMotorsound = false;
+            if (isMotorSound) {
+                isMotorSound = false;
                 if (motorSoundThread.joinable()) {
                     motorSoundThread.detach(); // 스레드 종료 (필요한 경우 detach)
                 }
@@ -602,6 +612,10 @@ private:
         play_sound2D("count_n.wav", "./asset/map_1/", false, &isCountNSound);
     }
     void engine_sound() {
-        play_sound2D("motor_x.ogg", "./asset/map_1/", true, &isMotorsound);
+        play_sound2D("motor_x.ogg", "./asset/map_1/", true, &isMotorSound);
+    }
+    void crash_sound() {
+        play_sound2D("crash.ogg", "./asset/map_1/", false, &isCrashSound);
+        isCrashSound = false;
     }
 };
