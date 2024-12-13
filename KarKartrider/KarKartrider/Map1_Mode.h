@@ -24,7 +24,7 @@ public:
 
     GLfloat kart_speed = 0.0f;
 
-    enum Move { NONE_M, UP, DOWN, LEFT, RIGHT };
+    enum Move { NONE_M, UP, DOWN, LEFT, RIGHT, CTRL };
     float MAX_SPEED = 0.5;
 
     int start_count;
@@ -58,6 +58,10 @@ public:
     std::thread countNSoundThread;
     bool isCountGoSound = false;
     std::thread countGoSoundThread;
+
+    // ----- game ------
+
+    int booster_cnt = 2;
 
     Map1_Mode() {
         Mode::currentInstance = this;  // Map1_Mode 인스턴스를 currentInstance에 할당
@@ -426,6 +430,14 @@ public:
     }
 
     void specialKey(int key, int x, int y) override {
+
+        int modifiers = glutGetModifiers();
+
+        // Ctrl 단독 감지
+        if (modifiers & GLUT_ACTIVE_CTRL) {
+            std::cout << "Ctrl key is pressed (with special key: " << key << ")" << std::endl;
+        }
+
         switch (key) {
         case GLUT_KEY_UP:
             kart_keyState[UP] = true;

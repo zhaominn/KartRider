@@ -140,11 +140,11 @@
     <ClInclude Include="CharacterModel.h">
       <Filter>헤더 파일\Object</Filter>
     </ClInclude>
-    <ClInclude Include="BarricateMap1Model.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="Ui.h">
       <Filter>헤더 파일\Ui</Filter>
+    </ClInclude>
+    <ClInclude Include="BarricateMap1Model.h">
+      <Filter>헤더 파일\Object</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
