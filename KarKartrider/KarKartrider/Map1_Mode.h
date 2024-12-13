@@ -25,6 +25,8 @@ public:
     GLfloat kart_speed = 0.0f;
 
     enum Move { NONE_M, UP, DOWN, LEFT, RIGHT, CTRL };
+    float LIMIT_SPEED = 0.5;
+    float BOOSTER_SPEED = 0.7;
     float MAX_SPEED = 0.5;
 
     int start_count;
