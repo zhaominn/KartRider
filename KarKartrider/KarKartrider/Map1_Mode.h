@@ -114,14 +114,20 @@ public:
         GLint isUILocation = glGetUniformLocation(shaderProgramID_UI, "isTimer");
         glUniform1i(isUILocation, true); // UI 모드 활성화
 
+		glPushMatrix();
+		glPixelZoom(5.0f, 5.0f);  // x축, y축 확대 비율 (2배 확대)
+
 		// 자동차 속도 문자열 생성
-		std::string speedText = "Speed: " + std::to_string(static_cast<int>(kart_speed * 100)) + " km/h";
+		std::string speedText = std::to_string(static_cast<int>(kart_speed * 100));
 
         // 자동차 속도를 화면 우측 상단에 표시
-        glRasterPos2f(0.7f, 0.9f); // 화면 우측 상단
+        glRasterPos2f(0.0f, -0.97f); // 화면 우측 상단
         for (char c : speedText) {
             glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
         }
+
+		glPixelZoom(1.0f, 1.0f);  // 원래 크기로 복구
+		glPopMatrix();
         glUniform1i(isUILocation, false); // UI 모드 활성화
 
         glUseProgram(0); // 원래 셰이더로 복원
@@ -810,8 +816,8 @@ public:
         glDisable(GL_DEPTH_TEST);
         draw_timer();
         draw_ui();
+		draw_dashBoard();
         draw_speed();
-        draw_dashBoard();
         glEnable(GL_DEPTH_TEST);
 
 		glDisable(GL_DEPTH_TEST);
