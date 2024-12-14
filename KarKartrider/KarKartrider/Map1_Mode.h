@@ -89,6 +89,23 @@ public:
         isCountGoSound = true;
     }
 
+    void draw_ui() {
+        glUseProgram(shaderProgramID_UI); // UI 렌더링용 셰이더 활성화
+
+        // isUI 플래그 활성화
+        GLint isUILocation = glGetUniformLocation(shaderProgramID_UI, "isTimer");
+        glUniform1i(isUILocation, true); // UI 모드 활성화
+
+        // 텍스트 렌더링 또는 UI Quad 그리기
+        std::string timerText = "map : village road";
+
+        glRasterPos2f(-0.95f, 0.85f); // 화면 좌측 상단에 표시
+        for (char c : timerText) {
+            glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
+        }
+
+        glUseProgram(shaderProgramID); // 원래 셰이더로 복원
+    }
 
     //timer ui
     void draw_timer() {
@@ -736,6 +753,7 @@ public:
         // Draw Timer
         glDisable(GL_DEPTH_TEST);
         draw_timer();
+        draw_ui();
         glEnable(GL_DEPTH_TEST);
 
         glDisable(GL_DEPTH_TEST);
