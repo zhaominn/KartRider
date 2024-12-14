@@ -71,6 +71,13 @@ public:
     int booster_cnt = 10;
     bool isBoosterActive = false; // 부스트 활성화 상태
 
+
+    //캐릭터 얼굴 회전 각도
+    float character_face_rotation = 0.0f; // 캐릭터 얼굴의 현재 Y축 회전 각도
+    const float MAX_FACE_ROTATION = 25.0f; // 고개가 좌우로 최대 회전할 각도 (도 단위)
+    const float ROTATION_SPEED = 3.0f;     // 고개 회전 속도 (프레임당 회전 각도)
+    const float RETURN_SPEED = 2.0f;       // 고개가 정면으로 돌아가는 속도 (프레임당 회전 각도)
+
     Map1_Mode() {
         Mode::currentInstance = this;  // Map1_Mode 인스턴스를 currentInstance에 할당
         isCountNSound = true;
@@ -363,6 +370,34 @@ public:
                 if (reducedRotationInfluence > 1.0f) reducedRotationInfluence = 1.0f;
             }
 
+            // 고개가 천천히 정면으로 돌아가도록 보간
+            if (!kart_keyState[LEFT] && !kart_keyState[RIGHT]) {
+                if (character_face_rotation > 0.0f) {
+                    character_face_rotation -= RETURN_SPEED;
+                    if (character_face_rotation < 0.0f) {
+                        character_face_rotation = 0.0f; // 정면으로 고정
+                    }
+                }
+                else if (character_face_rotation < 0.0f) {
+                    character_face_rotation += RETURN_SPEED;
+                    if (character_face_rotation > 0.0f) {
+                        character_face_rotation = 0.0f; // 정면으로 고정
+                    }
+                }
+            }
+
+            // 캐릭터 모델 업데이트
+            for (const auto& c : character) {
+                if (c->name == "character_face") {
+                    // 기존 변환 행렬 적용 후 Y축 회전
+                    glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(character_face_rotation), glm::vec3(0.0f, 0.0f, 1.0f));
+                    c->translateMatrix = karts[0]->translateMatrix * rotation;
+                }
+                else {
+                    c->translateMatrix = karts[0]->translateMatrix;
+                }
+            }
+
             // 카메라 업데이트
             setCamera();
             // 현재 카메라 위치를 목표 위치로 점진적으로 이동
@@ -524,9 +559,17 @@ public:
             break;
         case GLUT_KEY_LEFT:
             kart_keyState[LEFT] = true;
+            // 왼쪽 방향으로 고개 회전
+            if (character_face_rotation > -MAX_FACE_ROTATION) {
+                character_face_rotation -= ROTATION_SPEED;
+            }
             break;
         case GLUT_KEY_RIGHT:
             kart_keyState[RIGHT] = true;
+            // 오른쪽 방향으로 고개 회전
+            if (character_face_rotation < MAX_FACE_ROTATION) {
+                character_face_rotation += ROTATION_SPEED;
+            }
             break;
         }
 
