@@ -26,7 +26,7 @@ public:
     float ACCELERATION = 0.004f;
     float DECELERATION = 0.003f;
     float LIMIT_SPEED = 1.0;
-    float BOOSTER_SPEED = 4.0;
+    float BOOSTER_SPEED = 2.0;
     float MAX_SPEED = 1.0;
 
     int start_count;
@@ -69,6 +69,7 @@ public:
 
     // ----- game ------
     int booster_cnt = 10;
+    bool isBoosterActive = false; // 부스트 활성화 상태
 
     Map1_Mode() {
         Mode::currentInstance = this;  // Map1_Mode 인스턴스를 currentInstance에 할당
@@ -290,22 +291,25 @@ public:
             // 가속/감속 처리
             if (kart_keyState[UP]) {
                 if (kart_speed < MAX_SPEED) {
-                    kart_speed += ACCELERATION;
+                    kart_speed += ACCELERATION; // 가속도에 따라 증가
+                    if (kart_speed > MAX_SPEED) kart_speed = MAX_SPEED; // 최대 속도 제한
                 }
             }
             else if (kart_keyState[DOWN]) {
                 if (kart_speed > -MAX_SPEED / 2.0f) { // 후진 속도는 전진의 절반까지만 허용
-                    kart_speed -= ACCELERATION;
+                    kart_speed -= ACCELERATION; // 후진 시에도 가속도 반영
+                    if (kart_speed < -MAX_SPEED / 2.0f) kart_speed = -MAX_SPEED / 2.0f; // 후진 최대 속도 제한
                 }
             }
             else {
+                // 속도가 감소할 때 감속
                 if (kart_speed > 0.0f) {
                     kart_speed -= DECELERATION; // 전진 감속
-                    if (kart_speed < 0.0f) kart_speed = 0.0f;
+                    if (kart_speed < 0.0f) kart_speed = 0.0f; // 0으로 안정화
                 }
                 else if (kart_speed < 0.0f) {
                     kart_speed += DECELERATION; // 후진 감속
-                    if (kart_speed > 0.0f) kart_speed = 0.0f;
+                    if (kart_speed > 0.0f) kart_speed = 0.0f; // 0으로 안정화
                 }
             }
 
@@ -471,45 +475,46 @@ public:
 
     // 부스터 실행 함수
     void activateBooster() {
+
+        // 부스트가 이미 활성화 중이면 실행하지 않음
+        if (isBoosterActive) {
+            std::cout << "Booster is already active!" << std::endl;
+            return;
+        }
+
+        // 부스트 활성화 상태로 설정
+        isBoosterActive = true;
+
         std::cout << "Booster activated! Remaining boosters: " << booster_cnt << std::endl;
 
-        // 기존 MAX_SPEED 값을 저장
+        // 기존 MAX_SPEED와 ACCELERATION 값을 저장
         float originalMaxSpeed = MAX_SPEED;
+        float originalAcceleration = ACCELERATION;
 
-        // MAX_SPEED를 BOOSTER_SPEED로 설정
-        MAX_SPEED = BOOSTER_SPEED;
+        // 부스터 속도 및 가속도 설정
+        MAX_SPEED = BOOSTER_SPEED;           // 부스터 속도
+        ACCELERATION *= 1.05f;                // 가속도를 1.5배로 증가 (조정 가능)
 
-        // 부스터 사운드 재생 (isBoosterSound 플래그를 사용해 중복 방지)
+        // 부스터 사운드 재생
         if (!isBoosterSound) {
             isBoosterSound = true;
             boosterSoundThread = std::thread(&Map1_Mode::booster_sound, this);
-            boosterSoundThread.detach(); // 스레드 분리하여 비동기 실행
+            boosterSoundThread.detach(); // 비동기 실행
         }
 
-        // 부스터가 활성화된 상태를 알리기
-        std::thread([this, originalMaxSpeed]() {
-            std::this_thread::sleep_for(std::chrono::seconds(3)); // 3초 대기
-            MAX_SPEED = originalMaxSpeed; // 원래 속도로 복구
-            std::cout << "Booster ended. MAX_SPEED restored to: " << MAX_SPEED << std::endl;
-            }).detach(); // 스레드 분리
+        // 부스터 종료 후 속도 및 가속도 복구
+        std::thread([this, originalMaxSpeed, originalAcceleration]() {
+            std::this_thread::sleep_for(std::chrono::duration<double>(4.4)); // 부스터 지속 시간 3초
+            MAX_SPEED = originalMaxSpeed;        // 원래 속도 복구
+            ACCELERATION = originalAcceleration; // 원래 가속도 복구
+            isBoosterActive = false;             // 부스트 비활성화 상태로 설정
+            std::cout << "Booster ended. MAX_SPEED and ACCELERATION restored." << std::endl;
+            }).detach();
     }
 
     void specialKey(int key, int x, int y) override {
 
-        int modifiers = glutGetModifiers();
-
-        // Ctrl 단독 감지
-         // Ctrl 단독 감지
-        if (modifiers & GLUT_ACTIVE_CTRL) {
-            if (booster_cnt > 0) { // 부스터가 남아 있는 경우
-                booster_cnt--; // 부스터 개수 감소
-                activateBooster(); // 부스터 활성화
-            }
-            else {
-                std::cout << "No boosters left!" << std::endl;
-            }
-        }
-
+     
         switch (key) {
         case GLUT_KEY_UP:
             kart_keyState[UP] = true;
@@ -524,6 +529,26 @@ public:
             kart_keyState[RIGHT] = true;
             break;
         }
+
+        int modifiers = glutGetModifiers();
+
+        // Ctrl 단독 감지
+        if (modifiers & GLUT_ACTIVE_CTRL) {
+            // 부스트가 이미 활성화 중이거나 부스트 개수가 0이면 실행하지 않음
+            if (isBoosterActive) {
+                std::cout << "Booster is already active!" << std::endl;
+                return;
+            }
+
+            if (booster_cnt > 0) { // 부스터가 남아 있는 경우
+                booster_cnt--; // 부스터 개수 감소
+                activateBooster(); // 부스터 활성화
+            }
+            else {
+                std::cout << "No boosters left!" << std::endl;
+            }
+        }
+
     }
 
     void specialKeyUp(int key, int x, int y) override {
