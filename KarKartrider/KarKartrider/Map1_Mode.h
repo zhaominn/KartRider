@@ -634,63 +634,6 @@ public:
 
 	}
 
-	void moveCamera(unsigned char key, int x, int y) {
-		const float cameraSpeed = 0.1f; // 카메라 이동 속도
-		float angleInRadians = glm::radians(5.0f); // 5도 회전
-
-		// 카메라 전방 벡터
-		glm::vec3 forward = glm::normalize(cameraDirection - cameraPos);
-		// 카메라 오른쪽 벡터
-		glm::vec3 right = glm::normalize(glm::cross(forward, cameraUp));
-
-		switch (key) {
-		case 'w': // 전진
-			cameraPos += cameraSpeed * forward;
-			cameraDirection += cameraSpeed * forward;
-			break;
-		case 's': // 후진
-			cameraPos -= cameraSpeed * forward;
-			cameraDirection -= cameraSpeed * forward;
-			break;
-		case 'a': // 왼쪽 이동
-			cameraPos -= cameraSpeed * right;
-			cameraDirection -= cameraSpeed * right;
-			break;
-		case 'd': // 오른쪽 이동
-			cameraPos += cameraSpeed * right;
-			cameraDirection += cameraSpeed * right;
-			break;
-		case 'i': // 위로 회전 (X축 회전)
-		{
-			pitch += glm::degrees(angleInRadians);
-			if (pitch > 89.0f) pitch = 89.0f; // 상단 제한
-			updateCameraDirection();
-			break;
-		}
-		case 'k': // 아래로 회전 (X축 반대 방향)
-		{
-			pitch -= glm::degrees(angleInRadians);
-			if (pitch < -89.0f) pitch = -89.0f; // 하단 제한
-			updateCameraDirection();
-			break;
-		}
-		case 'j': // 왼쪽 회전 (Y축 회전)
-		{
-			yaw -= glm::degrees(angleInRadians);
-			updateCameraDirection();
-			break;
-		}
-		case 'l': // 오른쪽 회전 (Y축 반대 방향)
-		{
-			yaw += glm::degrees(angleInRadians);
-			updateCameraDirection();
-			break;
-		}
-		default:
-			break;
-		}
-	}
-
 	void mouseClick(int button, int state, int x, int y) override {
 		if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
 			if (x <= 470 && x >= 400 && y <= 410 && y >= 360) { //다시시도
@@ -711,7 +654,6 @@ public:
 	}
 
 	void keyboard(unsigned char key, int x, int y) override {
-		moveCamera(key, x, y);
 		if (key == 27) { //esc
 			if (Pause) {
 				//glutTimerFunc(16, timerHelper, 0); // 타이머 호출

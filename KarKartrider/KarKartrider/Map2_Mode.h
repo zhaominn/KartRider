@@ -299,6 +299,18 @@ public:
 		cameraDirection = carPosition; // 카메라가 항상 자동차를 바라봄
 	}
 
+	void goSelectMode_() {
+		Pause = true;
+		if (goSelectMode) { // goSelectMode가 설정되어 있다면 실행
+			isBackgroundSound = false;
+			isMotorSound = false;
+			if (motorSoundThread.joinable()) {
+				motorSoundThread.join();
+			}
+			goSelectMode();
+		}
+	}
+
 	void finish_game() {
 		isBackgroundSound = false;
 		if (isWinSound) return; // 이미 실행 중이면 종료
@@ -313,6 +325,30 @@ public:
 
 		winSoundThread.detach();
 
+		// 5초 후 goSelectMode_() 실행을 위한 스레드 생성
+		std::thread([this]() {
+			std::this_thread::sleep_for(std::chrono::seconds(9)); // 5초 대기
+			goSelectMode_(); // 5초 후 실행
+			}).detach();
+	}
+
+	void draw_finish_time() {
+		glUseProgram(shaderProgramID_UI);
+
+		// 활성화 플래그
+		GLint isTimerLocation = glGetUniformLocation(shaderProgramID_UI, "isRed");
+		glUniform1i(isTimerLocation, true);
+
+		// 타이머 텍스트
+		std::string Text = "Time: " + std::to_string(30 - game_timer);
+
+		glRasterPos2f(0.0f, 0.0f);
+		for (char c : Text) {
+			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
+		}
+		glUniform1i(isTimerLocation, false);
+
+		glUseProgram(0); // 원래 셰이더로 복원
 	}
 
 	void lose_game() {
@@ -331,6 +367,12 @@ public:
 				isLoseSound = false; // 사운드 재생 완료 후 플래그 해제
 				});
 			loseSoundThread.detach();
+
+			// 5초 후 goSelectMode_() 실행을 위한 스레드 생성
+			std::thread([this]() {
+				std::this_thread::sleep_for(std::chrono::seconds(9)); // 5초 대기
+				goSelectMode_(); // 5초 후 실행
+				}).detach();
 		}
 	}
 
@@ -586,63 +628,6 @@ public:
 		}
 	}
 
-	void moveCamera(unsigned char key, int x, int y) {
-		const float cameraSpeed = 0.1f; // 카메라 이동 속도
-		float angleInRadians = glm::radians(5.0f); // 5도 회전
-
-		// 카메라 전방 벡터
-		glm::vec3 forward = glm::normalize(cameraDirection - cameraPos);
-		// 카메라 오른쪽 벡터
-		glm::vec3 right = glm::normalize(glm::cross(forward, cameraUp));
-
-		switch (key) {
-		case 'w': // 전진
-			cameraPos += cameraSpeed * forward;
-			cameraDirection += cameraSpeed * forward;
-			break;
-		case 's': // 후진
-			cameraPos -= cameraSpeed * forward;
-			cameraDirection -= cameraSpeed * forward;
-			break;
-		case 'a': // 왼쪽 이동
-			cameraPos -= cameraSpeed * right;
-			cameraDirection -= cameraSpeed * right;
-			break;
-		case 'd': // 오른쪽 이동
-			cameraPos += cameraSpeed * right;
-			cameraDirection += cameraSpeed * right;
-			break;
-		case 'i': // 위로 회전 (X축 회전)
-		{
-			pitch += glm::degrees(angleInRadians);
-			if (pitch > 89.0f) pitch = 89.0f; // 상단 제한
-			updateCameraDirection();
-			break;
-		}
-		case 'k': // 아래로 회전 (X축 반대 방향)
-		{
-			pitch -= glm::degrees(angleInRadians);
-			if (pitch < -89.0f) pitch = -89.0f; // 하단 제한
-			updateCameraDirection();
-			break;
-		}
-		case 'j': // 왼쪽 회전 (Y축 회전)
-		{
-			yaw -= glm::degrees(angleInRadians);
-			updateCameraDirection();
-			break;
-		}
-		case 'l': // 오른쪽 회전 (Y축 반대 방향)
-		{
-			yaw += glm::degrees(angleInRadians);
-			updateCameraDirection();
-			break;
-		}
-		default:
-			break;
-		}
-	}
-
 	void mouseClick(int button, int state, int x, int y) override {
 		if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
 			if (x <= 470 && x >= 400 && y <= 410 && y >= 360) { //다시시도
@@ -657,21 +642,12 @@ public:
 				MM.SetMode(map2Mode);
 			}
 			else if (x <= 580 && x >= 510 && y <= 410 && y >= 360) { //메뉴
-				Pause = true;
-				if (goSelectMode) { // goSelectMode가 설정되어 있다면 실행
-					isBackgroundSound = false;
-					isMotorSound = false;
-					if (motorSoundThread.joinable()) {
-						motorSoundThread.join();
-					}
-					goSelectMode();
-				}
+				goSelectMode_();
 			}
 		}
 	}
 
 	void keyboard(unsigned char key, int x, int y) override {
-		moveCamera(key, x, y);
 		if (key == 27) { //esc
 			if (Pause) {
 				//glutTimerFunc(16, timerHelper, 0); // 타이머 호출
@@ -705,6 +681,9 @@ public:
 				}
 			}
 			Pause = !Pause;
+		}
+		if (key == 'p') {
+			goSelectMode_();
 		}
 	}
 
@@ -871,6 +850,8 @@ public:
 		draw_ui();
 		draw_dashBoard();
 		draw_speed();
+		if (isGameOver)
+			draw_finish_time();
 		glEnable(GL_DEPTH_TEST);
 
 		glDisable(GL_DEPTH_TEST);
