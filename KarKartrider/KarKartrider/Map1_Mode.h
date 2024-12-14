@@ -207,8 +207,6 @@ public:
             kart->rigidBody->setGravity(btVector3(0.0f, 0.0f, 0.0f));
 
             for (const auto& barri : road1_barricate) {
-                if (barri->name != "baricate") continue; // 바리케이드가 "baricate" 이름이 아니면 스킵
-
                 // 충돌 콜백 객체 생성
                 CustomContactResultCallback resultCallback;
 
@@ -216,6 +214,13 @@ public:
                 dynamicsWorld->contactPairTest(kart->rigidBody, barri->rigidBody, resultCallback);
 
                 if (resultCallback.hitDetected) { // 충돌이 감지되었을 때
+
+                    if (barri->name == "finish") { //종료~~~~
+                        cout << "끝!!!" << endl;
+
+                        continue;
+                    }
+
                     // 충돌 사운드 재생 (isCrashSound로 중복 재생 방지)
                     if (!isCrashSound) {
                         isCrashSound = true;
