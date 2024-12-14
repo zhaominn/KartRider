@@ -128,6 +128,10 @@ public:
             glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
         }
 
+        for (const auto& booster_ui : booster_uis) { // 실제 모델 draw
+            booster_ui->draw(shaderProgramID, isKeyPressed_s);
+        }
+
         glUseProgram(shaderProgramID); // 원래 셰이더로 복원
     }
 
