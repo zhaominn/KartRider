@@ -27,8 +27,9 @@ public:
         std::thread soundThread(&LogoMode::runSound, this);
 
         // 3. 모델 로드 및 Bullet Physics 초기화 (메인 스레드에서 실행)
-        loadModelWithProgress<KartModel>("bazzi_face.obj", "obj/character/", "chcracter", "box", glm::scale(glm::mat4(1.0f), glm::vec3(1.0, 1.0, 1.0)), character, true, true);
-        loadModelWithProgress<KartModel>("bazzi_body.obj", "obj/character/", "chcracter", "box", glm::scale(glm::mat4(1.0f), glm::vec3(1.0, 1.0, 1.0)), character, true, true);
+        loadModelWithProgress<KartModel>("bazzi_face.obj", "obj/character/", "chcracter", "box", glm::scale(glm::mat4(1.0f), glm::vec3(1.0, 1.0, 1.0)), character, false, true);
+        loadModelWithProgress<KartModel>("bazzi_body.obj", "obj/character/", "chcracter", "box", glm::scale(glm::mat4(1.0f), glm::vec3(1.0, 1.0, 1.0)), character, false, true);
+        loadModelWithProgress<KartModel>("booster.obj", "obj/car/booster/", "chcracter", "box", glm::scale(glm::mat4(1.0f), glm::vec3(1.0, 1.0, 1.0)), character, false, true);
         loadModelWithProgress<KartModel>("kronos.obj", "obj/car/kronos/", "car", "box", glm::scale(glm::mat4(1.0f), glm::vec3(1.0, 1.0, 1.0)), karts, true, true);
 
         loadModelWithProgress<RoadModel>("road_all_01.obj", "obj/road/", "road_all_1", "cube", glm::scale(glm::mat4(1.0f), glm::vec3(15.0, 15.0, 15.0)), road1, false, true);
