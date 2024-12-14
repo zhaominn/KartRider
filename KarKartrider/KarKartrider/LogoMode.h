@@ -18,7 +18,9 @@ public:
 
     /* 기본 생성자 필수~~ */
     LogoMode() : isRunning(true) {}
-    ~LogoMode() {}
+    ~LogoMode() {
+        delete this;
+    }
 
     void init() override {
         // 1. 동영상 재생 스레드 시작
@@ -98,7 +100,9 @@ public:
 
     void draw_bb() override {}
 
-    void finish() override {}
+    void finish() override {
+
+    }
 
 private:
     // 동영상 실행 함수

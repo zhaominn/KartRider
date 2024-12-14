@@ -88,6 +88,7 @@ public:
 		isCountNSound = true;
 		isCountGoSound = true;
 	}
+<<<<<<< HEAD
 	~Map2_Mode(){}
 	void draw_dashBoard() {
 		glUseProgram(shaderProgramID_UI);
@@ -174,6 +175,10 @@ public:
 		glUniform1i(isTimerLocation, false);
 
 		glUseProgram(0); // 원래 셰이더로 복원
+=======
+	~Map2_Mode(){
+		delete this;
+>>>>>>> 6483c0a27d18c4ce26a4a51f0bc20809dd709303
 	}
 
 	void init() override {

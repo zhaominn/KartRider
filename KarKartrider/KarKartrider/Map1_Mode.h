@@ -92,7 +92,9 @@ public:
         isCountNSound = true;
         isCountGoSound = true;
     }
-    ~Map1_Mode() {}
+    ~Map1_Mode() {
+		delete this;
+	}
 
     void draw_dashBoard() {
         glUseProgram(shaderProgramID_UI);
