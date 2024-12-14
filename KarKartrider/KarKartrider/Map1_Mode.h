@@ -68,11 +68,14 @@ public:
     std::thread boosterSoundThread;
     bool isWinSound = false;
     std::thread winSoundThread;
+    bool isLoseSound = false;
+    std::thread loseSoundThread;
 
     // ----- game ------
     int booster_cnt = 10;
     bool isBoosterActive = false; // 부스트 활성화 상태
-
+    bool isGameOver = false; // 게임 종료 상태 플래그
+    int game_timer = 30;
 
     //캐릭터 얼굴 회전 각도
     float character_face_rotation = 0.0f; // 캐릭터 얼굴의 현재 Y축 회전 각도
@@ -205,6 +208,7 @@ public:
         isBackgroundSound = false;
         if (isWinSound) return; // 이미 실행 중이면 종료
         isWinSound = true;
+        isGameOver = true; // 게임 종료 상태 설정
 
         // 새로운 스레드 생성 및 분리
         winSoundThread = std::thread([this]() {
@@ -213,6 +217,25 @@ public:
             });
 
         winSoundThread.detach();
+    }
+
+    void lose_game() {
+        if (isGameOver) return; // 이미 종료 상태라면 실행하지 않음
+
+        isGameOver = true; // 게임 종료 상태 설정
+        isBackgroundSound = false; // 배경음악 종료
+
+        std::cout << "Game Over! Time is up!" << std::endl;
+
+        // 패배 사운드 재생
+        if (!isLoseSound) {
+            isLoseSound = true;
+            loseSoundThread = std::thread([this]() {
+                lose_sound();
+                isLoseSound = false; // 사운드 재생 완료 후 플래그 해제
+                });
+            loseSoundThread.detach();
+        }
     }
 
     void checkCollisionKart() {
@@ -723,20 +746,29 @@ private:
 
     static void timerHelper(int value) {
         if (Map1_Mode* instance = dynamic_cast<Map1_Mode*>(Mode::currentInstance)) {
-            // 물리 시뮬레이션을 여러 번 실행하여 높은 정확도 유지
-            const int physicsSteps = 2;  // 물리 엔진을 렌더링 프레임마다 두 번 실행
-            const float deltaTime = 1.0f / 120.0f; // 120FPS (1초에 120번 업데이트)
+            if (!instance->isGameOver) {
+                // 물리 엔진 및 게임 로직 업데이트 (프레임 단위로 실행)
+                const float deltaTime = 1.0f / 60.0f; // 60FPS 기준, 한 프레임의 시간
+                instance->updatePhysics(deltaTime); // 물리 엔진 업데이트
+                instance->timer(); // 렌더링 및 게임 로직 업데이트
 
-            for (int i = 0; i < physicsSteps; ++i) {
-                instance->updatePhysics(deltaTime); // 물리 시뮬레이션 업데이트
+                // 게임 타이머 갱신 (1초 단위로 계산)
+                static float elapsedTime = 0.0f;
+                elapsedTime += deltaTime;
+                if (elapsedTime >= 1.0f) { // 1초가 지났다면
+                    elapsedTime = 0.0f;
+                    instance->game_timer--; // 타이머 1초 감소
+                    if (instance->game_timer <= 0) { // 타이머가 0이 되면
+                        instance->game_timer = 0;
+                        instance->lose_game(); // 패배 처리
+                    }
+                }
             }
-
-            instance->timer(); // 렌더링 관련 업데이트
         }
 
         // 렌더링 업데이트를 60FPS로 유지
         glutPostRedisplay();
-        glutTimerFunc(16, timerHelper, value); // 60FPS 렌더링 주기
+        glutTimerFunc(16, timerHelper, value); // 16ms 간격으로 호출 (약 60FPS)
     }
 
 
@@ -764,5 +796,9 @@ private:
     void win_sound() {
         play_sound2D("game_win.ogg", "./asset/map_1/", false, &isWinSound);
         isWinSound = false;
+    }
+    void lose_sound() {
+        play_sound2D("game_lose.ogg", "./asset/map_1/", false, &isLoseSound);
+        isLoseSound = false;
     }
 };
