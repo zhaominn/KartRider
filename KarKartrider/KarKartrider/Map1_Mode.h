@@ -223,47 +223,51 @@ public:
                         crashSoundThread.detach(); // 스레드를 분리하여 비동기 재생
                     }
 
-                    // 1. 충돌 지점 및 법선 벡터 가져오기
+                    // 1. 충돌 방향 및 침투 깊이 가져오기
                     btVector3 collisionNormal = resultCallback.collisionNormal; // 충돌 방향
                     collisionNormal.setY(0.0f); // y축 방향 제거 (xz 평면에서만 처리)
 
-                    // 2. 진행 방향과 충돌 방향 계산
-                    glm::vec3 kartDirection = glm::normalize(glm::vec3(-kart->translateMatrix[2])); // 진행 방향 (Z축 기준)
-                    glm::vec3 collisionDirection = glm::normalize(glm::vec3(collisionNormal.x(), collisionNormal.y(), collisionNormal.z()));
-
-                    // 진행 방향과 충돌 방향이 거의 일치하는 경우만 속도 감소
-                    float dotProduct = glm::dot(kartDirection, collisionDirection);
-
-                    // 3. 감속 처리 (충돌 강도에 따라 속도를 감소)
-                    if (dotProduct < 0.0f) { // 충돌 방향이 진행 방향과 반대일 때만 처리
-                        float decelerationFactor = 0.05f; // 감속 비율
-                        kart_speed *= 1.0f - decelerationFactor; // 속도를 천천히 줄임
-
-                        if (kart_speed < 0.01f) { // 너무 느려지면 멈춤
-                            kart_speed = 0.0f;
-                        }
+                    // 침투 깊이 제한
+                    float penetrationDepth = std::abs(resultCallback.penetrationDepth);
+                    const float MAX_PENETRATION_DEPTH = 2.0f; // 최대 침투 깊이
+                    if (penetrationDepth > MAX_PENETRATION_DEPTH) {
+                        penetrationDepth = MAX_PENETRATION_DEPTH;
                     }
 
-                    // 4. 충돌 위치 보정 (침투 깊이만큼 이동)
+                    // 2. 보정 값 계산 (침투 깊이에 기반한 이동)
+                    float correctionScale = 0.5f; // 보정 값 감쇠 계수
+                    btVector3 correction = correctionScale * collisionNormal * penetrationDepth;
+
+                    // 3. 속도 기반 추가 이동 적용
+                    glm::vec3 kartVelocity = glm::vec3(-kart->translateMatrix[2]) * kart_speed;
+                    float speedFactor = glm::length(kartVelocity); // 카트의 속도 크기
+                    correction += collisionNormal * speedFactor * 0.2f; // 속도에 비례한 추가 이동 (0.2는 조정 가능)
+
+                    // 4. 카트 위치 업데이트
                     btTransform kartTransform;
                     kart->rigidBody->getMotionState()->getWorldTransform(kartTransform);
                     btVector3 kartPos = kartTransform.getOrigin();
 
-                    btVector3 correction = collisionNormal * std::abs(resultCallback.penetrationDepth);
-                    correction.setY(0.0f); // y축 이동 제거
-                    btVector3 newKartPos = kartPos + correction;
+                    btVector3 newKartPos = kartPos + correction; // 최종 위치 계산
                     newKartPos.setY(2.6f); // y축 고정
 
                     kartTransform.setOrigin(newKartPos);
 
-                    // 업데이트된 Transform을 카트에 적용
+                    // 물리 엔진에 새로운 Transform 적용
                     kart->rigidBody->getMotionState()->setWorldTransform(kartTransform);
                     kart->rigidBody->setWorldTransform(kartTransform);
 
-                    // OpenGL 변환 행렬에도 반영
+                    // OpenGL 변환 행렬에 반영
                     btScalar transformMatrix[16];
                     kartTransform.getOpenGLMatrix(transformMatrix);
                     kart->translateMatrix = glm::make_mat4(transformMatrix);
+
+                    // 5. 속도 감소 처리
+                    float decelerationFactor = 0.2f; // 감속 비율 (충돌 후 속도 감소)
+                    kart_speed *= 1.0f - decelerationFactor;
+                    if (kart_speed < 0.01f) { // 너무 느려지면 정지
+                        kart_speed = 0.0f;
+                    }
                 }
             }
         }
