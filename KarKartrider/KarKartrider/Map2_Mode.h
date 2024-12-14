@@ -208,7 +208,7 @@ public:
 		draw_model();
 		glutTimerFunc(0, Map2_Mode::timerHelper, 0);
 
-		cameraPos = glm::vec3(0.0, 6.0, 253.0);
+		cameraPos = glm::vec3(165.0, 4.4, 45.0);
 		updateCameraDirection();
 	}
 
