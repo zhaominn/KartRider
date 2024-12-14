@@ -84,6 +84,10 @@ public:
 	const float ROTATION_SPEED = 5.0f;     // 고개 회전 속도 (프레임당 회전 각도)
 	const float RETURN_SPEED = 2.0f;       // 고개가 정면으로 돌아가는 속도 (프레임당 회전 각도)
 
+	float booster_head_tilt = 0.0f; // 캐릭터 머리의 X축 회전 각도
+	const float MAX_HEAD_TILT = 20.0f; // 부스터 사용 시 최대 X축 회전 각도
+	const float TILT_SPEED = 2.0f;     // 부스터 시 머리의 회전 속도
+
     Map1_Mode() {
         Mode::currentInstance = this;  // Map1_Mode 인스턴스를 currentInstance에 할당
         isCountNSound = true;
@@ -525,12 +529,43 @@ public:
 					}
 				}
 
-				// 캐릭터 모델 업데이트
+				if (isBoosterActive) {
+					// 머리를 X축으로 뒤로 기울이기 (서서히 MAX_HEAD_TILT까지)
+					if (booster_head_tilt < MAX_HEAD_TILT) {
+						booster_head_tilt += TILT_SPEED;
+						if (booster_head_tilt > MAX_HEAD_TILT) {
+							booster_head_tilt = MAX_HEAD_TILT;
+						}
+					}
+				}
+				else {
+					// 머리를 원래 상태로 복구 (서서히 0도로 복귀)
+					if (booster_head_tilt > 0.0f) {
+						booster_head_tilt -= TILT_SPEED;
+						if (booster_head_tilt < 0.0f) {
+							booster_head_tilt = 0.0f;
+						}
+					}
+				}
+
+				// 캐릭터 모델 업데이트 (머리의 X축 회전 포함)
 				for (const auto& c : character) {
 					if (c->name == "character_face") {
-						// 기존 변환 행렬 적용 후 Y축 회전
-						glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(-character_face_rotation), glm::vec3(0.0f, 0.0f, 1.0f));
-						c->translateMatrix = karts[0]->translateMatrix * rotation;
+						// 기존 Y축 회전 (character_face_rotation) 추가
+						glm::mat4 headRotation = glm::rotate(
+							glm::mat4(1.0f),
+							glm::radians(-character_face_rotation),
+							glm::vec3(0.0f, 0.0f, 1.0f)
+						);
+
+						// X축 회전 추가 (부스터 상태에 따른 머리 기울임)
+						headRotation = glm::rotate(
+							headRotation,
+							glm::radians(booster_head_tilt), // X축 회전
+							glm::vec3(1.0f, 0.0f, 0.0f)
+						);
+
+						c->translateMatrix = karts[0]->translateMatrix * headRotation;
 					}
 					else {
 						c->translateMatrix = karts[0]->translateMatrix;
