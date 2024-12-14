@@ -20,6 +20,9 @@ std::vector<Model*> character;
 
 std::vector<Model*> countDown;
 std::vector<Model*> pause;
+
+std::vector<Model*> booster_ui;
+
 // mode
 ModeManager MM;
 

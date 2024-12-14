@@ -25,9 +25,9 @@ public:
     enum Move { NONE_M, UP, DOWN, LEFT, RIGHT, CTRL };
     float ACCELERATION = 0.004f;
     float DECELERATION = 0.003f;
-    float LIMIT_SPEED = 0.5;
-    float BOOSTER_SPEED = 4.0;
-    float MAX_SPEED = 0.5;
+    float LIMIT_SPEED = 1.0;
+    float BOOSTER_SPEED = 2.0;
+    float MAX_SPEED = 1.0;
 
     int start_count;
 
@@ -66,14 +66,90 @@ public:
     std::thread crashSoundThread;
     bool isBoosterSound = false;
     std::thread boosterSoundThread;
+    bool isWinSound = false;
+    std::thread winSoundThread;
+    bool isLoseSound = false;
+    std::thread loseSoundThread;
 
     // ----- game ------
     int booster_cnt = 10;
+    bool isBoosterActive = false; // 부스트 활성화 상태
+    bool isGameOver = false; // 게임 종료 상태 플래그
+    int game_timer = 30;
+
+    //캐릭터 얼굴 회전 각도
+    float character_face_rotation = 0.0f; // 캐릭터 얼굴의 현재 Y축 회전 각도
+    const float MAX_FACE_ROTATION = 25.0f; // 고개가 좌우로 최대 회전할 각도 (도 단위)
+    const float ROTATION_SPEED = 5.0f;     // 고개 회전 속도 (프레임당 회전 각도)
+    const float RETURN_SPEED = 2.0f;       // 고개가 정면으로 돌아가는 속도 (프레임당 회전 각도)
 
     Map1_Mode() {
         Mode::currentInstance = this;  // Map1_Mode 인스턴스를 currentInstance에 할당
         isCountNSound = true;
         isCountGoSound = true;
+    }
+
+    void draw_speed() {
+        glUseProgram(shaderProgramID_UI); // UI 렌더링용 셰이더 활성화
+
+        // isUI 플래그 활성화
+        GLint isUILocation = glGetUniformLocation(shaderProgramID_UI, "isTimer");
+        glUniform1i(isUILocation, true); // UI 모드 활성화
+        // isUI 플래그 활성화
+        GLint isUILocation2 = glGetUniformLocation(shaderProgramID_UI, "isUI");
+        glUniform1i(isUILocation2, true); // UI 모드 활성화
+
+        // 자동차 속도 문자열 생성
+        std::string speedText = "Speed: " + std::to_string(static_cast<int>(kart_speed * 100)) + " km/h";
+
+        // 자동차 속도를 화면 우측 상단에 표시
+        glRasterPos2f(0.7f, 0.9f); // 화면 우측 상단
+        for (char c : speedText) {
+            glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
+        }
+
+        glUseProgram(shaderProgramID); // 원래 셰이더로 복원
+    }
+
+    void draw_ui() {
+        glUseProgram(shaderProgramID_UI); // UI 렌더링용 셰이더 활성화
+
+        // isUI 플래그 활성화
+        GLint isUILocation = glGetUniformLocation(shaderProgramID_UI, "isTimer");
+        glUniform1i(isUILocation, true); // UI 모드 활성화
+        GLint isUILocation2 = glGetUniformLocation(shaderProgramID_UI, "isUI");
+        glUniform1i(isUILocation2, true); // UI 모드 활성화
+
+        // 텍스트 렌더링 또는 UI Quad 그리기
+        std::string timerText = "map : village road";
+
+        glRasterPos2f(-0.95f, 0.85f); // 화면 좌측 상단에 표시
+        for (char c : timerText) {
+            glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
+        }
+
+        glUseProgram(shaderProgramID); // 원래 셰이더로 복원
+    }
+
+    //timer ui
+    void draw_timer() {
+        glUseProgram(shaderProgramID_UI); // UI 렌더링용 셰이더 활성화
+
+        // isUI 플래그 활성화
+        GLint isUILocation = glGetUniformLocation(shaderProgramID_UI, "isTimer");
+        glUniform1i(isUILocation, true); // UI 모드 활성화
+        GLint isUILocation2 = glGetUniformLocation(shaderProgramID_UI, "isUI");
+        glUniform1i(isUILocation2, true); // UI 모드 활성화
+
+        // 텍스트 렌더링 또는 UI Quad 그리기
+        std::string timerText = "Time: " + std::to_string(game_timer);
+
+        glRasterPos2f(-0.95f, 0.9f); // 화면 좌측 상단에 표시
+        for (char c : timerText) {
+            glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
+        }
+
+        glUseProgram(shaderProgramID); // 원래 셰이더로 복원
     }
 
     void init() override {
@@ -176,14 +252,53 @@ public:
         glm::mat3 adjustedRotationMatrix = glm::mat3_cast(interpolatedRotation);
 
         // 카메라 목표 위치 정의 (속도에 따라 동적으로 조정)
+        // "kart_speed"를 사용하여 카메라 목표를 동적으로 설정
         glm::vec3 baseOffset = glm::vec3(0.0f, 6.0f + (kart_speed * 2.0f), 14.0f + (kart_speed * 10.0f));
         glm::vec3 rotatedOffset = adjustedRotationMatrix * baseOffset;
 
-        // 카메라 목표 위치 계산 (자동차 위치 + 회전된 오프셋)
+        // 목표 위치 계산
         cameraTargetPos = carPosition + rotatedOffset;
 
+        // 현재 카메라 위치를 목표 위치로 점진적으로 이동 (보간 속도 조정 가능)
+        float cameraFollowSpeed = 0.1f; // 카메라가 목표로 따라가는 속도 (0.0 ~ 1.0)
+        cameraPos = glm::mix(cameraPos, cameraTargetPos, cameraFollowSpeed);
+
         // 카메라가 자동차를 바라보도록 방향 업데이트
-        cameraDirection = carPosition; // 자동차를 항상 바라봄
+        cameraDirection = carPosition; // 카메라가 항상 자동차를 바라봄
+    }
+
+    void finish_game() {
+        isBackgroundSound = false;
+        if (isWinSound) return; // 이미 실행 중이면 종료
+        isWinSound = true;
+        isGameOver = true; // 게임 종료 상태 설정
+
+        // 새로운 스레드 생성 및 분리
+        winSoundThread = std::thread([this]() {
+            win_sound();  // 사운드 재생
+            isWinSound = false; // 사운드 재생 완료 후 플래그 해제
+            });
+
+        winSoundThread.detach();
+    }
+
+    void lose_game() {
+        if (isGameOver) return; // 이미 종료 상태라면 실행하지 않음
+
+        isGameOver = true; // 게임 종료 상태 설정
+        isBackgroundSound = false; // 배경음악 종료
+
+        std::cout << "Game Over! Time is up!" << std::endl;
+
+        // 패배 사운드 재생
+        if (!isLoseSound) {
+            isLoseSound = true;
+            loseSoundThread = std::thread([this]() {
+                lose_sound();
+                isLoseSound = false; // 사운드 재생 완료 후 플래그 해제
+                });
+            loseSoundThread.detach();
+        }
     }
 
     void checkCollisionKart() {
@@ -194,8 +309,6 @@ public:
             kart->rigidBody->setGravity(btVector3(0.0f, 0.0f, 0.0f));
 
             for (const auto& barri : road1_barricate) {
-                if (barri->name != "baricate") continue; // 바리케이드가 "baricate" 이름이 아니면 스킵
-
                 // 충돌 콜백 객체 생성
                 CustomContactResultCallback resultCallback;
 
@@ -203,6 +316,13 @@ public:
                 dynamicsWorld->contactPairTest(kart->rigidBody, barri->rigidBody, resultCallback);
 
                 if (resultCallback.hitDetected) { // 충돌이 감지되었을 때
+
+                    if (barri->name == "finish") { //종료~~~~
+                        cout << "끝!!!" << endl;
+                        finish_game();
+                        continue;
+                    }
+
                     // 충돌 사운드 재생 (isCrashSound로 중복 재생 방지)
                     if (!isCrashSound) {
                         isCrashSound = true;
@@ -210,47 +330,51 @@ public:
                         crashSoundThread.detach(); // 스레드를 분리하여 비동기 재생
                     }
 
-                    // 1. 충돌 지점 및 법선 벡터 가져오기
+                    // 1. 충돌 방향 및 침투 깊이 가져오기
                     btVector3 collisionNormal = resultCallback.collisionNormal; // 충돌 방향
                     collisionNormal.setY(0.0f); // y축 방향 제거 (xz 평면에서만 처리)
 
-                    // 2. 진행 방향과 충돌 방향 계산
-                    glm::vec3 kartDirection = glm::normalize(glm::vec3(-kart->translateMatrix[2])); // 진행 방향 (Z축 기준)
-                    glm::vec3 collisionDirection = glm::normalize(glm::vec3(collisionNormal.x(), collisionNormal.y(), collisionNormal.z()));
-
-                    // 진행 방향과 충돌 방향이 거의 일치하는 경우만 속도 감소
-                    float dotProduct = glm::dot(kartDirection, collisionDirection);
-
-                    // 3. 감속 처리 (충돌 강도에 따라 속도를 감소)
-                    if (dotProduct < 0.0f) { // 충돌 방향이 진행 방향과 반대일 때만 처리
-                        float decelerationFactor = 0.05f; // 감속 비율
-                        kart_speed *= 1.0f - decelerationFactor; // 속도를 천천히 줄임
-
-                        if (kart_speed < 0.01f) { // 너무 느려지면 멈춤
-                            kart_speed = 0.0f;
-                        }
+                    // 침투 깊이 제한
+                    float penetrationDepth = std::abs(resultCallback.penetrationDepth);
+                    const float MAX_PENETRATION_DEPTH = 2.0f; // 최대 침투 깊이
+                    if (penetrationDepth > MAX_PENETRATION_DEPTH) {
+                        penetrationDepth = MAX_PENETRATION_DEPTH;
                     }
 
-                    // 4. 충돌 위치 보정 (침투 깊이만큼 이동)
+                    // 2. 보정 값 계산 (침투 깊이에 기반한 이동)
+                    float correctionScale = 0.5f; // 보정 값 감쇠 계수
+                    btVector3 correction = correctionScale * collisionNormal * penetrationDepth;
+
+                    // 3. 속도 기반 추가 이동 적용
+                    glm::vec3 kartVelocity = glm::vec3(-kart->translateMatrix[2]) * kart_speed;
+                    float speedFactor = glm::length(kartVelocity); // 카트의 속도 크기
+                    correction += collisionNormal * speedFactor * 0.2f; // 속도에 비례한 추가 이동 (0.2는 조정 가능)
+
+                    // 4. 카트 위치 업데이트
                     btTransform kartTransform;
                     kart->rigidBody->getMotionState()->getWorldTransform(kartTransform);
                     btVector3 kartPos = kartTransform.getOrigin();
 
-                    btVector3 correction = collisionNormal * std::abs(resultCallback.penetrationDepth);
-                    correction.setY(0.0f); // y축 이동 제거
-                    btVector3 newKartPos = kartPos + correction;
+                    btVector3 newKartPos = kartPos + correction; // 최종 위치 계산
                     newKartPos.setY(2.6f); // y축 고정
 
                     kartTransform.setOrigin(newKartPos);
 
-                    // 업데이트된 Transform을 카트에 적용
+                    // 물리 엔진에 새로운 Transform 적용
                     kart->rigidBody->getMotionState()->setWorldTransform(kartTransform);
                     kart->rigidBody->setWorldTransform(kartTransform);
 
-                    // OpenGL 변환 행렬에도 반영
+                    // OpenGL 변환 행렬에 반영
                     btScalar transformMatrix[16];
                     kartTransform.getOpenGLMatrix(transformMatrix);
                     kart->translateMatrix = glm::make_mat4(transformMatrix);
+
+                    // 5. 속도 감소 처리
+                    float decelerationFactor = 0.2f; // 감속 비율 (충돌 후 속도 감소)
+                    kart_speed *= 1.0f - decelerationFactor;
+                    if (kart_speed < 0.01f) { // 너무 느려지면 정지
+                        kart_speed = 0.0f;
+                    }
                 }
             }
         }
@@ -285,24 +409,30 @@ public:
             // 가속/감속 처리
             if (kart_keyState[UP]) {
                 if (kart_speed < MAX_SPEED) {
-                    kart_speed += ACCELERATION;
+                    kart_speed += ACCELERATION; // 가속도에 따라 증가
+                    if (kart_speed > MAX_SPEED) kart_speed = MAX_SPEED; // 최대 속도 제한
                 }
             }
             else if (kart_keyState[DOWN]) {
                 if (kart_speed > -MAX_SPEED / 2.0f) { // 후진 속도는 전진의 절반까지만 허용
-                    kart_speed -= ACCELERATION;
+                    kart_speed -= ACCELERATION; // 후진 시에도 가속도 반영
+                    if (kart_speed < -MAX_SPEED / 2.0f) kart_speed = -MAX_SPEED / 2.0f; // 후진 최대 속도 제한
                 }
             }
             else {
+                // 속도가 감소할 때 감속
                 if (kart_speed > 0.0f) {
                     kart_speed -= DECELERATION; // 전진 감속
-                    if (kart_speed < 0.0f) kart_speed = 0.0f;
+                    if (kart_speed < 0.0f) kart_speed = 0.0f; // 0으로 안정화
                 }
                 else if (kart_speed < 0.0f) {
                     kart_speed += DECELERATION; // 후진 감속
-                    if (kart_speed > 0.0f) kart_speed = 0.0f;
+                    if (kart_speed > 0.0f) kart_speed = 0.0f; // 0으로 안정화
                 }
             }
+
+            // 속도를 제한 (MAX_SPEED를 초과하지 않도록)
+            if (kart_speed > MAX_SPEED) kart_speed = MAX_SPEED;
 
             // 카트 이동 처리
             if (kart_speed > 0.0f) { // 전진
@@ -349,6 +479,34 @@ public:
             else {
                 reducedRotationInfluence += 0.01f; // 키가 안 눌릴 때 천천히 회복
                 if (reducedRotationInfluence > 1.0f) reducedRotationInfluence = 1.0f;
+            }
+
+            // 고개가 천천히 정면으로 돌아가도록 보간
+            if (!kart_keyState[LEFT] && !kart_keyState[RIGHT]) {
+                if (character_face_rotation > 0.0f) {
+                    character_face_rotation -= RETURN_SPEED;
+                    if (character_face_rotation < 0.0f) {
+                        character_face_rotation = 0.0f; // 정면으로 고정
+                    }
+                }
+                else if (character_face_rotation < 0.0f) {
+                    character_face_rotation += RETURN_SPEED;
+                    if (character_face_rotation > 0.0f) {
+                        character_face_rotation = 0.0f; // 정면으로 고정
+                    }
+                }
+            }
+
+            // 캐릭터 모델 업데이트
+            for (const auto& c : character) {
+                if (c->name == "character_face") {
+                    // 기존 변환 행렬 적용 후 Y축 회전
+                    glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(-character_face_rotation), glm::vec3(0.0f, 0.0f, 1.0f));
+                    c->translateMatrix = karts[0]->translateMatrix * rotation;
+                }
+                else {
+                    c->translateMatrix = karts[0]->translateMatrix;
+                }
             }
 
             // 카메라 업데이트
@@ -463,45 +621,46 @@ public:
 
     // 부스터 실행 함수
     void activateBooster() {
+
+        // 부스트가 이미 활성화 중이면 실행하지 않음
+        if (isBoosterActive) {
+            std::cout << "Booster is already active!" << std::endl;
+            return;
+        }
+
+        // 부스트 활성화 상태로 설정
+        isBoosterActive = true;
+
         std::cout << "Booster activated! Remaining boosters: " << booster_cnt << std::endl;
 
-        // 기존 MAX_SPEED 값을 저장
+        // 기존 MAX_SPEED와 ACCELERATION 값을 저장
         float originalMaxSpeed = MAX_SPEED;
+        float originalAcceleration = ACCELERATION;
 
-        // MAX_SPEED를 BOOSTER_SPEED로 설정
-        MAX_SPEED = BOOSTER_SPEED;
+        // 부스터 속도 및 가속도 설정
+        MAX_SPEED = BOOSTER_SPEED;           // 부스터 속도
+        ACCELERATION *= 1.05f;                // 가속도를 1.5배로 증가 (조정 가능)
 
-        // 부스터 사운드 재생 (isBoosterSound 플래그를 사용해 중복 방지)
+        // 부스터 사운드 재생
         if (!isBoosterSound) {
             isBoosterSound = true;
             boosterSoundThread = std::thread(&Map1_Mode::booster_sound, this);
-            boosterSoundThread.detach(); // 스레드 분리하여 비동기 실행
+            boosterSoundThread.detach(); // 비동기 실행
         }
 
-        // 부스터가 활성화된 상태를 알리기
-        std::thread([this, originalMaxSpeed]() {
-            std::this_thread::sleep_for(std::chrono::seconds(3)); // 3초 대기
-            MAX_SPEED = originalMaxSpeed; // 원래 속도로 복구
-            std::cout << "Booster ended. MAX_SPEED restored to: " << MAX_SPEED << std::endl;
-            }).detach(); // 스레드 분리
+        // 부스터 종료 후 속도 및 가속도 복구
+        std::thread([this, originalMaxSpeed, originalAcceleration]() {
+            std::this_thread::sleep_for(std::chrono::duration<double>(4.4)); // 부스터 지속 시간 3초
+            MAX_SPEED = originalMaxSpeed;        // 원래 속도 복구
+            ACCELERATION = originalAcceleration; // 원래 가속도 복구
+            isBoosterActive = false;             // 부스트 비활성화 상태로 설정
+            std::cout << "Booster ended. MAX_SPEED and ACCELERATION restored." << std::endl;
+            }).detach();
     }
 
     void specialKey(int key, int x, int y) override {
 
-        int modifiers = glutGetModifiers();
-
-        // Ctrl 단독 감지
-         // Ctrl 단독 감지
-        if (modifiers & GLUT_ACTIVE_CTRL) {
-            if (booster_cnt > 0) { // 부스터가 남아 있는 경우
-                booster_cnt--; // 부스터 개수 감소
-                activateBooster(); // 부스터 활성화
-            }
-            else {
-                std::cout << "No boosters left!" << std::endl;
-            }
-        }
-
+     
         switch (key) {
         case GLUT_KEY_UP:
             kart_keyState[UP] = true;
@@ -511,11 +670,39 @@ public:
             break;
         case GLUT_KEY_LEFT:
             kart_keyState[LEFT] = true;
+            // 왼쪽 방향으로 고개 회전
+            if (character_face_rotation > -MAX_FACE_ROTATION) {
+                character_face_rotation -= ROTATION_SPEED;
+            }
             break;
         case GLUT_KEY_RIGHT:
             kart_keyState[RIGHT] = true;
+            // 오른쪽 방향으로 고개 회전
+            if (character_face_rotation < MAX_FACE_ROTATION) {
+                character_face_rotation += ROTATION_SPEED;
+            }
             break;
         }
+
+        int modifiers = glutGetModifiers();
+
+        // Ctrl 단독 감지
+        if (modifiers & GLUT_ACTIVE_CTRL) {
+            // 부스트가 이미 활성화 중이거나 부스트 개수가 0이면 실행하지 않음
+            if (isBoosterActive) {
+                std::cout << "Booster is already active!" << std::endl;
+                return;
+            }
+
+            if (booster_cnt > 0) { // 부스터가 남아 있는 경우
+                booster_cnt--; // 부스터 개수 감소
+                activateBooster(); // 부스터 활성화
+            }
+            else {
+                std::cout << "No boosters left!" << std::endl;
+            }
+        }
+
     }
 
     void specialKeyUp(int key, int x, int y) override {
@@ -541,7 +728,6 @@ public:
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glUseProgram(shaderProgramID);
-
 
         GLenum error = glGetError();
         if (error != GL_NO_ERROR) {
@@ -576,6 +762,8 @@ public:
             road->draw(shaderProgramID, isKeyPressed_s);
         }
         for (const auto& c : character) { // 실제 모델 draw
+            if (c->name == "booster" && !isBoosterActive)
+                continue;
             c->draw(shaderProgramID, isKeyPressed_s);
         }
         for (const auto& barricate : road1_barricate) { // 실제 모델 draw
@@ -584,8 +772,16 @@ public:
         if (start_count >= 0 && start_count < 4) {
             countDown[start_count]->draw(shaderProgramID, isKeyPressed_s);
         }
+
         if (Pause)
             pause[0]->draw(shaderProgramID, isKeyPressed_s);
+
+        // Draw Timer
+        glDisable(GL_DEPTH_TEST);
+        draw_timer();
+        draw_ui();
+        draw_speed();
+        glEnable(GL_DEPTH_TEST);
 
         glDisable(GL_DEPTH_TEST);
     }
@@ -619,20 +815,30 @@ private:
 
     static void timerHelper(int value) {
         if (Map1_Mode* instance = dynamic_cast<Map1_Mode*>(Mode::currentInstance)) {
-            // 물리 시뮬레이션을 여러 번 실행하여 높은 정확도 유지
-            const int physicsSteps = 2;  // 물리 엔진을 렌더링 프레임마다 두 번 실행
-            const float deltaTime = 1.0f / 120.0f; // 120FPS (1초에 120번 업데이트)
+            const float deltaTime = 1.0f / 60.0f; // 60FPS 기준, 한 프레임의 시간
 
-            for (int i = 0; i < physicsSteps; ++i) {
-                instance->updatePhysics(deltaTime); // 물리 시뮬레이션 업데이트
+            // 물리 엔진 및 게임 로직 업데이트 (게임 종료 상태에서도 계속 실행)
+            instance->updatePhysics(deltaTime); // 물리 엔진 업데이트
+            instance->timer(); // 렌더링 및 게임 로직 업데이트
+
+            // 게임 타이머 갱신 (게임 종료 상태에서는 타이머를 감소시키지 않음)
+            if (!instance->isGameOver) {
+                static float elapsedTime = 0.0f;
+                elapsedTime += deltaTime;
+                if (elapsedTime >= 1.0f) { // 1초가 지났다면
+                    elapsedTime = 0.0f;
+                    instance->game_timer--; // 타이머 1초 감소
+                    if (instance->game_timer <= 0) { // 타이머가 0이 되면
+                        instance->game_timer = 0;
+                        instance->lose_game(); // 패배 처리
+                    }
+                }
             }
-
-            instance->timer(); // 렌더링 관련 업데이트
         }
 
         // 렌더링 업데이트를 60FPS로 유지
         glutPostRedisplay();
-        glutTimerFunc(16, timerHelper, value); // 60FPS 렌더링 주기
+        glutTimerFunc(16, timerHelper, value); // 16ms 간격으로 호출 (약 60FPS)
     }
 
 
@@ -656,5 +862,13 @@ private:
     void booster_sound() {
         play_sound2D("booster.ogg", "./asset/map_1/", false, &isBoosterSound);
         isBoosterSound = false;
+    }
+    void win_sound() {
+        play_sound2D("game_win.ogg", "./asset/map_1/", false, &isWinSound);
+        isWinSound = false;
+    }
+    void lose_sound() {
+        play_sound2D("game_lose.ogg", "./asset/map_1/", false, &isLoseSound);
+        isLoseSound = false;
     }
 };

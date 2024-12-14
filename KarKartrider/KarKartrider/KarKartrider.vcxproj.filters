@@ -54,6 +54,12 @@
     <None Include="fragment.glsl">
       <Filter>Shader</Filter>
     </None>
+    <None Include="vertex_ui.glsl">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="fragment_ui.glsl">
+      <Filter>Shader</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BulletPhysics.h">

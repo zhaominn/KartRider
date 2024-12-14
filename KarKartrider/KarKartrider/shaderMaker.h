@@ -74,3 +74,70 @@ void make_shaderProgram() {
 
     glUseProgram(shaderProgramID);  // 쉐이더 프로그램 사용
 }
+
+GLuint shaderProgramID_UI;  // 쉐이더 프로그램의 ID를 저장하는 변수
+GLuint vertexShader_UI;  // 버텍스 쉐이더 ID를 저장하는 변수
+GLuint fragmentShader_UI;  // 프래그먼트 쉐이더 ID를 저장하는 변수
+
+GLchar* vertexSource_UI, * fragmentSource_UI;  // 쉐이더 소스 코드를 저장할 변수들
+
+// 버텍스 쉐이더를 만드는 함수
+void make_vertexShaders_ui() {
+    vertexSource_UI = filetobuf("vertex_ui.glsl");  // 버텍스 쉐이더 파일 읽기
+    vertexShader_UI = glCreateShader(GL_VERTEX_SHADER);  // 버텍스 쉐이더 생성
+    std::cout << "Vertex Shader ID: " << vertexShader_UI << std::endl;
+    glShaderSource(vertexShader_UI, 1, (const GLchar**)&vertexSource_UI, 0);  // 쉐이더 소스 코드 설정
+    glCompileShader(vertexShader_UI);  // 쉐이더 컴파일
+
+    GLint success;
+    char infoLog[512];
+    glGetShaderiv(vertexShader_UI, GL_COMPILE_STATUS, &success);
+    if (!success) {
+        glGetShaderInfoLog(vertexShader_UI, 512, NULL, infoLog);
+        std::cout << "ERROR::VERTEX_SHADER::COMPILATION_FAILED\n" << infoLog << std::endl;
+    }
+
+}
+
+// 프래그먼트 쉐이더를 만드는 함수
+void make_fragmentShaders_ui() {
+    fragmentSource_UI = filetobuf("fragment_ui.glsl");  // 프래그먼트 쉐이더 파일 읽기
+    fragmentShader_UI = glCreateShader(GL_FRAGMENT_SHADER);  // 프래그먼트 쉐이더 생성
+    glShaderSource(fragmentShader_UI, 1, (const GLchar**)&fragmentSource_UI, 0);  // 쉐이더 소스 코드 설정
+    glCompileShader(fragmentShader_UI);  // 쉐이더 컴파일
+
+    GLint success;
+    char infoLog[512];
+    // 컴파일 오류 확인
+    glGetShaderiv(fragmentShader_UI, GL_COMPILE_STATUS, &success);
+    if (!success) {
+        glGetShaderInfoLog(fragmentShader_UI, 512, NULL, infoLog);
+        std::cout << "ERROR::FRAGMENT_SHADER::COMPILATION_FAILED\n" << infoLog << std::endl;
+    }
+}
+
+// 쉐이더 프로그램을 만드는 함수
+void make_shaderProgram_ui() {
+    make_vertexShaders_ui();  // 버텍스 쉐이더 생성
+    make_fragmentShaders_ui();  // 프래그먼트 쉐이더 생성
+
+    shaderProgramID_UI = glCreateProgram();  // 쉐이더 프로그램 생성
+    glAttachShader(shaderProgramID_UI, vertexShader_UI);  // 버텍스 쉐이더 프로그램에 첨부
+    glAttachShader(shaderProgramID_UI, fragmentShader_UI);  // 프래그먼트 쉐이더 프로그램에 첨부
+    glLinkProgram(shaderProgramID_UI);  // 쉐이더 프로그램 링크
+    // 프로그램 링크 상태 확인
+    GLint success;
+    glGetProgramiv(shaderProgramID_UI, GL_LINK_STATUS, &success);
+    if (!success) {
+        char infoLog[512];
+        glGetProgramInfoLog(shaderProgramID_UI, 512, NULL, infoLog);
+        std::cout << "ERROR::SHADER_PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+    }
+    else {
+        std::cout << "Shader Program linked successfully.\n";
+    }
+    glDeleteShader(vertexShader_UI);  // 버텍스 쉐이더 삭제 (이미 프로그램에 포함되었으므로)
+    glDeleteShader(fragmentShader_UI);  // 프래그먼트 쉐이더 삭제
+
+    glUseProgram(shaderProgramID_UI);  // 쉐이더 프로그램 사용
+}
