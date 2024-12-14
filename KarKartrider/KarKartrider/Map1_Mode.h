@@ -66,6 +66,8 @@ public:
     std::thread crashSoundThread;
     bool isBoosterSound = false;
     std::thread boosterSoundThread;
+    bool isWinSound = false;
+    std::thread winSoundThread;
 
     // ----- game ------
     int booster_cnt = 10;
@@ -199,6 +201,20 @@ public:
         cameraDirection = carPosition; // 카메라가 항상 자동차를 바라봄
     }
 
+    void finish_game() {
+        isBackgroundSound = false;
+        if (isWinSound) return; // 이미 실행 중이면 종료
+        isWinSound = true;
+
+        // 새로운 스레드 생성 및 분리
+        winSoundThread = std::thread([this]() {
+            win_sound();  // 사운드 재생
+            isWinSound = false; // 사운드 재생 완료 후 플래그 해제
+            });
+
+        winSoundThread.detach();
+    }
+
     void checkCollisionKart() {
         for (auto& kart : karts) {
             if (kart->name != "car") continue; // 카트가 "car" 이름이 아니면 스킵
@@ -217,7 +233,7 @@ public:
 
                     if (barri->name == "finish") { //종료~~~~
                         cout << "끝!!!" << endl;
-
+                        finish_game();
                         continue;
                     }
 
@@ -744,5 +760,9 @@ private:
     void booster_sound() {
         play_sound2D("booster.ogg", "./asset/map_1/", false, &isBoosterSound);
         isBoosterSound = false;
+    }
+    void win_sound() {
+        play_sound2D("game_win.ogg", "./asset/map_1/", false, &isWinSound);
+        isWinSound = false;
     }
 };
