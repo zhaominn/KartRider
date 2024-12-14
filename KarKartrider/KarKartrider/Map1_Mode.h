@@ -88,7 +88,7 @@ public:
         isCountNSound = true;
         isCountGoSound = true;
     }
-
+    ~Map1_Mode() {}
     void draw_speed() {
         glUseProgram(shaderProgramID_UI); // UI ∑ª¥ı∏µøÎ ºŒ¿Ã¥ı »∞º∫»≠
 
@@ -279,6 +279,7 @@ public:
             });
 
         winSoundThread.detach();
+
     }
 
     void lose_game() {
@@ -798,7 +799,7 @@ public:
     }
 
     void finish() override {
-
+        
     }
 private:
 

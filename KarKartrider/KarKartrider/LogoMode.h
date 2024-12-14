@@ -19,6 +19,7 @@ public:
 
     /* 기본 생성자 필수~~ */
     LogoMode() : isRunning(true) {}
+    ~LogoMode() {}
 
     void init() override {
         // 1. 동영상 재생 스레드 시작

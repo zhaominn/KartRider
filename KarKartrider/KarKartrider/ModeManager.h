@@ -7,7 +7,7 @@ private:
 
 public:
 	ModeManager() : mode(nullptr) {}
-
+	~ModeManager(){}
 	void SetMode(Mode* m) {
 		if (mode)
 			mode->finish();
