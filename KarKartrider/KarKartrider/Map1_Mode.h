@@ -303,6 +303,19 @@ public:
 		cameraDirection = carPosition; // 카메라가 항상 자동차를 바라봄
 	}
 
+
+	void goSelectMode_() {
+		Pause = true;
+		if (goSelectMode) { // goSelectMode가 설정되어 있다면 실행
+			isBackgroundSound = false;
+			isMotorSound = false;
+			if (motorSoundThread.joinable()) {
+				motorSoundThread.join();
+			}
+			goSelectMode();
+		}
+	}
+
 	void finish_game() {
 		isBackgroundSound = false;
 		if (isWinSound) return; // 이미 실행 중이면 종료
@@ -317,6 +330,11 @@ public:
 
 		winSoundThread.detach();
 
+		// 5초 후 goSelectMode_() 실행을 위한 스레드 생성
+		std::thread([this]() {
+			std::this_thread::sleep_for(std::chrono::seconds(9)); // 5초 대기
+			goSelectMode_(); // 5초 후 실행
+			}).detach();
 	}
 
 	void draw_finish_time() {
@@ -354,6 +372,12 @@ public:
 				isLoseSound = false; // 사운드 재생 완료 후 플래그 해제
 				});
 			loseSoundThread.detach();
+
+			// 5초 후 goSelectMode_() 실행을 위한 스레드 생성
+			std::thread([this]() {
+				std::this_thread::sleep_for(std::chrono::seconds(9)); // 5초 대기
+				goSelectMode_(); // 5초 후 실행
+				}).detach();
 		}
 	}
 
@@ -681,15 +705,7 @@ public:
 				MM.SetMode(map1Mode);
 			}
 			else if (x <= 580 && x >= 510 && y <= 410 && y >= 360) { //메뉴
-				Pause = true;
-				if (goSelectMode) { // goSelectMode가 설정되어 있다면 실행
-					isBackgroundSound = false;
-					isMotorSound = false;
-					if (motorSoundThread.joinable()) {
-						motorSoundThread.join();
-					}
-					goSelectMode();
-				}
+				goSelectMode_();
 			}
 		}
 	}
@@ -731,15 +747,7 @@ public:
 			Pause = !Pause;
 		}
 		if (key == 'p') {
-			Pause = true;
-			if (goSelectMode) { // goSelectMode가 설정되어 있다면 실행
-				isBackgroundSound = false;
-				isMotorSound = false;
-				if (motorSoundThread.joinable()) {
-					motorSoundThread.join();
-				}
-				goSelectMode();
-			}
+			goSelectMode_();
 		}
 	}
 
