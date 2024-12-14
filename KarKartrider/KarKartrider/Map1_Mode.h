@@ -866,7 +866,8 @@ public:
 	}
 
 	void draw_bb() override {
-
+		if (!bb_status)
+			return;
 		for (const auto& model : karts) { // ¸ðµ¨ bb draw
 			model->draw_rigidBody(shaderProgramID);
 		}

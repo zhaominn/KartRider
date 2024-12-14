@@ -43,6 +43,9 @@ void keyDown(unsigned char key, int x, int y) {
 	case ']':
 		volume += 0.05;
 		break;
+	case 'b':
+		bb_status = !bb_status;
+		break;
 	case 'q':
 		std::cout << " 프로그램 종료 " << std::endl;
 		exit(0);
