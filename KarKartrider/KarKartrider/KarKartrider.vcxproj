@@ -173,6 +173,7 @@
     <ClInclude Include="SelectMapMode.h" />
     <ClInclude Include="shaderMaker.h" />
     <ClInclude Include="Ui.h" />
+    <ClInclude Include="Ui_v2.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="filetobuf.cpp" />

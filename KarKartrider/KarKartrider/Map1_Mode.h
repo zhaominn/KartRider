@@ -95,9 +95,6 @@ public:
         // isUI 플래그 활성화
         GLint isUILocation = glGetUniformLocation(shaderProgramID_UI, "isTimer");
         glUniform1i(isUILocation, true); // UI 모드 활성화
-        // isUI 플래그 활성화
-        GLint isUILocation2 = glGetUniformLocation(shaderProgramID_UI, "isUI");
-        glUniform1i(isUILocation2, true); // UI 모드 활성화
 
         // 자동차 속도 문자열 생성
         std::string speedText = "Speed: " + std::to_string(static_cast<int>(kart_speed * 100)) + " km/h";
@@ -112,48 +109,51 @@ public:
     }
 
     void draw_ui() {
-        glUseProgram(shaderProgramID_UI); // UI 렌더링용 셰이더 활성화
+        glUseProgram(shaderProgramID_UI);
 
-        // isUI 플래그 활성화
+        // 활성화 플래그
         GLint isUILocation = glGetUniformLocation(shaderProgramID_UI, "isTimer");
-        glUniform1i(isUILocation, true); // UI 모드 활성화
-        GLint isUILocation2 = glGetUniformLocation(shaderProgramID_UI, "isUI");
-        glUniform1i(isUILocation2, true); // UI 모드 활성화
+        glUniform1i(isUILocation, true);
 
-        // 텍스트 렌더링 또는 UI Quad 그리기
-        std::string timerText = "map : village road";
-
-        glRasterPos2f(-0.95f, 0.85f); // 화면 좌측 상단에 표시
-        for (char c : timerText) {
+        std::string uiText = "map : village road";
+        glRasterPos2f(-0.95f, 0.85f); // 좌상단 위치
+        for (char c : uiText) {
             glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
         }
+        glUniform1i(isUILocation, false);
 
-        for (const auto& booster_ui : booster_uis) { // 실제 모델 draw
-            booster_ui->draw(shaderProgramID, isKeyPressed_s);
+        // 텍스처 활성화 플래그
+        GLint isTextureLocation = glGetUniformLocation(shaderProgramID_UI, "isTexture");
+        glUniform1i(isTextureLocation, true);
+
+        // 텍스처 모델 렌더링
+        for (const auto& booster_ui : booster_uis) {
+            glActiveTexture(GL_TEXTURE0); // 텍스처 유닛 0 활성화
+            glBindTexture(GL_TEXTURE_2D, booster_ui->textureID); // 텍스처 바인딩
+            glUniform1i(glGetUniformLocation(shaderProgramID_UI, "texture1"), 0); // texture1 유니폼에 텍스처 연결
+
+            // 실제 UI 모델 그리기
+            booster_ui->draw(shaderProgramID_UI, isKeyPressed_s);
         }
 
-        glUseProgram(shaderProgramID); // 원래 셰이더로 복원
+        glUseProgram(0); // 원래 셰이더로 복원
     }
 
-    //timer ui
     void draw_timer() {
-        glUseProgram(shaderProgramID_UI); // UI 렌더링용 셰이더 활성화
+        glUseProgram(shaderProgramID_UI);
 
-        // isUI 플래그 활성화
-        GLint isUILocation = glGetUniformLocation(shaderProgramID_UI, "isTimer");
-        glUniform1i(isUILocation, true); // UI 모드 활성화
-        GLint isUILocation2 = glGetUniformLocation(shaderProgramID_UI, "isUI");
-        glUniform1i(isUILocation2, true); // UI 모드 활성화
+        // 활성화 플래그
+        GLint isTimerLocation = glGetUniformLocation(shaderProgramID_UI, "isTimer");
+        glUniform1i(isTimerLocation, true);
 
-        // 텍스트 렌더링 또는 UI Quad 그리기
+        // 타이머 텍스트
         std::string timerText = "Time: " + std::to_string(game_timer);
-
-        glRasterPos2f(-0.95f, 0.9f); // 화면 좌측 상단에 표시
+        glRasterPos2f(-0.95f, 0.9f); // 좌상단 위치
         for (char c : timerText) {
             glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
         }
 
-        glUseProgram(shaderProgramID); // 원래 셰이더로 복원
+        glUseProgram(0); // 원래 셰이더로 복원
     }
 
     void init() override {

@@ -152,6 +152,9 @@
     <ClInclude Include="BarricateMap1Model.h">
       <Filter>헤더 파일\Object</Filter>
     </ClInclude>
+    <ClInclude Include="Ui_v2.h">
+      <Filter>헤더 파일\Ui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
