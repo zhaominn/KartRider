@@ -84,21 +84,18 @@ public:
 	const float ROTATION_SPEED = 5.0f;     // 고개 회전 속도 (프레임당 회전 각도)
 	const float RETURN_SPEED = 2.0f;       // 고개가 정면으로 돌아가는 속도 (프레임당 회전 각도)
 
-	Map1_Mode() {
-		Mode::currentInstance = this;  // Map1_Mode 인스턴스를 currentInstance에 할당
-		isCountNSound = true;
-		isCountGoSound = true;
-	}
+    Map1_Mode() {
+        Mode::currentInstance = this;  // Map1_Mode 인스턴스를 currentInstance에 할당
+        isCountNSound = true;
+        isCountGoSound = true;
+    }
+    ~Map1_Mode() {}
+    void draw_speed() {
+        glUseProgram(shaderProgramID_UI); // UI 렌더링용 셰이더 활성화
 
-	void draw_speed() {
-		glUseProgram(shaderProgramID_UI); // UI 렌더링용 셰이더 활성화
-
-		// isUI 플래그 활성화
-		GLint isUILocation = glGetUniformLocation(shaderProgramID_UI, "isTimer");
-		glUniform1i(isUILocation, true); // UI 모드 활성화
-		// isUI 플래그 활성화
-		GLint isUILocation2 = glGetUniformLocation(shaderProgramID_UI, "isUI");
-		glUniform1i(isUILocation2, true); // UI 모드 활성화
+        // isUI 플래그 활성화
+        GLint isUILocation = glGetUniformLocation(shaderProgramID_UI, "isTimer");
+        glUniform1i(isUILocation, true); // UI 모드 활성화
 
 		// 자동차 속도 문자열 생성
 		std::string speedText = "Speed: " + std::to_string(static_cast<int>(kart_speed * 100)) + " km/h";
@@ -112,50 +109,48 @@ public:
 		glUseProgram(shaderProgramID); // 원래 셰이더로 복원
 	}
 
-	void draw_ui() {
-		glUseProgram(shaderProgramID_UI); // UI 렌더링용 셰이더 활성화
+    void draw_ui() {
+        glUseProgram(shaderProgramID_UI);
 
-		// isUI 플래그 활성화
-		GLint isUILocation = glGetUniformLocation(shaderProgramID_UI, "isTimer");
-		glUniform1i(isUILocation, true); // UI 모드 활성화
-		GLint isUILocation2 = glGetUniformLocation(shaderProgramID_UI, "isUI");
-		glUniform1i(isUILocation2, true); // UI 모드 활성화
+        // 활성화 플래그
+        GLint isUILocation = glGetUniformLocation(shaderProgramID_UI, "isTimer");
+        glUniform1i(isUILocation, true);
 
-		// 텍스트 렌더링 또는 UI Quad 그리기
-		std::string timerText = "map : village road";
+        std::string uiText = "map : village road";
+        glRasterPos2f(-0.95f, 0.85f); // 좌상단 위치
+        for (char c : uiText) {
+            glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
+        }
+        glUniform1i(isUILocation, false);
 
-		glRasterPos2f(-0.95f, 0.85f); // 화면 좌측 상단에 표시
-		for (char c : timerText) {
-			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
-		}
+        // 텍스처 활성화 플래그
+        GLint isTextureLocation = glGetUniformLocation(shaderProgramID_UI, "isTexture");
+        glUniform1i(isTextureLocation, true);
 
-		for (const auto& booster_ui : booster_uis) { // 실제 모델 draw
-			booster_ui->draw(shaderProgramID, isKeyPressed_s);
-		}
+        // 텍스처 모델 렌더링
+        for (const auto& booster_ui : booster_uis) {
+            booster_ui->draw(shaderProgramID_UI, isKeyPressed_s);
+        }
 
-		glUseProgram(shaderProgramID); // 원래 셰이더로 복원
-	}
+        glUseProgram(0); // 원래 셰이더로 복원
+    }
 
-	//timer ui
-	void draw_timer() {
-		glUseProgram(shaderProgramID_UI); // UI 렌더링용 셰이더 활성화
+    void draw_timer() {
+        glUseProgram(shaderProgramID_UI);
 
-		// isUI 플래그 활성화
-		GLint isUILocation = glGetUniformLocation(shaderProgramID_UI, "isTimer");
-		glUniform1i(isUILocation, true); // UI 모드 활성화
-		GLint isUILocation2 = glGetUniformLocation(shaderProgramID_UI, "isUI");
-		glUniform1i(isUILocation2, true); // UI 모드 활성화
+        // 활성화 플래그
+        GLint isTimerLocation = glGetUniformLocation(shaderProgramID_UI, "isTimer");
+        glUniform1i(isTimerLocation, true);
 
-		// 텍스트 렌더링 또는 UI Quad 그리기
-		std::string timerText = "Time: " + std::to_string(game_timer);
+        // 타이머 텍스트
+        std::string timerText = "Time: " + std::to_string(game_timer);
+        glRasterPos2f(-0.95f, 0.9f); // 좌상단 위치
+        for (char c : timerText) {
+            glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
+        }
 
-		glRasterPos2f(-0.95f, 0.9f); // 화면 좌측 상단에 표시
-		for (char c : timerText) {
-			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
-		}
-
-		glUseProgram(shaderProgramID); // 원래 셰이더로 복원
-	}
+        glUseProgram(0); // 원래 셰이더로 복원
+    }
 
 	void init() override {
 
@@ -284,8 +279,9 @@ public:
 			isWinSound = false; // 사운드 재생 완료 후 플래그 해제
 			});
 
-		winSoundThread.detach();
-	}
+        winSoundThread.detach();
+
+    }
 
 	void lose_game() {
 		if (isGameOver) return; // 이미 종료 상태라면 실행하지 않음
@@ -811,16 +807,9 @@ public:
 		}
 	}
 
-	void finish() override {
-		// 사운드 쓰레드 정리
-
-		if (backgroundSoundThread.joinable()) {
-			isBackgroundSound = false;
-			backgroundSoundThread.join();
-		}
-		if (countNSoundThread.joinable()) countNSoundThread.join();
-		if (countGoSoundThread.joinable()) countGoSoundThread.join();
-	}
+    void finish() override {
+        
+    }
 private:
 
 	void updatePhysics(float deltaTime) {
