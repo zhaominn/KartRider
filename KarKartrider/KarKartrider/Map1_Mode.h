@@ -403,124 +403,126 @@ public:
     }
 
     void timer() {
-        if (start_count < 4) {
-            if (start_count >= 0)
-                playCountdown(start_count);
-            ++start_count;
-        }
-        else {
-
-            // 가속/감속 처리
-            if (kart_keyState[UP]) {
-                if (kart_speed < MAX_SPEED) {
-                    kart_speed += ACCELERATION; // 가속도에 따라 증가
-                    if (kart_speed > MAX_SPEED) kart_speed = MAX_SPEED; // 최대 속도 제한
-                }
-            }
-            else if (kart_keyState[DOWN]) {
-                if (kart_speed > -MAX_SPEED / 2.0f) { // 후진 속도는 전진의 절반까지만 허용
-                    kart_speed -= ACCELERATION; // 후진 시에도 가속도 반영
-                    if (kart_speed < -MAX_SPEED / 2.0f) kart_speed = -MAX_SPEED / 2.0f; // 후진 최대 속도 제한
-                }
+        if(!Pause){
+            if (start_count < 4) {
+                if (start_count >= 0)
+                    playCountdown(start_count);
+                ++start_count;
             }
             else {
-                // 속도가 감소할 때 감속
-                if (kart_speed > 0.0f) {
-                    kart_speed -= DECELERATION; // 전진 감속
-                    if (kart_speed < 0.0f) kart_speed = 0.0f; // 0으로 안정화
-                }
-                else if (kart_speed < 0.0f) {
-                    kart_speed += DECELERATION; // 후진 감속
-                    if (kart_speed > 0.0f) kart_speed = 0.0f; // 0으로 안정화
-                }
-            }
 
-            // 속도를 제한 (MAX_SPEED를 초과하지 않도록)
-            if (kart_speed > MAX_SPEED) kart_speed = MAX_SPEED;
-
-            // 카트 이동 처리
-            if (kart_speed > 0.0f) { // 전진
-                for (const auto& kart : karts) {
-                    kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, -kart_speed));
-                }
-            }
-            else if (kart_speed < 0.0f) { // 후진
-                for (const auto& kart : karts) {
-                    kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, -kart_speed));
-                }
-            }
-
-            // 방향 전환 처리
-            if (kart_keyState[LEFT]) {
-                if (kart_speed != 0.0f) {
-                    for (const auto& kart : karts) {
-                        kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, -1.5));
-                        kart->translateMatrix = glm::rotate(kart->translateMatrix, glm::radians(TURN_ANGLE), glm::vec3(0.0f, 1.0f, 0.0f));
-                        kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, 1.5));
+                // 가속/감속 처리
+                if (kart_keyState[UP]) {
+                    if (kart_speed < MAX_SPEED) {
+                        kart_speed += ACCELERATION; // 가속도에 따라 증가
+                        if (kart_speed > MAX_SPEED) kart_speed = MAX_SPEED; // 최대 속도 제한
                     }
                 }
-            }
-
-            if (kart_keyState[RIGHT]) {
-                if (kart_speed != 0.0f) {
-                    for (const auto& kart : karts) {
-                        kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, -1.5));
-                        kart->translateMatrix = glm::rotate(kart->translateMatrix, glm::radians(-TURN_ANGLE), glm::vec3(0.0f, 1.0f, 0.0f));
-                        kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, 1.5));
+                else if (kart_keyState[DOWN]) {
+                    if (kart_speed > -MAX_SPEED / 2.0f) { // 후진 속도는 전진의 절반까지만 허용
+                        kart_speed -= ACCELERATION; // 후진 시에도 가속도 반영
+                        if (kart_speed < -MAX_SPEED / 2.0f) kart_speed = -MAX_SPEED / 2.0f; // 후진 최대 속도 제한
                     }
-                }
-            }
-
-            //캐릭터 
-            for (const auto& c : character) { //카트와 같은 행렬 적용
-                c->translateMatrix = karts[0]->translateMatrix;
-            }
-
-            // 카메라 회전 보간율 업데이트 (속도에 따라 카메라 회전이 빨라짐)
-            if (kart_speed != 0.0f) {
-                reducedRotationInfluence = 0.1f + (std::abs(kart_speed) / MAX_SPEED) * 0.4f; // 속도 비례 보간율
-            }
-            else {
-                reducedRotationInfluence += 0.01f; // 키가 안 눌릴 때 천천히 회복
-                if (reducedRotationInfluence > 1.0f) reducedRotationInfluence = 1.0f;
-            }
-
-            // 고개가 천천히 정면으로 돌아가도록 보간
-            if (!kart_keyState[LEFT] && !kart_keyState[RIGHT]) {
-                if (character_face_rotation > 0.0f) {
-                    character_face_rotation -= RETURN_SPEED;
-                    if (character_face_rotation < 0.0f) {
-                        character_face_rotation = 0.0f; // 정면으로 고정
-                    }
-                }
-                else if (character_face_rotation < 0.0f) {
-                    character_face_rotation += RETURN_SPEED;
-                    if (character_face_rotation > 0.0f) {
-                        character_face_rotation = 0.0f; // 정면으로 고정
-                    }
-                }
-            }
-
-            // 캐릭터 모델 업데이트
-            for (const auto& c : character) {
-                if (c->name == "character_face") {
-                    // 기존 변환 행렬 적용 후 Y축 회전
-                    glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(-character_face_rotation), glm::vec3(0.0f, 0.0f, 1.0f));
-                    c->translateMatrix = karts[0]->translateMatrix * rotation;
                 }
                 else {
+                    // 속도가 감소할 때 감속
+                    if (kart_speed > 0.0f) {
+                        kart_speed -= DECELERATION; // 전진 감속
+                        if (kart_speed < 0.0f) kart_speed = 0.0f; // 0으로 안정화
+                    }
+                    else if (kart_speed < 0.0f) {
+                        kart_speed += DECELERATION; // 후진 감속
+                        if (kart_speed > 0.0f) kart_speed = 0.0f; // 0으로 안정화
+                    }
+                }
+
+                // 속도를 제한 (MAX_SPEED를 초과하지 않도록)
+                if (kart_speed > MAX_SPEED) kart_speed = MAX_SPEED;
+
+                // 카트 이동 처리
+                if (kart_speed > 0.0f) { // 전진
+                    for (const auto& kart : karts) {
+                        kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, -kart_speed));
+                    }
+                }
+                else if (kart_speed < 0.0f) { // 후진
+                    for (const auto& kart : karts) {
+                        kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, -kart_speed));
+                    }
+                }
+
+                // 방향 전환 처리
+                if (kart_keyState[LEFT]) {
+                    if (kart_speed != 0.0f) {
+                        for (const auto& kart : karts) {
+                            kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, -1.5));
+                            kart->translateMatrix = glm::rotate(kart->translateMatrix, glm::radians(TURN_ANGLE), glm::vec3(0.0f, 1.0f, 0.0f));
+                            kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, 1.5));
+                        }
+                    }
+                }
+
+                if (kart_keyState[RIGHT]) {
+                    if (kart_speed != 0.0f) {
+                        for (const auto& kart : karts) {
+                            kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, -1.5));
+                            kart->translateMatrix = glm::rotate(kart->translateMatrix, glm::radians(-TURN_ANGLE), glm::vec3(0.0f, 1.0f, 0.0f));
+                            kart->translateMatrix = glm::translate(kart->translateMatrix, glm::vec3(0.0, 0.0, 1.5));
+                        }
+                    }
+                }
+
+                //캐릭터 
+                for (const auto& c : character) { //카트와 같은 행렬 적용
                     c->translateMatrix = karts[0]->translateMatrix;
                 }
+
+                // 카메라 회전 보간율 업데이트 (속도에 따라 카메라 회전이 빨라짐)
+                if (kart_speed != 0.0f) {
+                    reducedRotationInfluence = 0.1f + (std::abs(kart_speed) / MAX_SPEED) * 0.4f; // 속도 비례 보간율
+                }
+                else {
+                    reducedRotationInfluence += 0.01f; // 키가 안 눌릴 때 천천히 회복
+                    if (reducedRotationInfluence > 1.0f) reducedRotationInfluence = 1.0f;
+                }
+
+                // 고개가 천천히 정면으로 돌아가도록 보간
+                if (!kart_keyState[LEFT] && !kart_keyState[RIGHT]) {
+                    if (character_face_rotation > 0.0f) {
+                        character_face_rotation -= RETURN_SPEED;
+                        if (character_face_rotation < 0.0f) {
+                            character_face_rotation = 0.0f; // 정면으로 고정
+                        }
+                    }
+                    else if (character_face_rotation < 0.0f) {
+                        character_face_rotation += RETURN_SPEED;
+                        if (character_face_rotation > 0.0f) {
+                            character_face_rotation = 0.0f; // 정면으로 고정
+                        }
+                    }
+                }
+
+                // 캐릭터 모델 업데이트
+                for (const auto& c : character) {
+                    if (c->name == "character_face") {
+                        // 기존 변환 행렬 적용 후 Y축 회전
+                        glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(-character_face_rotation), glm::vec3(0.0f, 0.0f, 1.0f));
+                        c->translateMatrix = karts[0]->translateMatrix * rotation;
+                    }
+                    else {
+                        c->translateMatrix = karts[0]->translateMatrix;
+                    }
+                }
+
+                // 카메라 업데이트
+                setCamera();
+                // 현재 카메라 위치를 목표 위치로 점진적으로 이동
+                float cameraFollowSpeed = 0.1f; // 카메라가 따라가는 속도 (0.0 ~ 1.0 사이의 값)
+                cameraPos = glm::mix(cameraPos, cameraTargetPos, cameraFollowSpeed);
+
+                checkCollisionKart();
+                checkEngineSound();
             }
-
-            // 카메라 업데이트
-            setCamera();
-            // 현재 카메라 위치를 목표 위치로 점진적으로 이동
-            float cameraFollowSpeed = 0.1f; // 카메라가 따라가는 속도 (0.0 ~ 1.0 사이의 값)
-            cameraPos = glm::mix(cameraPos, cameraTargetPos, cameraFollowSpeed);
-
-            checkCollisionKart();
-            checkEngineSound();
         }
     }
 
@@ -583,7 +585,7 @@ public:
 
     void mouseClick(int button, int state, int x, int y) override {
         if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
-
+            cout << "x : " << x << ", y : " << y << endl;
         }
     }
 
@@ -591,7 +593,7 @@ public:
         moveCamera(key, x, y);
         if (key == 27) { //esc
             if (Pause) {
-                glutTimerFunc(16, timerHelper, 0); // 타이머 호출
+                //glutTimerFunc(16, timerHelper, 0); // 타이머 호출
             }
             else {
                 glm::vec3 zAxis = glm::normalize(cameraPos - glm::vec3(karts[0]->translateMatrix[3]));
