@@ -178,7 +178,7 @@ public:
 
 	void init() override {
 
-		UpdateRigidBodyTransforms(road1_barricate);
+		UpdateRigidBodyTransforms(road2_barricate);
 		UpdateRigidBodyTransforms(karts);
 
 		// Move 상태 초기화
@@ -208,7 +208,7 @@ public:
 		draw_model();
 		glutTimerFunc(0, Map2_Mode::timerHelper, 0);
 
-		cameraPos = glm::vec3(0.0, 6.0, 253.0);
+		cameraPos = glm::vec3(165.0, 4.4, 45.0);
 		updateCameraDirection();
 	}
 
@@ -331,7 +331,7 @@ public:
 			// 중력을 제거 (한 번만 설정)
 			kart->rigidBody->setGravity(btVector3(0.0f, 0.0f, 0.0f));
 
-			for (const auto& barri : road1_barricate) {
+			for (const auto& barri : road2_barricate) {
 				// 충돌 콜백 객체 생성
 				CustomContactResultCallback resultCallback;
 
@@ -379,7 +379,7 @@ public:
 					btVector3 kartPos = kartTransform.getOrigin();
 
 					btVector3 newKartPos = kartPos + correction; // 최종 위치 계산
-					newKartPos.setY(2.6f); // y축 고정
+					newKartPos.setY(1.0f); // y축 고정
 
 					kartTransform.setOrigin(newKartPos);
 
@@ -829,7 +829,7 @@ public:
 				continue;
 			c->draw(shaderProgramID, isKeyPressed_s);
 		}
-		for (const auto& barricate : road1_barricate) { // 실제 모델 draw
+		for (const auto& barricate : road2_barricate) { // 실제 모델 draw
 			barricate->draw(shaderProgramID, isKeyPressed_s);
 		}
 		if (start_count >= 0 && start_count < 4) {
@@ -855,7 +855,7 @@ public:
 		for (const auto& model : karts) { // 모델 bb draw
 			model->draw_rigidBody(shaderProgramID);
 		}
-		for (const auto& barricate : road1_barricate) { // 모델 bb draw
+		for (const auto& barricate : road2_barricate) { // 모델 bb draw
 			barricate->draw_rigidBody(shaderProgramID);
 		}
 	}
@@ -871,7 +871,7 @@ private:
 
 		// 물리 엔진에서 객체의 Transform 업데이트
 		UpdateRigidBodyTransforms(karts);
-		UpdateRigidBodyTransforms(road1_barricate);
+		UpdateRigidBodyTransforms(road2_barricate);
 
 		// 충돌 처리 (물리 엔진 업데이트 후 실행)
 		checkCollisionKart();
