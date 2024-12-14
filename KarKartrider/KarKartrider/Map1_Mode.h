@@ -88,10 +88,23 @@ public:
         isCountNSound = true;
         isCountGoSound = true;
     }
+    ~Map1_Mode() {}
 
-    ~Map1_Mode() {
-		cout << "소멸" << endl;
-	}
+    void draw_dashBoard() {
+        glUseProgram(shaderProgramID_UI);
+
+        // 텍스처 활성화 플래그
+        GLint isTextureLocation = glGetUniformLocation(shaderProgramID_UI, "isTexture");
+        glUniform1i(isTextureLocation, true);
+
+        // 텍스처 모델 렌더링
+        for (const auto& dashBoard : dashBoards) {
+            dashBoard->draw(shaderProgramID_UI, isKeyPressed_s);
+        }
+        glUniform1i(isTextureLocation, false);
+
+        glUseProgram(0); // 원래 셰이더로 복원
+    }
 
     void draw_speed() {
         glUseProgram(shaderProgramID_UI); // UI 렌더링용 셰이더 활성화
@@ -103,14 +116,15 @@ public:
 		// 자동차 속도 문자열 생성
 		std::string speedText = "Speed: " + std::to_string(static_cast<int>(kart_speed * 100)) + " km/h";
 
-		// 자동차 속도를 화면 우측 상단에 표시
-		glRasterPos2f(0.7f, 0.9f); // 화면 우측 상단
-		for (char c : speedText) {
-			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
-		}
+        // 자동차 속도를 화면 우측 상단에 표시
+        glRasterPos2f(0.7f, 0.9f); // 화면 우측 상단
+        for (char c : speedText) {
+            glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
+        }
+        glUniform1i(isUILocation, false); // UI 모드 활성화
 
-		glUseProgram(shaderProgramID); // 원래 셰이더로 복원
-	}
+        glUseProgram(0); // 원래 셰이더로 복원
+    }
 
     void draw_ui() {
         glUseProgram(shaderProgramID_UI);
@@ -134,6 +148,7 @@ public:
         for (const auto& booster_ui : booster_uis) {
             booster_ui->draw(shaderProgramID_UI, isKeyPressed_s);
         }
+        glUniform1i(isTextureLocation, false);
 
         glUseProgram(0); // 원래 셰이더로 복원
     }
@@ -151,6 +166,7 @@ public:
         for (char c : timerText) {
             glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
         }
+        glUniform1i(isTimerLocation, false);
 
         glUseProgram(0); // 원래 셰이더로 복원
     }
@@ -790,12 +806,13 @@ public:
 		if (Pause)
 			pause[0]->draw(shaderProgramID, isKeyPressed_s);
 
-		// Draw Timer
-		glDisable(GL_DEPTH_TEST);
-		draw_timer();
-		draw_ui();
-		draw_speed();
-		glEnable(GL_DEPTH_TEST);
+        // Draw Timer
+        glDisable(GL_DEPTH_TEST);
+        draw_timer();
+        draw_ui();
+        draw_speed();
+        draw_dashBoard();
+        glEnable(GL_DEPTH_TEST);
 
 		glDisable(GL_DEPTH_TEST);
 	}
