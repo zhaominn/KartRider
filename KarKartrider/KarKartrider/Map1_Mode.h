@@ -13,9 +13,11 @@
 #include <gl/glm/glm/gtc/quaternion.hpp> // 쿼터니언 관련
 #include <gl/glm/glm/gtx/quaternion.hpp> // SLERP(Spherical Linear Interpolation)
 #include <unordered_map> // keystate
+#include <functional>  // std::function을 사용하기 위해 필요
 
 class Map1_Mode : public Mode {
 public:
+	std::function<void()> goSelectMode; // 셀렉트 모드로 돌아가는 함수
 
 	glm::quat cameraRotationQuat = glm::quat(glm::vec3(0.0f, 0.0f, 0.0f)); // 현재 카메라 행렬을 쿼터니언으로 저장
 	float reducedRotationInfluence = 0.0f; // 보간할 퍼센트
@@ -215,7 +217,11 @@ public:
 
 		kart_speed = 0.0f;
 		draw_model();
-		glutTimerFunc(0, Map1_Mode::timerHelper, 0);
+		if (!isGameRunning)
+		{
+			isGameRunning = true;
+			glutTimerFunc(0, Map1_Mode::timerHelper, 0);
+		}
 
 		cameraPos = glm::vec3(0.0, 6.0, 253.0);
 		updateCameraDirection();
@@ -688,6 +694,17 @@ public:
 				}
 			}
 			Pause = !Pause;
+		}
+		if (key == 'p') {
+			if (goSelectMode) { // goSelectMode가 설정되어 있다면 실행
+				isBackgroundSound = false;
+				if (isMotorSound)
+					isMotorSound = false;
+				if (motorSoundThread.joinable()) {
+					motorSoundThread.join();
+				}
+				goSelectMode();
+			}
 		}
 	}
 
