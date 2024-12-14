@@ -650,33 +650,13 @@ public:
 		moveCamera(key, x, y);
 		if (key == 27) { //esc
 			if (Pause) {
-				//glutTimerFunc(16, timerHelper, 0); // 타이머 호출
+				//isMotorSound = true;
 			}
 			else {
-				glm::vec3 zAxis = glm::normalize(cameraPos - glm::vec3(karts[0]->translateMatrix[3]));
-
-				// 오른쪽 벡터 (X축) 계산
-				glm::vec3 xAxis = glm::normalize(glm::cross(cameraUp, zAxis));
-
-				// 상단 벡터 (Y축) 계산
-				glm::vec3 yAxis = glm::cross(zAxis, xAxis);
-
-				// 3x3 회전 행렬 생성
-				glm::mat3 rotationMatrix = glm::mat3(
-					xAxis, // X축
-					yAxis, // Y축
-					zAxis  // Z축
-				);
-
-				// 4x4 행렬로 확장
-				glm::mat4 modelMatrix = glm::mat4(1.0f); // 단위 행렬로 초기화
-				modelMatrix[0] = glm::vec4(rotationMatrix[0], 0.0f); // X축
-				modelMatrix[1] = glm::vec4(rotationMatrix[1], 0.0f); // Y축
-				modelMatrix[2] = glm::vec4(rotationMatrix[2], 0.0f); // Z축
-				modelMatrix[3] = glm::vec4(cameraPos, 1.0f);          // 위치 추가
-
-				//pause[0]->translateMatrix = modelMatrix;
-				//pause[0]->translateMatrix = glm::translate(pause[0]->translateMatrix, glm::vec3(0.0, 0.0, -2.0));
+				isMotorSound = false;
+				if (motorSoundThread.joinable()) {
+					motorSoundThread.detach(); // 스레드 종료 (필요한 경우 detach)
+				}
 			}
 			Pause = !Pause;
 		}
