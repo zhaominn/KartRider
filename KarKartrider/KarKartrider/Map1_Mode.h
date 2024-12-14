@@ -5,7 +5,6 @@
 #include "shaderMaker.h"
 #include "LoadProgress.h"
 #include "root.h"
-#include "KeyBoard.h"
 #include "Light.h"
 #include "SelectMapMode.h"
 
@@ -31,7 +30,7 @@ public:
 
 	int start_count;
 
-	bool Pause;
+	bool Pause=false;
 
 	//키
 	std::unordered_map<Move, bool> kart_keyState;
@@ -669,8 +668,8 @@ public:
 				MM.SetMode(map1Mode);*/
 			}
 			else if (x <= 580 && x >= 510 && y <= 410 && y >= 360) { //메뉴
-				/*SelectMapMode* selectMapMode = new SelectMapMode();
-				MM.SetMode(selectMapMode);*/
+				//SelectMapMode* selectMapMode = new SelectMapMode();
+				//MM.SetMode(selectMapMode);
 			}
 		}
 	}
@@ -678,7 +677,6 @@ public:
 	void keyboard(unsigned char key, int x, int y) override {
 		moveCamera(key, x, y);
 		if (key == 27) { //esc
-			/*
 			if (Pause) {
 				//glutTimerFunc(16, timerHelper, 0); // 타이머 호출
 				//isMotorSound = true;
@@ -703,14 +701,8 @@ public:
 				modelMatrix[3] = glm::vec4(cameraPos, 1.0f);          // 위치 추가
 				pause[0]->translateMatrix = modelMatrix;
 				pause[0]->translateMatrix = glm::translate(pause[0]->translateMatrix, glm::vec3(0.0, 0.0, -2.0));
-				isMotorSound = false;
-				if (motorSoundThread.joinable()) {
-					motorSoundThread.detach(); // 스레드 종료 (필요한 경우 detach)
-				}*/
-			if (Pause) {
-				//isMotorSound = true;
-			}
-			else {
+
+
 				isMotorSound = false;
 				if (motorSoundThread.joinable()) {
 					motorSoundThread.detach(); // 스레드 종료 (필요한 경우 detach)
@@ -875,8 +867,8 @@ public:
 			countDown[start_count]->draw(shaderProgramID, isKeyPressed_s);
 		}
 
-		//if (Pause)
-		//	pause[0]->draw(shaderProgramID, isKeyPressed_s);
+		if (Pause)
+			pause[0]->draw(shaderProgramID, isKeyPressed_s);
 
 		// Draw Timer
 		glDisable(GL_DEPTH_TEST);

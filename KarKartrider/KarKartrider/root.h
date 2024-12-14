@@ -19,7 +19,7 @@ std::vector<Model*> selectMaps;
 std::vector<Model*> character;
 
 std::vector<Model*> countDown;
-//std::vector<Model*> pause;
+std::vector<Model*> pause;
 
 std::vector<Model*> booster_uis;
 std::vector<Model*> dashBoards;//∞Ë±‚∆«
