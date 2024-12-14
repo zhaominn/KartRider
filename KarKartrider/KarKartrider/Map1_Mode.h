@@ -609,6 +609,8 @@ public:
             road->draw(shaderProgramID, isKeyPressed_s);
         }
         for (const auto& c : character) { // ½ÇÁ¦ ¸ðµ¨ draw
+            if (c->name == "booster" && !isBoosterActive)
+                return;
             c->draw(shaderProgramID, isKeyPressed_s);
         }
         for (const auto& barricate : road1_barricate) { // ½ÇÁ¦ ¸ðµ¨ draw
@@ -617,6 +619,7 @@ public:
         if (start_count >= 0 && start_count < 4) {
             countDown[start_count]->draw(shaderProgramID, isKeyPressed_s);
         }
+
         if (Pause)
             pause[0]->draw(shaderProgramID, isKeyPressed_s);
 
