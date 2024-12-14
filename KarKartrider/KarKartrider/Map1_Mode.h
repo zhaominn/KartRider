@@ -25,9 +25,9 @@ public:
     enum Move { NONE_M, UP, DOWN, LEFT, RIGHT, CTRL };
     float ACCELERATION = 0.004f;
     float DECELERATION = 0.003f;
-    float LIMIT_SPEED = 0.5;
+    float LIMIT_SPEED = 1.0;
     float BOOSTER_SPEED = 4.0;
-    float MAX_SPEED = 0.5;
+    float MAX_SPEED = 1.0;
 
     int start_count;
 
