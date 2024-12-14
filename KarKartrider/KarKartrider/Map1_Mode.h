@@ -653,7 +653,7 @@ public:
         }
         for (const auto& c : character) { // ½ÇÁ¦ ¸ðµ¨ draw
             if (c->name == "booster" && !isBoosterActive)
-                return;
+                continue;
             c->draw(shaderProgramID, isKeyPressed_s);
         }
         for (const auto& barricate : road1_barricate) { // ½ÇÁ¦ ¸ðµ¨ draw
