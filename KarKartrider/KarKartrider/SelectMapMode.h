@@ -54,7 +54,9 @@ public:
 	bool isclickRunning;
 
 	SelectMapMode() :isSoundRunning(true), isclickRunning(true) {}
-	~SelectMapMode(){}
+	~SelectMapMode(){
+		delete this;
+	}
 
 	void init() override {
 

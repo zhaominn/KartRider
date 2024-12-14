@@ -92,7 +92,9 @@ public:
         isCountNSound = true;
         isCountGoSound = true;
     }
-    ~Map1_Mode() {}
+    ~Map1_Mode() {
+		delete this;
+	}
 
     void draw_dashBoard() {
         glUseProgram(shaderProgramID_UI);
@@ -648,8 +650,8 @@ public:
 				MM.SetMode(map1Mode);*/
 			}
 			else if (x <= 580 && x >= 510 && y <= 410 && y >= 360) { //¸Þ´º
-				SelectMapMode* selectMapMode = new SelectMapMode();
-				MM.SetMode(selectMapMode);
+				/*SelectMapMode* selectMapMode = new SelectMapMode();
+				MM.SetMode(selectMapMode);*/
 			}
 		}
 	}

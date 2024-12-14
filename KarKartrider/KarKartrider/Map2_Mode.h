@@ -45,7 +45,9 @@ public:
 	Map2_Mode() {
 		Mode::currentInstance = this;  // Map1_Mode 인스턴스를 currentInstance에 할당
 	}
-	~Map2_Mode(){}
+	~Map2_Mode(){
+		delete this;
+	}
 
 	void init() override {
 		for (const auto& kart : karts) { // 카트 위치 초기화
