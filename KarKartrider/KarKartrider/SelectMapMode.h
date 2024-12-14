@@ -3,7 +3,6 @@
 #include <thread>
 #include <random>
 
-#include "Mode.h"
 #include "shaderMaker.h"
 #include "root.h"
 #include "KeyBoard.h"

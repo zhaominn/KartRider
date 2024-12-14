@@ -2,7 +2,6 @@
 #include <iostream>
 #include <thread>
 
-#include "Mode.h"
 #include "shaderMaker.h"
 #include "root.h"
 #include "KeyBoard.h"
