@@ -83,12 +83,18 @@ public:
 	const float ROTATION_SPEED = 5.0f;     // 고개 회전 속도 (프레임당 회전 각도)
 	const float RETURN_SPEED = 2.0f;       // 고개가 정면으로 돌아가는 속도 (프레임당 회전 각도)
 
+	float booster_head_tilt = 0.0f; // 캐릭터 머리의 X축 회전 각도
+	const float MAX_HEAD_TILT = 20.0f; // 부스터 사용 시 최대 X축 회전 각도
+	const float TILT_SPEED = 2.0f;     // 부스터 시 머리의 회전 속도
+
     Map1_Mode() {
         Mode::currentInstance = this;  // Map1_Mode 인스턴스를 currentInstance에 할당
         isCountNSound = true;
         isCountGoSound = true;
     }
-    ~Map1_Mode() {}
+    ~Map1_Mode() {
+		delete this;
+	}
 
     void draw_dashBoard() {
         glUseProgram(shaderProgramID_UI);
@@ -113,14 +119,20 @@ public:
         GLint isUILocation = glGetUniformLocation(shaderProgramID_UI, "isTimer");
         glUniform1i(isUILocation, true); // UI 모드 활성화
 
+		glPushMatrix();
+		glPixelZoom(5.0f, 5.0f);  // x축, y축 확대 비율 (2배 확대)
+
 		// 자동차 속도 문자열 생성
-		std::string speedText = "Speed: " + std::to_string(static_cast<int>(kart_speed * 100)) + " km/h";
+		std::string speedText = std::to_string(static_cast<int>(kart_speed * 100));
 
         // 자동차 속도를 화면 우측 상단에 표시
-        glRasterPos2f(0.7f, 0.9f); // 화면 우측 상단
+        glRasterPos2f(0.0f, -0.97f); // 화면 우측 상단
         for (char c : speedText) {
             glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
         }
+
+		glPixelZoom(1.0f, 1.0f);  // 원래 크기로 복구
+		glPopMatrix();
         glUniform1i(isUILocation, false); // UI 모드 활성화
 
         glUseProgram(0); // 원래 셰이더로 복원
@@ -518,12 +530,43 @@ public:
 					}
 				}
 
-				// 캐릭터 모델 업데이트
+				if (isBoosterActive) {
+					// 머리를 X축으로 뒤로 기울이기 (서서히 MAX_HEAD_TILT까지)
+					if (booster_head_tilt < MAX_HEAD_TILT) {
+						booster_head_tilt += TILT_SPEED;
+						if (booster_head_tilt > MAX_HEAD_TILT) {
+							booster_head_tilt = MAX_HEAD_TILT;
+						}
+					}
+				}
+				else {
+					// 머리를 원래 상태로 복구 (서서히 0도로 복귀)
+					if (booster_head_tilt > 0.0f) {
+						booster_head_tilt -= TILT_SPEED;
+						if (booster_head_tilt < 0.0f) {
+							booster_head_tilt = 0.0f;
+						}
+					}
+				}
+
+				// 캐릭터 모델 업데이트 (머리의 X축 회전 포함)
 				for (const auto& c : character) {
 					if (c->name == "character_face") {
-						// 기존 변환 행렬 적용 후 Y축 회전
-						glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(-character_face_rotation), glm::vec3(0.0f, 0.0f, 1.0f));
-						c->translateMatrix = karts[0]->translateMatrix * rotation;
+						// 기존 Y축 회전 (character_face_rotation) 추가
+						glm::mat4 headRotation = glm::rotate(
+							glm::mat4(1.0f),
+							glm::radians(-character_face_rotation),
+							glm::vec3(0.0f, 0.0f, 1.0f)
+						);
+
+						// X축 회전 추가 (부스터 상태에 따른 머리 기울임)
+						headRotation = glm::rotate(
+							headRotation,
+							glm::radians(booster_head_tilt), // X축 회전
+							glm::vec3(1.0f, 0.0f, 0.0f)
+						);
+
+						c->translateMatrix = karts[0]->translateMatrix * headRotation;
 					}
 					else {
 						c->translateMatrix = karts[0]->translateMatrix;
@@ -602,13 +645,12 @@ public:
 	void mouseClick(int button, int state, int x, int y) override {
 		if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
 			if (x <= 470 && x >= 400 && y <= 410 && y >= 360) { //다시시도
-				
-				Map1_Mode* map1Mode = new Map1_Mode();
-				MM.SetMode(map1Mode);
+				/*Map1_Mode* map1Mode = new Map1_Mode();
+				MM.SetMode(map1Mode);*/
 			}
 			else if (x <= 580 && x >= 510 && y <= 410 && y >= 360) { //메뉴
-				//SelectMapMode* selectMapMode = new SelectMapMode();
-				//MM.SetMode(selectMapMode);
+				/*SelectMapMode* selectMapMode = new SelectMapMode();
+				MM.SetMode(selectMapMode);*/
 			}
 		}
 	}
@@ -810,8 +852,8 @@ public:
         glDisable(GL_DEPTH_TEST);
         draw_timer();
         draw_ui();
+		draw_dashBoard();
         draw_speed();
-        draw_dashBoard();
         glEnable(GL_DEPTH_TEST);
 
 		glDisable(GL_DEPTH_TEST);
