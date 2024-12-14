@@ -73,7 +73,10 @@ public:
 	std::thread loseSoundThread;
 
 	// ----- game ------
-	int booster_cnt = 10;
+	int booster_cnt = 2;
+	const int MAX_BOOSTER_CNT = 2;        // 최대 부스터 개수
+	bool isBoosterRegenActive = true;     // 부스터 재생성 활성화 여부
+	std::thread boosterRegenThread;       // 부스터 재생성 스레드
 	bool isBoosterActive = false; // 부스트 활성화 상태
 	bool isGameOver = false; // 게임 종료 상태 플래그
 	int game_timer = 30;
@@ -92,9 +95,31 @@ public:
 		Mode::currentInstance = this;  // Map1_Mode 인스턴스를 currentInstance에 할당
 		isCountNSound = true;
 		isCountGoSound = true;
+		// 부스터 재생성 스레드 시작
+		boosterRegenThread = std::thread(&Map1_Mode::startBoosterRegen, this);
 	}
 	~Map1_Mode() {
 		delete this;
+	}
+
+	// 부스터 재생성 로직
+	void startBoosterRegen() {
+		while (isBoosterRegenActive) {
+			// 부스터가 최대 개수에 도달하지 않았을 때만 대기 후 증가
+			if (booster_cnt < MAX_BOOSTER_CNT) {
+				std::this_thread::sleep_for(std::chrono::seconds(6)); // 3초 대기
+
+				// 부스터 증가 (다시 확인해 조건 충족 시 증가)
+				if (booster_cnt < MAX_BOOSTER_CNT) {
+					++booster_cnt; // 부스터 개수 증가
+					std::cout << "Booster regenerated! Current boosters: " << booster_cnt << std::endl;
+				}
+			}
+			else {
+				// 만약 부스터가 이미 최대치라면 일정 시간 대기 후 다시 확인
+				std::this_thread::sleep_for(std::chrono::milliseconds(100)); // 0.1초 대기
+			}
+		}
 	}
 
 	void draw_dashBoard() {
@@ -158,8 +183,8 @@ public:
 		glUniform1i(isTextureLocation, true);
 
 		// 텍스처 모델 렌더링
-		for (const auto& booster_ui : booster_uis) {
-			booster_ui->draw(shaderProgramID_UI, isKeyPressed_s);
+		for (int i = 0; i < booster_cnt; ++i) {
+			booster_uis[i]->draw(shaderProgramID_UI, isKeyPressed_s);
 		}
 		glUniform1i(isTextureLocation, false);
 
@@ -313,6 +338,11 @@ public:
 				motorSoundThread.join();
 			}
 			goSelectMode();
+		}
+
+		isBoosterRegenActive = false; // 부스터 재생성 종료
+		if (boosterRegenThread.joinable()) {
+			boosterRegenThread.join(); // 스레드 종료
 		}
 	}
 
