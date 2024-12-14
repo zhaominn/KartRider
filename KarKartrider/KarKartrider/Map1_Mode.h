@@ -314,6 +314,25 @@ public:
 
 	}
 
+	void draw_finish_time() {
+		glUseProgram(shaderProgramID_UI);
+
+		// 활성화 플래그
+		GLint isTimerLocation = glGetUniformLocation(shaderProgramID_UI, "isRed");
+		glUniform1i(isTimerLocation, true);
+
+		// 타이머 텍스트
+		std::string Text = "Time: " + std::to_string(30 - game_timer);
+
+		glRasterPos2f(0.0f, 0.0f);
+		for (char c : Text) {
+			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
+		}
+		glUniform1i(isTimerLocation, false);
+
+		glUseProgram(0); // 원래 셰이더로 복원
+	}
+
 	void lose_game() {
 		if (isGameOver) return; // 이미 종료 상태라면 실행하지 않음
 
@@ -583,6 +602,7 @@ public:
 				checkEngineSound();
 			}
 		}
+
 	}
 
 	void moveCamera(unsigned char key, int x, int y) {
@@ -821,6 +841,7 @@ public:
 		for (const auto& barricate : road1_barricate) { // 실제 모델 draw
 			barricate->draw(shaderProgramID, isKeyPressed_s);
 		}
+
 		if (start_count >= 0 && start_count < 4) {
 			countDown[start_count]->draw(shaderProgramID, isKeyPressed_s);
 		}
@@ -834,9 +855,12 @@ public:
 		draw_ui();
 		draw_dashBoard();
 		draw_speed();
+		if (isGameOver)
+			draw_finish_time();
 		glEnable(GL_DEPTH_TEST);
 
 		glDisable(GL_DEPTH_TEST);
+
 	}
 
 	void draw_bb() override {
