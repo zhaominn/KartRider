@@ -6,7 +6,8 @@ C:\Users\somin\OneDrive\KartRider\KarKartrider\KarKartrider\KeyBoard.h(44,13): w
   (소스 파일 'main.cpp'을(를) 컴파일하는 중)
   
   코드를 생성하고 있습니다.
-  Previous IPDB was built with incompatible compiler, fall back to full compilation.
-  All 2851 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  1 of 2851 functions (<0.1%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    41 functions had inline decision re-evaluated but remain unchanged
   코드를 생성했습니다.
   KarKartrider.vcxproj -> C:\Users\somin\OneDrive\KartRider\KarKartrider\x64\Release\KarKartrider.exe

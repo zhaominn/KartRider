@@ -87,37 +87,37 @@ public:
 	const float MAX_HEAD_TILT = 20.0f; // 부스터 사용 시 최대 X축 회전 각도
 	const float TILT_SPEED = 2.0f;     // 부스터 시 머리의 회전 속도
 
-    Map1_Mode() {
-        Mode::currentInstance = this;  // Map1_Mode 인스턴스를 currentInstance에 할당
-        isCountNSound = true;
-        isCountGoSound = true;
-    }
-    ~Map1_Mode() {
+	Map1_Mode() {
+		Mode::currentInstance = this;  // Map1_Mode 인스턴스를 currentInstance에 할당
+		isCountNSound = true;
+		isCountGoSound = true;
+	}
+	~Map1_Mode() {
 		delete this;
 	}
 
-    void draw_dashBoard() {
-        glUseProgram(shaderProgramID_UI);
+	void draw_dashBoard() {
+		glUseProgram(shaderProgramID_UI);
 
-        // 텍스처 활성화 플래그
-        GLint isTextureLocation = glGetUniformLocation(shaderProgramID_UI, "isTexture");
-        glUniform1i(isTextureLocation, true);
+		// 텍스처 활성화 플래그
+		GLint isTextureLocation = glGetUniformLocation(shaderProgramID_UI, "isTexture");
+		glUniform1i(isTextureLocation, true);
 
-        // 텍스처 모델 렌더링
-        for (const auto& dashBoard : dashBoards) {
-            dashBoard->draw(shaderProgramID_UI, isKeyPressed_s);
-        }
-        glUniform1i(isTextureLocation, false);
+		// 텍스처 모델 렌더링
+		for (const auto& dashBoard : dashBoards) {
+			dashBoard->draw(shaderProgramID_UI, isKeyPressed_s);
+		}
+		glUniform1i(isTextureLocation, false);
 
-        glUseProgram(0); // 원래 셰이더로 복원
-    }
+		glUseProgram(0); // 원래 셰이더로 복원
+	}
 
-    void draw_speed() {
-        glUseProgram(shaderProgramID_UI); // UI 렌더링용 셰이더 활성화
+	void draw_speed() {
+		glUseProgram(shaderProgramID_UI); // UI 렌더링용 셰이더 활성화
 
-        // isUI 플래그 활성화
-        GLint isUILocation = glGetUniformLocation(shaderProgramID_UI, "isTimer");
-        glUniform1i(isUILocation, true); // UI 모드 활성화
+		// isUI 플래그 활성화
+		GLint isUILocation = glGetUniformLocation(shaderProgramID_UI, "isTimer");
+		glUniform1i(isUILocation, true); // UI 모드 활성화
 
 		glPushMatrix();
 		glPixelZoom(5.0f, 5.0f);  // x축, y축 확대 비율 (2배 확대)
@@ -125,63 +125,63 @@ public:
 		// 자동차 속도 문자열 생성
 		std::string speedText = std::to_string(static_cast<int>(kart_speed * 100));
 
-        // 자동차 속도를 화면 우측 상단에 표시
-        glRasterPos2f(0.0f, -0.97f); // 화면 우측 상단
-        for (char c : speedText) {
-            glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
-        }
+		// 자동차 속도를 화면 우측 상단에 표시
+		glRasterPos2f(0.0f, -0.97f); // 화면 우측 상단
+		for (char c : speedText) {
+			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
+		}
 
 		glPixelZoom(1.0f, 1.0f);  // 원래 크기로 복구
 		glPopMatrix();
-        glUniform1i(isUILocation, false); // UI 모드 활성화
+		glUniform1i(isUILocation, false); // UI 모드 활성화
 
-        glUseProgram(0); // 원래 셰이더로 복원
-    }
+		glUseProgram(0); // 원래 셰이더로 복원
+	}
 
-    void draw_ui() {
-        glUseProgram(shaderProgramID_UI);
+	void draw_ui() {
+		glUseProgram(shaderProgramID_UI);
 
-        // 활성화 플래그
-        GLint isUILocation = glGetUniformLocation(shaderProgramID_UI, "isTimer");
-        glUniform1i(isUILocation, true);
+		// 활성화 플래그
+		GLint isUILocation = glGetUniformLocation(shaderProgramID_UI, "isTimer");
+		glUniform1i(isUILocation, true);
 
-        std::string uiText = "map : village road";
-        glRasterPos2f(-0.95f, 0.85f); // 좌상단 위치
-        for (char c : uiText) {
-            glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
-        }
-        glUniform1i(isUILocation, false);
+		std::string uiText = "map : village road";
+		glRasterPos2f(-0.95f, 0.85f); // 좌상단 위치
+		for (char c : uiText) {
+			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
+		}
+		glUniform1i(isUILocation, false);
 
-        // 텍스처 활성화 플래그
-        GLint isTextureLocation = glGetUniformLocation(shaderProgramID_UI, "isTexture");
-        glUniform1i(isTextureLocation, true);
+		// 텍스처 활성화 플래그
+		GLint isTextureLocation = glGetUniformLocation(shaderProgramID_UI, "isTexture");
+		glUniform1i(isTextureLocation, true);
 
-        // 텍스처 모델 렌더링
-        for (const auto& booster_ui : booster_uis) {
-            booster_ui->draw(shaderProgramID_UI, isKeyPressed_s);
-        }
-        glUniform1i(isTextureLocation, false);
+		// 텍스처 모델 렌더링
+		for (const auto& booster_ui : booster_uis) {
+			booster_ui->draw(shaderProgramID_UI, isKeyPressed_s);
+		}
+		glUniform1i(isTextureLocation, false);
 
-        glUseProgram(0); // 원래 셰이더로 복원
-    }
+		glUseProgram(0); // 원래 셰이더로 복원
+	}
 
-    void draw_timer() {
-        glUseProgram(shaderProgramID_UI);
+	void draw_timer() {
+		glUseProgram(shaderProgramID_UI);
 
-        // 활성화 플래그
-        GLint isTimerLocation = glGetUniformLocation(shaderProgramID_UI, "isTimer");
-        glUniform1i(isTimerLocation, true);
+		// 활성화 플래그
+		GLint isTimerLocation = glGetUniformLocation(shaderProgramID_UI, "isTimer");
+		glUniform1i(isTimerLocation, true);
 
-        // 타이머 텍스트
-        std::string timerText = "Time: " + std::to_string(game_timer);
-        glRasterPos2f(-0.95f, 0.9f); // 좌상단 위치
-        for (char c : timerText) {
-            glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
-        }
-        glUniform1i(isTimerLocation, false);
+		// 타이머 텍스트
+		std::string timerText = "Time: " + std::to_string(game_timer);
+		glRasterPos2f(-0.95f, 0.9f); // 좌상단 위치
+		for (char c : timerText) {
+			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
+		}
+		glUniform1i(isTimerLocation, false);
 
-        glUseProgram(0); // 원래 셰이더로 복원
-    }
+		glUseProgram(0); // 원래 셰이더로 복원
+	}
 
 	void init() override {
 
@@ -310,9 +310,9 @@ public:
 			isWinSound = false; // 사운드 재생 완료 후 플래그 해제
 			});
 
-        winSoundThread.detach();
+		winSoundThread.detach();
 
-    }
+	}
 
 	void lose_game() {
 		if (isGameOver) return; // 이미 종료 상태라면 실행하지 않음
@@ -659,33 +659,13 @@ public:
 		moveCamera(key, x, y);
 		if (key == 27) { //esc
 			if (Pause) {
-				//glutTimerFunc(16, timerHelper, 0); // 타이머 호출
+				//isMotorSound = true;
 			}
 			else {
-				glm::vec3 zAxis = glm::normalize(cameraPos - glm::vec3(karts[0]->translateMatrix[3]));
-
-				// 오른쪽 벡터 (X축) 계산
-				glm::vec3 xAxis = glm::normalize(glm::cross(cameraUp, zAxis));
-
-				// 상단 벡터 (Y축) 계산
-				glm::vec3 yAxis = glm::cross(zAxis, xAxis);
-
-				// 3x3 회전 행렬 생성
-				glm::mat3 rotationMatrix = glm::mat3(
-					xAxis, // X축
-					yAxis, // Y축
-					zAxis  // Z축
-				);
-
-				// 4x4 행렬로 확장
-				glm::mat4 modelMatrix = glm::mat4(1.0f); // 단위 행렬로 초기화
-				modelMatrix[0] = glm::vec4(rotationMatrix[0], 0.0f); // X축
-				modelMatrix[1] = glm::vec4(rotationMatrix[1], 0.0f); // Y축
-				modelMatrix[2] = glm::vec4(rotationMatrix[2], 0.0f); // Z축
-				modelMatrix[3] = glm::vec4(cameraPos, 1.0f);          // 위치 추가
-
-				//pause[0]->translateMatrix = modelMatrix;
-				//pause[0]->translateMatrix = glm::translate(pause[0]->translateMatrix, glm::vec3(0.0, 0.0, -2.0));
+				isMotorSound = false;
+				if (motorSoundThread.joinable()) {
+					motorSoundThread.detach(); // 스레드 종료 (필요한 경우 detach)
+				}
 			}
 			Pause = !Pause;
 		}
@@ -848,13 +828,13 @@ public:
 		//if (Pause)
 		//	pause[0]->draw(shaderProgramID, isKeyPressed_s);
 
-        // Draw Timer
-        glDisable(GL_DEPTH_TEST);
-        draw_timer();
-        draw_ui();
+		// Draw Timer
+		glDisable(GL_DEPTH_TEST);
+		draw_timer();
+		draw_ui();
 		draw_dashBoard();
-        draw_speed();
-        glEnable(GL_DEPTH_TEST);
+		draw_speed();
+		glEnable(GL_DEPTH_TEST);
 
 		glDisable(GL_DEPTH_TEST);
 	}
@@ -869,9 +849,9 @@ public:
 		}
 	}
 
-    void finish() override {
-        
-    }
+	void finish() override {
+
+	}
 private:
 
 	void updatePhysics(float deltaTime) {
