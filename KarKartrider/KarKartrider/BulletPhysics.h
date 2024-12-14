@@ -194,10 +194,10 @@ void UpdateRigidBodyTransforms(std::vector<Model*>models) {
         transform.setFromOpenGLMatrix(glm::value_ptr(modelMatrix));
 
         // µð¹ö±ë ·Î±×
-        std::cout << "Updating RigidBody for Model: " << model->name
+        /*std::cout << "Updating RigidBody for Model: " << model->name
             << " | OpenGL Position: (" << modelMatrix[3][0] << ", "
             << modelMatrix[3][1] << ", " << modelMatrix[3][2] << ")"
-            << std::endl;
+            << std::endl;*/
 
         model->rigidBody->setWorldTransform(transform);
     }
