@@ -746,13 +746,14 @@ private:
 
     static void timerHelper(int value) {
         if (Map1_Mode* instance = dynamic_cast<Map1_Mode*>(Mode::currentInstance)) {
-            if (!instance->isGameOver) {
-                // 물리 엔진 및 게임 로직 업데이트 (프레임 단위로 실행)
-                const float deltaTime = 1.0f / 60.0f; // 60FPS 기준, 한 프레임의 시간
-                instance->updatePhysics(deltaTime); // 물리 엔진 업데이트
-                instance->timer(); // 렌더링 및 게임 로직 업데이트
+            const float deltaTime = 1.0f / 60.0f; // 60FPS 기준, 한 프레임의 시간
 
-                // 게임 타이머 갱신 (1초 단위로 계산)
+            // 물리 엔진 및 게임 로직 업데이트 (게임 종료 상태에서도 계속 실행)
+            instance->updatePhysics(deltaTime); // 물리 엔진 업데이트
+            instance->timer(); // 렌더링 및 게임 로직 업데이트
+
+            // 게임 타이머 갱신 (게임 종료 상태에서는 타이머를 감소시키지 않음)
+            if (!instance->isGameOver) {
                 static float elapsedTime = 0.0f;
                 elapsedTime += deltaTime;
                 if (elapsedTime >= 1.0f) { // 1초가 지났다면
@@ -770,6 +771,7 @@ private:
         glutPostRedisplay();
         glutTimerFunc(16, timerHelper, value); // 16ms 간격으로 호출 (약 60FPS)
     }
+
 
 
     // bgm 실행 함수
