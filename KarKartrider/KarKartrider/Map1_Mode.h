@@ -1,6 +1,5 @@
 #pragma once
 #include <iostream>
-#include "Mode.h"
 #include "RoadModel.h"
 #include "KartModel.h"
 #include "shaderMaker.h"
@@ -89,7 +88,11 @@ public:
         isCountNSound = true;
         isCountGoSound = true;
     }
-    ~Map1_Mode() {}
+
+    ~Map1_Mode() {
+		cout << "소멸" << endl;
+	}
+
     void draw_speed() {
         glUseProgram(shaderProgramID_UI); // UI 렌더링용 셰이더 활성화
 
@@ -583,8 +586,9 @@ public:
 	void mouseClick(int button, int state, int x, int y) override {
 		if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
 			if (x <= 470 && x >= 400 && y <= 410 && y >= 360) { //다시시도
-				//Map1_Mode* map1Mode = new Map1_Mode();
-				//MM.SetMode(map1Mode);
+				
+				Map1_Mode* map1Mode = new Map1_Mode();
+				MM.SetMode(map1Mode);
 			}
 			else if (x <= 580 && x >= 510 && y <= 410 && y >= 360) { //메뉴
 				//SelectMapMode* selectMapMode = new SelectMapMode();
