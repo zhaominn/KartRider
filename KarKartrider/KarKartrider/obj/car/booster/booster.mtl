@@ -1,5 +1,5 @@
 # 3ds Max Wavefront OBJ Exporter v0.99 - (c)2007 guruware
-# File Created: 14.12.2024 16:22:13
+# File Created: 14.12.2024 17:21:00
 
 newmtl wire_255255255
 	Ns 32
@@ -10,4 +10,4 @@ newmtl wire_255255255
 	Ka 1.0000 1.0000 1.0000
 	Kd 1.0000 1.0000 1.0000
 	Ks 0.3500 0.3500 0.3500
-map_Kd booster.png
+map_Kd booster2.png
