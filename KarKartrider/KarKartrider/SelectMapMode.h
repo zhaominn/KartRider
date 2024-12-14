@@ -32,10 +32,8 @@ void SelectMap_timer(int value) {
 	glutTimerFunc(16, SelectMap_timer, 0);    // 약 60FPS로 타이머 반복 호출
 }
 
-
 class SelectMapMode : public Mode {
 public:
-
 
 	int map_num = 1;
 
@@ -54,8 +52,11 @@ public:
 	bool isclickRunning;
 
 	SelectMapMode() :isSoundRunning(true), isclickRunning(true) {}
-	~SelectMapMode(){
-		delete this;
+	~SelectMapMode(){}
+
+	void goSelectMode() {
+		SelectMapMode* selectMode = new SelectMapMode();
+		MM.SetMode(selectMode);
 	}
 
 	void init() override {
@@ -74,7 +75,7 @@ public:
 	}
 
 	void mouseClick(int button, int state, int x, int y) override {}
-
+	 
 	void keyboard(unsigned char key, int x, int y) override {
 		std::thread clickSoundThread(&SelectMapMode::clickSound, this);
 		switch (key) {
@@ -87,10 +88,12 @@ public:
 			*/
 			if (map_num == 1) {
 				Map1_Mode* map1Mode = new Map1_Mode();
+				map1Mode->goSelectMode = [this]() { goSelectMode(); }; // 람다로 전달
 				MM.SetMode(map1Mode);
 			}
 			else if (map_num == 2) {
 				Map2_Mode* map2Mode = new Map2_Mode();
+				map2Mode->goSelectMode = [this]() { goSelectMode(); }; // 람다로 전달
 				MM.SetMode(map2Mode);
 			}
 			break;

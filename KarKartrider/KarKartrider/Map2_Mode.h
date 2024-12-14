@@ -10,9 +10,13 @@
 
 #include <gl/glm/glm/gtc/quaternion.hpp> // 쿼터니언 관련
 #include <gl/glm/glm/gtx/quaternion.hpp> // SLERP(Spherical Linear Interpolation)
+#include <functional>  // std::function을 사용하기 위해 필요
 
 class Map2_Mode : public Mode {
 public:
+
+	std::function<void()> goSelectMode; // 셀렉트 모드로 돌아가는 함수
+
 	glm::quat cameraRotationQuat = glm::quat(glm::vec3(0.0f, 0.0f, 0.0f)); // 현재 카메라 행렬을 쿼터니언으로 저장
 	float reducedRotationInfluence = 0.0f; // 보간할 퍼센트
 
@@ -68,7 +72,10 @@ public:
 	std::thread loseSoundThread;
 
 	// ----- game ------
-	int booster_cnt = 10;
+	int booster_cnt = 2;
+	const int MAX_BOOSTER_CNT = 2;        // 최대 부스터 개수
+	bool isBoosterRegenActive = true;     // 부스터 재생성 활성화 여부
+	std::thread boosterRegenThread;       // 부스터 재생성 스레드
 	bool isBoosterActive = false; // 부스트 활성화 상태
 	bool isGameOver = false; // 게임 종료 상태 플래그
 	int game_timer = 30;
@@ -87,8 +94,31 @@ public:
 		Mode::currentInstance = this;  // Map1_Mode 인스턴스를 currentInstance에 할당
 		isCountNSound = true;
 		isCountGoSound = true;
+		// 부스터 재생성 스레드 시작
+		boosterRegenThread = std::thread(&Map2_Mode::startBoosterRegen, this);
 	}
 	~Map2_Mode(){}
+
+	// 부스터 재생성 로직
+	void startBoosterRegen() {
+		while (isBoosterRegenActive) {
+			// 부스터가 최대 개수에 도달하지 않았을 때만 대기 후 증가
+			if (booster_cnt < MAX_BOOSTER_CNT) {
+				std::this_thread::sleep_for(std::chrono::seconds(6)); // 3초 대기
+
+				// 부스터 증가 (다시 확인해 조건 충족 시 증가)
+				if (booster_cnt < MAX_BOOSTER_CNT) {
+					++booster_cnt; // 부스터 개수 증가
+					std::cout << "Booster regenerated! Current boosters: " << booster_cnt << std::endl;
+				}
+			}
+			else {
+				// 만약 부스터가 이미 최대치라면 일정 시간 대기 후 다시 확인
+				std::this_thread::sleep_for(std::chrono::milliseconds(100)); // 0.1초 대기
+			}
+		}
+	}
+
 	void draw_dashBoard() {
 		glUseProgram(shaderProgramID_UI);
 
@@ -150,8 +180,8 @@ public:
 		glUniform1i(isTextureLocation, true);
 
 		// 텍스처 모델 렌더링
-		for (const auto& booster_ui : booster_uis) {
-			booster_ui->draw(shaderProgramID_UI, isKeyPressed_s);
+		for (int i = 0; i < booster_cnt; ++i) {
+			booster_uis[i]->draw(shaderProgramID_UI, isKeyPressed_s);
 		}
 		glUniform1i(isTextureLocation, false);
 
@@ -204,10 +234,16 @@ public:
 		isBackgroundSound = true;
 		backgroundSoundThread = std::thread(&Map2_Mode::backgroundSound, this);
 
+		
+
 		kart_speed = 0.0f;
 		draw_model();
-		glutTimerFunc(0, Map2_Mode::timerHelper, 0);
 
+		if (!isGameRunning2)
+		{
+			isGameRunning2 = true;
+			glutTimerFunc(0, Map2_Mode::timerHelper, 0);
+		}
 		cameraPos = glm::vec3(165.0, 4.4, 45.0);
 		updateCameraDirection();
 	}
@@ -289,6 +325,22 @@ public:
 		cameraDirection = carPosition; // 카메라가 항상 자동차를 바라봄
 	}
 
+	void goSelectMode_() {
+		Pause = true;
+		if (goSelectMode) { // goSelectMode가 설정되어 있다면 실행
+			isBackgroundSound = false;
+			isMotorSound = false;
+			if (motorSoundThread.joinable()) {
+				motorSoundThread.join();
+			}
+			goSelectMode();
+		}
+		isBoosterRegenActive = false; // 부스터 재생성 종료
+		if (boosterRegenThread.joinable()) {
+			boosterRegenThread.join(); // 스레드 종료
+		}
+	}
+
 	void finish_game() {
 		isBackgroundSound = false;
 		if (isWinSound) return; // 이미 실행 중이면 종료
@@ -303,6 +355,30 @@ public:
 
 		winSoundThread.detach();
 
+		// 5초 후 goSelectMode_() 실행을 위한 스레드 생성
+		std::thread([this]() {
+			std::this_thread::sleep_for(std::chrono::seconds(9)); // 5초 대기
+			goSelectMode_(); // 5초 후 실행
+			}).detach();
+	}
+
+	void draw_finish_time() {
+		glUseProgram(shaderProgramID_UI);
+
+		// 활성화 플래그
+		GLint isTimerLocation = glGetUniformLocation(shaderProgramID_UI, "isRed");
+		glUniform1i(isTimerLocation, true);
+
+		// 타이머 텍스트
+		std::string Text = "Time: " + std::to_string(30 - game_timer);
+
+		glRasterPos2f(0.0f, 0.0f);
+		for (char c : Text) {
+			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
+		}
+		glUniform1i(isTimerLocation, false);
+
+		glUseProgram(0); // 원래 셰이더로 복원
 	}
 
 	void lose_game() {
@@ -321,6 +397,12 @@ public:
 				isLoseSound = false; // 사운드 재생 완료 후 플래그 해제
 				});
 			loseSoundThread.detach();
+
+			// 5초 후 goSelectMode_() 실행을 위한 스레드 생성
+			std::thread([this]() {
+				std::this_thread::sleep_for(std::chrono::seconds(9)); // 5초 대기
+				goSelectMode_(); // 5초 후 실행
+				}).detach();
 		}
 	}
 
@@ -576,78 +658,26 @@ public:
 		}
 	}
 
-	void moveCamera(unsigned char key, int x, int y) {
-		const float cameraSpeed = 0.1f; // 카메라 이동 속도
-		float angleInRadians = glm::radians(5.0f); // 5도 회전
-
-		// 카메라 전방 벡터
-		glm::vec3 forward = glm::normalize(cameraDirection - cameraPos);
-		// 카메라 오른쪽 벡터
-		glm::vec3 right = glm::normalize(glm::cross(forward, cameraUp));
-
-		switch (key) {
-		case 'w': // 전진
-			cameraPos += cameraSpeed * forward;
-			cameraDirection += cameraSpeed * forward;
-			break;
-		case 's': // 후진
-			cameraPos -= cameraSpeed * forward;
-			cameraDirection -= cameraSpeed * forward;
-			break;
-		case 'a': // 왼쪽 이동
-			cameraPos -= cameraSpeed * right;
-			cameraDirection -= cameraSpeed * right;
-			break;
-		case 'd': // 오른쪽 이동
-			cameraPos += cameraSpeed * right;
-			cameraDirection += cameraSpeed * right;
-			break;
-		case 'i': // 위로 회전 (X축 회전)
-		{
-			pitch += glm::degrees(angleInRadians);
-			if (pitch > 89.0f) pitch = 89.0f; // 상단 제한
-			updateCameraDirection();
-			break;
-		}
-		case 'k': // 아래로 회전 (X축 반대 방향)
-		{
-			pitch -= glm::degrees(angleInRadians);
-			if (pitch < -89.0f) pitch = -89.0f; // 하단 제한
-			updateCameraDirection();
-			break;
-		}
-		case 'j': // 왼쪽 회전 (Y축 회전)
-		{
-			yaw -= glm::degrees(angleInRadians);
-			updateCameraDirection();
-			break;
-		}
-		case 'l': // 오른쪽 회전 (Y축 반대 방향)
-		{
-			yaw += glm::degrees(angleInRadians);
-			updateCameraDirection();
-			break;
-		}
-		default:
-			break;
-		}
-	}
-
 	void mouseClick(int button, int state, int x, int y) override {
 		if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
 			if (x <= 470 && x >= 400 && y <= 410 && y >= 360) { //다시시도
-				/*Map1_Mode* map1Mode = new Map1_Mode();
-				MM.SetMode(map1Mode);*/
+				Pause = true;
+				isBackgroundSound = false;
+				isMotorSound = false;
+				if (motorSoundThread.joinable()) {
+					motorSoundThread.join();
+				}
+				Map2_Mode* map2Mode = new Map2_Mode();
+				map2Mode->goSelectMode = [this]() { goSelectMode(); }; // 람다로 전달
+				MM.SetMode(map2Mode);
 			}
 			else if (x <= 580 && x >= 510 && y <= 410 && y >= 360) { //메뉴
-				/*SelectMapMode* selectMapMode = new SelectMapMode();
-				MM.SetMode(selectMapMode);*/
+				goSelectMode_();
 			}
 		}
 	}
 
 	void keyboard(unsigned char key, int x, int y) override {
-		moveCamera(key, x, y);
 		if (key == 27) { //esc
 			if (Pause) {
 				//glutTimerFunc(16, timerHelper, 0); // 타이머 호출
@@ -681,6 +711,9 @@ public:
 				}
 			}
 			Pause = !Pause;
+		}
+		if (key == 'p') {
+			goSelectMode_();
 		}
 	}
 
@@ -847,13 +880,16 @@ public:
 		draw_ui();
 		draw_dashBoard();
 		draw_speed();
+		if (isGameOver)
+			draw_finish_time();
 		glEnable(GL_DEPTH_TEST);
 
 		glDisable(GL_DEPTH_TEST);
 	}
 
 	void draw_bb() override {
-
+		if (!bb_status)
+			return;
 		for (const auto& model : karts) { // 모델 bb draw
 			model->draw_rigidBody(shaderProgramID);
 		}
