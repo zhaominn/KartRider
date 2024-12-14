@@ -89,6 +89,23 @@ public:
         isCountGoSound = true;
     }
     ~Map1_Mode() {}
+
+    void draw_dashBoard() {
+        glUseProgram(shaderProgramID_UI);
+
+        // 텍스처 활성화 플래그
+        GLint isTextureLocation = glGetUniformLocation(shaderProgramID_UI, "isTexture");
+        glUniform1i(isTextureLocation, true);
+
+        // 텍스처 모델 렌더링
+        for (const auto& dashBoard : dashBoards) {
+            dashBoard->draw(shaderProgramID_UI, isKeyPressed_s);
+        }
+        glUniform1i(isTextureLocation, false);
+
+        glUseProgram(0); // 원래 셰이더로 복원
+    }
+
     void draw_speed() {
         glUseProgram(shaderProgramID_UI); // UI 렌더링용 셰이더 활성화
 
@@ -104,8 +121,9 @@ public:
         for (char c : speedText) {
             glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
         }
+        glUniform1i(isUILocation, false); // UI 모드 활성화
 
-        glUseProgram(shaderProgramID); // 원래 셰이더로 복원
+        glUseProgram(0); // 원래 셰이더로 복원
     }
 
     void draw_ui() {
@@ -130,6 +148,7 @@ public:
         for (const auto& booster_ui : booster_uis) {
             booster_ui->draw(shaderProgramID_UI, isKeyPressed_s);
         }
+        glUniform1i(isTextureLocation, false);
 
         glUseProgram(0); // 원래 셰이더로 복원
     }
@@ -147,6 +166,7 @@ public:
         for (char c : timerText) {
             glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
         }
+        glUniform1i(isTimerLocation, false);
 
         glUseProgram(0); // 원래 셰이더로 복원
     }
@@ -783,6 +803,7 @@ public:
         draw_timer();
         draw_ui();
         draw_speed();
+        draw_dashBoard();
         glEnable(GL_DEPTH_TEST);
 
         glDisable(GL_DEPTH_TEST);
