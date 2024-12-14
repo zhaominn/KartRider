@@ -38,6 +38,7 @@ int main(int argc, char** argv) {
 		cout << "GLEW Initialized\n";
 
 	make_shaderProgram();
+	make_shaderProgram_ui();
 
 	initPhysics(); // Bullet 초기화 함수 호출
 

@@ -138,6 +138,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="fragment.glsl" />
+    <None Include="fragment_ui.glsl" />
+    <None Include="vertex_ui.glsl" />
     <None Include="vertex.glsl" />
   </ItemGroup>
   <ItemGroup>

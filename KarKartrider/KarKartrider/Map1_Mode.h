@@ -89,6 +89,20 @@ public:
         isCountGoSound = true;
     }
 
+    void draw_timer() {
+        glUseProgram(shaderProgramID_UI); // UI 렌더링 전용 셰이더 활성화
+
+        // 텍스트 또는 UI Quad 그리기
+        std::string timerText = "Time: " + std::to_string(game_timer);
+
+        glColor3f(1.0, 0.0, 0.0); // 빨간색 텍스트
+        glRasterPos2f(-0.95f, 0.9f); // 화면 좌측 상단에 표시
+        for (char c : timerText) {
+            glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
+        }
+        glUseProgram(shaderProgramID); // 원래 셰이더로 복원
+    }
+
     void init() override {
 
         UpdateRigidBodyTransforms(road1_barricate);
@@ -666,7 +680,6 @@ public:
 
         glUseProgram(shaderProgramID);
 
-
         GLenum error = glGetError();
         if (error != GL_NO_ERROR) {
             std::cout << "Error in glUseProgram: " << error << std::endl;
@@ -713,6 +726,11 @@ public:
 
         if (Pause)
             pause[0]->draw(shaderProgramID, isKeyPressed_s);
+
+        // Draw Timer
+        glDisable(GL_DEPTH_TEST);
+        draw_timer();
+        glEnable(GL_DEPTH_TEST);
 
         glDisable(GL_DEPTH_TEST);
     }
@@ -771,7 +789,6 @@ private:
         glutPostRedisplay();
         glutTimerFunc(16, timerHelper, value); // 16ms 간격으로 호출 (약 60FPS)
     }
-
 
 
     // bgm 실행 함수
