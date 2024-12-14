@@ -95,9 +95,6 @@ public:
         // isUI 플래그 활성화
         GLint isUILocation = glGetUniformLocation(shaderProgramID_UI, "isTimer");
         glUniform1i(isUILocation, true); // UI 모드 활성화
-        // isUI 플래그 활성화
-        GLint isUILocation2 = glGetUniformLocation(shaderProgramID_UI, "isUI");
-        glUniform1i(isUILocation2, true); // UI 모드 활성화
 
         // 자동차 속도 문자열 생성
         std::string speedText = "Speed: " + std::to_string(static_cast<int>(kart_speed * 100)) + " km/h";
@@ -117,8 +114,6 @@ public:
         // isUI 플래그 활성화
         GLint isUILocation = glGetUniformLocation(shaderProgramID_UI, "isTimer");
         glUniform1i(isUILocation, true); // UI 모드 활성화
-        GLint isUILocation2 = glGetUniformLocation(shaderProgramID_UI, "isUI");
-        glUniform1i(isUILocation2, true); // UI 모드 활성화
 
         // 텍스트 렌더링 또는 UI Quad 그리기
         std::string timerText = "map : village road";
@@ -127,6 +122,9 @@ public:
         for (char c : timerText) {
             glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
         }
+
+        GLint isUILocation2 = glGetUniformLocation(shaderProgramID_UI, "isTextrue");
+        glUniform1i(isUILocation2, true);
 
         for (const auto& booster_ui : booster_uis) { // 실제 모델 draw
             booster_ui->draw(shaderProgramID, isKeyPressed_s);
@@ -142,8 +140,6 @@ public:
         // isUI 플래그 활성화
         GLint isUILocation = glGetUniformLocation(shaderProgramID_UI, "isTimer");
         glUniform1i(isUILocation, true); // UI 모드 활성화
-        GLint isUILocation2 = glGetUniformLocation(shaderProgramID_UI, "isUI");
-        glUniform1i(isUILocation2, true); // UI 모드 활성화
 
         // 텍스트 렌더링 또는 UI Quad 그리기
         std::string timerText = "Time: " + std::to_string(game_timer);

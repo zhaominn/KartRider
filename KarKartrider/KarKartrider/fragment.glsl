@@ -27,7 +27,6 @@ uniform vec3 Kd;           // 기본 난반사광 계수
 uniform vec3 Ks;           // 기본 반사광 계수
 uniform float Ns;          // 반짝임 강도 (Shininess)
 
-
 uniform bool isUI;          // UI 모드 플래그
 
 void main() {
