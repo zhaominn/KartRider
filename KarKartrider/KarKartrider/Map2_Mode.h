@@ -675,8 +675,8 @@ public:
 				modelMatrix[2] = glm::vec4(rotationMatrix[2], 0.0f); // Z축
 				modelMatrix[3] = glm::vec4(cameraPos, 1.0f);          // 위치 추가
 
-				pause[0]->translateMatrix = modelMatrix;
-				pause[0]->translateMatrix = glm::translate(pause[0]->translateMatrix, glm::vec3(0.0, 0.0, -2.0));
+				//pause[0]->translateMatrix = modelMatrix;
+				//pause[0]->translateMatrix = glm::translate(pause[0]->translateMatrix, glm::vec3(0.0, 0.0, -2.0));
 			}
 			Pause = !Pause;
 		}
@@ -836,8 +836,8 @@ public:
 			countDown[start_count]->draw(shaderProgramID, isKeyPressed_s);
 		}
 
-		if (Pause)
-			pause[0]->draw(shaderProgramID, isKeyPressed_s);
+		//if (Pause)
+		//	pause[0]->draw(shaderProgramID, isKeyPressed_s);
 
 		// Draw Timer
 		glDisable(GL_DEPTH_TEST);
