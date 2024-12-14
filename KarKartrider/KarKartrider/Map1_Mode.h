@@ -128,11 +128,6 @@ public:
 
         // 텍스처 모델 렌더링
         for (const auto& booster_ui : booster_uis) {
-            glActiveTexture(GL_TEXTURE0); // 텍스처 유닛 0 활성화
-            glBindTexture(GL_TEXTURE_2D, booster_ui->textureID); // 텍스처 바인딩
-            glUniform1i(glGetUniformLocation(shaderProgramID_UI, "texture1"), 0); // texture1 유니폼에 텍스처 연결
-
-            // 실제 UI 모델 그리기
             booster_ui->draw(shaderProgramID_UI, isKeyPressed_s);
         }
 
