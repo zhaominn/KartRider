@@ -42,3 +42,4 @@ GLvoid Reshape(int w, int h) {
 }
 
 bool isGameRunning = false;
+bool isGameRunning2 = false;

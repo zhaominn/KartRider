@@ -93,6 +93,7 @@ public:
 			}
 			else if (map_num == 2) {
 				Map2_Mode* map2Mode = new Map2_Mode();
+				map2Mode->goSelectMode = [this]() { goSelectMode(); }; // 람다로 전달
 				MM.SetMode(map2Mode);
 			}
 			break;

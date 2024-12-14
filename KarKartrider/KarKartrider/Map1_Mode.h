@@ -668,7 +668,6 @@ public:
 	}
 
 	void mouseClick(int button, int state, int x, int y) override {
-		cout << 1 << endl;
 		if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
 			if (x <= 470 && x >= 400 && y <= 410 && y >= 360) { //다시시도
 				Pause = true;
