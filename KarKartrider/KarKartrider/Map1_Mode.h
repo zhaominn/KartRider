@@ -89,6 +89,25 @@ public:
         isCountGoSound = true;
     }
 
+    void draw_speed() {
+        glUseProgram(shaderProgramID_UI); // UI 렌더링용 셰이더 활성화
+
+        // isUI 플래그 활성화
+        GLint isUILocation = glGetUniformLocation(shaderProgramID_UI, "isTimer");
+        glUniform1i(isUILocation, true); // UI 모드 활성화
+
+        // 자동차 속도 문자열 생성
+        std::string speedText = "Speed: " + std::to_string(static_cast<int>(kart_speed * 100)) + " km/h";
+
+        // 자동차 속도를 화면 우측 상단에 표시
+        glRasterPos2f(0.7f, 0.9f); // 화면 우측 상단
+        for (char c : speedText) {
+            glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
+        }
+
+        glUseProgram(shaderProgramID); // 원래 셰이더로 복원
+    }
+
     void draw_ui() {
         glUseProgram(shaderProgramID_UI); // UI 렌더링용 셰이더 활성화
 
@@ -754,6 +773,7 @@ public:
         glDisable(GL_DEPTH_TEST);
         draw_timer();
         draw_ui();
+        draw_speed();
         glEnable(GL_DEPTH_TEST);
 
         glDisable(GL_DEPTH_TEST);
