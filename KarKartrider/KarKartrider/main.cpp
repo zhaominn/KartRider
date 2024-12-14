@@ -104,7 +104,7 @@ void InitBuffer() {
 		model->initBuffer();
 	}
 
-	for (const auto& model : booster_ui) {
+	for (const auto& model : booster_uis) {
 		model->initBuffer();
 	}
 }
