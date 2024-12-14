@@ -19,7 +19,7 @@ public:
 
     Ui_v2(string name, string path, string obj_name, string obj_type, bool rigid_status, glm::mat4 start_matrix = glm::mat4(1.0f)) {
         read_obj_file(name, path, this, obj_name, obj_type);
-        this->matrix = start_matrix * this->matrix;
+        this->translateMatrix = start_matrix * this->translateMatrix;
         this->rigid_status = rigid_status;
     }
 
@@ -27,7 +27,7 @@ public:
 
     void load_obj(string name, string path, string obj_name, string obj_type, glm::mat4 start_matrix = glm::mat4(1.0f)) override {
         read_obj_file(name, path, this, obj_name, obj_type);
-        this->matrix = start_matrix * this->matrix;
+        this->translateMatrix = start_matrix * this->translateMatrix;
     }
 
     const void draw(GLint shaderProgramID, bool (*isKeyPressed_s)(const char&)) override {
@@ -46,7 +46,7 @@ public:
             glUniformMatrix3fv(normalLoc, 1, GL_FALSE, glm::value_ptr(normalMatrix));
 
             // Set the model matrix
-            glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(this->matrix));
+            glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(this->translateMatrix));
 
             // Texture and rendering logic
             GLuint lastBoundTextureID = 0; // Track the last bound texture
