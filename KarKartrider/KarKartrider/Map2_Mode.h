@@ -29,6 +29,8 @@ public:
 	float BOOSTER_SPEED = 2.0;
 	float MAX_SPEED = 1.0;
 
+	int finish_cnt = 0;
+
 	int start_count;
 
 	bool Pause;
@@ -342,24 +344,29 @@ public:
 	}
 
 	void finish_game() {
-		isBackgroundSound = false;
-		if (isWinSound) return; // 이미 실행 중이면 종료
-		isWinSound = true;
-		isGameOver = true; // 게임 종료 상태 설정
+		if (finish_cnt != 0) {
+			isBackgroundSound = false;
+			if (isWinSound) return; // 이미 실행 중이면 종료
+			isWinSound = true;
+			isGameOver = true; // 게임 종료 상태 설정
 
-		// 새로운 스레드 생성 및 분리
-		winSoundThread = std::thread([this]() {
-			win_sound();  // 사운드 재생
-			isWinSound = false; // 사운드 재생 완료 후 플래그 해제
-			});
+			// 새로운 스레드 생성 및 분리
+			winSoundThread = std::thread([this]() {
+				win_sound();  // 사운드 재생
+				isWinSound = false; // 사운드 재생 완료 후 플래그 해제
+				});
 
-		winSoundThread.detach();
+			winSoundThread.detach();
 
-		// 5초 후 goSelectMode_() 실행을 위한 스레드 생성
-		std::thread([this]() {
-			std::this_thread::sleep_for(std::chrono::seconds(9)); // 5초 대기
-			goSelectMode_(); // 5초 후 실행
-			}).detach();
+			// 5초 후 goSelectMode_() 실행을 위한 스레드 생성
+			std::thread([this]() {
+				std::this_thread::sleep_for(std::chrono::seconds(9)); // 5초 대기
+				goSelectMode_(); // 5초 후 실행
+				}).detach();
+		}
+		else {
+			return;
+		}
 	}
 
 	void draw_finish_time() {
@@ -422,8 +429,12 @@ public:
 
 				if (resultCallback.hitDetected) { // 충돌이 감지되었을 때
 
+					if (barri->name == "finish_ch") {
+						finish_cnt++;
+						continue;
+					}
+
 					if (barri->name == "finish") { //종료~~~~
-						cout << "끝!!!" << endl;
 						finish_game();
 						continue;
 					}
