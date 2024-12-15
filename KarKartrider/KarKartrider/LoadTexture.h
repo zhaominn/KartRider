@@ -6,8 +6,8 @@
 #include <string>
 #include <gl/glm/glm/glm.hpp>
 #include <gl/glew.h>
-#include <gl/stb_image.h>
 
+#include "include/stb_image.h"
 
 /// 텍스처 로드 함수: OpenGL 텍스처를 생성하고 파일에서 데이터를 로드
 /// @param path 텍스처 파일 경로
