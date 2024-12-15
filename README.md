@@ -11,7 +11,7 @@ KartRider 모작, 컴퓨터 그래픽스 프로젝트
 
 플랫폼: pc.
 
-## 프로젝트 세팅 방법
+## 프로젝트 세팅 방법 (릴리스 모드)
 ![img.png](asset/img.png)
 1. 알집을 사용해서 vol1 번 파일을 풀어준다.
 ![img.png](asset/img2.png)
